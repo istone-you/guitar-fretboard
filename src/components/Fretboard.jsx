@@ -85,40 +85,42 @@ export default function Fretboard({
 
   return (
     <div className="overflow-x-auto">
-      <div className="min-w-max">
-        {/* フレット番号ヘッダー */}
-        <div className="flex mb-1">
-          <div className="w-8 shrink-0" />
-          {Array.from({ length: FRET_COUNT }, (_, fret) => (
-            <FretHeader key={fret} fret={fret} capo={capo} theme={theme} />
+      <div className="flex justify-center">
+        <div className="min-w-max">
+          {/* フレット番号ヘッダー */}
+          <div className="flex mb-1">
+            <div className="w-8 shrink-0" />
+            {Array.from({ length: FRET_COUNT }, (_, fret) => (
+              <FretHeader key={fret} fret={fret} capo={capo} theme={theme} />
+            ))}
+          </div>
+
+          {/* ポジションマーク行 */}
+          <div className="flex mb-2">
+            <div className="w-8 shrink-0" />
+            {Array.from({ length: FRET_COUNT }, (_, fret) => (
+              <PositionMark key={fret} fret={fret} theme={theme} />
+            ))}
+          </div>
+
+          {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
+          {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
+            <StringRow
+              key={stringIdx}
+              theme={theme}
+              stringIdx={stringIdx}
+              capo={capo}
+              rootIndex={rootIndex}
+              baseLabelMode={baseLabelMode}
+              showScale={showScale}
+              scaleType={scaleType}
+              cagedPositions={cagedPositions}
+              chordPositions={chordPositions}
+              opacity={opacity}
+              onNoteClick={onNoteClick}
+            />
           ))}
         </div>
-
-        {/* ポジションマーク行 */}
-        <div className="flex mb-2">
-          <div className="w-8 shrink-0" />
-          {Array.from({ length: FRET_COUNT }, (_, fret) => (
-            <PositionMark key={fret} fret={fret} theme={theme} />
-          ))}
-        </div>
-
-        {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
-        {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
-          <StringRow
-            key={stringIdx}
-            theme={theme}
-            stringIdx={stringIdx}
-            capo={capo}
-            rootIndex={rootIndex}
-            baseLabelMode={baseLabelMode}
-            showScale={showScale}
-            scaleType={scaleType}
-            cagedPositions={cagedPositions}
-            chordPositions={chordPositions}
-            opacity={opacity}
-            onNoteClick={onNoteClick}
-          />
-        ))}
       </div>
     </div>
   )

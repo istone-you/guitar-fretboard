@@ -7,7 +7,6 @@ export default function App() {
   const [rootNote, setRootNote] = useState('C')
   // カポ（0=なし）
   const [capo, setCapo] = useState(0)
-  const [theme, setTheme] = useState('dark')
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState('note')
 
@@ -43,43 +42,44 @@ export default function App() {
     setRootNote(noteName)
   }
 
+  const theme = 'dark'
+
   return (
     <div className={`min-h-screen p-4 flex flex-col gap-4 ${
       theme === 'dark' ? 'bg-gray-950' : 'bg-stone-100'
     }`}>
-      <Controls
-        theme={theme}
-        setTheme={setTheme}
-        rootNote={rootNote}
-        setRootNote={setRootNote}
-        capo={capo}
-        setCapo={setCapo}
-        baseLabelMode={baseLabelMode}
-        setBaseLabelMode={setBaseLabelMode}
-        showChord={showChord}
-        setShowChord={setShowChord}
-        chordDisplayMode={chordDisplayMode}
-        setChordDisplayMode={setChordDisplayMode}
-        showScale={showScale}
-        setShowScale={setShowScale}
-        scaleType={scaleType}
-        setScaleType={setScaleType}
-        showCaged={showCaged}
-        setShowCaged={setShowCaged}
-        cagedForms={cagedForms}
-        toggleCagedForm={toggleCagedForm}
-        chordType={chordType}
-        setChordType={setChordType}
-        chordRootString={chordRootString}
-        setChordRootString={setChordRootString}
-        layerOpacity={layerOpacity}
-        setLayerOpacity={setLayerOpacity}
-      />
-
-      <div className={`rounded-xl p-4 ${
+      <div className={`rounded-xl p-4 space-y-4 ${
         theme === 'dark' ? 'bg-gray-900' : 'bg-white border border-stone-300 shadow-sm'
       }`}>
-        <div className="mb-2 flex items-center gap-3">
+        <Controls
+          theme={theme}
+          rootNote={rootNote}
+          setRootNote={setRootNote}
+          capo={capo}
+          setCapo={setCapo}
+          baseLabelMode={baseLabelMode}
+          setBaseLabelMode={setBaseLabelMode}
+          showChord={showChord}
+          setShowChord={setShowChord}
+          chordDisplayMode={chordDisplayMode}
+          setChordDisplayMode={setChordDisplayMode}
+          showScale={showScale}
+          setShowScale={setShowScale}
+          scaleType={scaleType}
+          setScaleType={setScaleType}
+          showCaged={showCaged}
+          setShowCaged={setShowCaged}
+          cagedForms={cagedForms}
+          toggleCagedForm={toggleCagedForm}
+          chordType={chordType}
+          setChordType={setChordType}
+          chordRootString={chordRootString}
+          setChordRootString={setChordRootString}
+          layerOpacity={layerOpacity}
+          setLayerOpacity={setLayerOpacity}
+        />
+
+        <div className="mb-2 flex items-center justify-center gap-3 text-center">
           <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>
             Root: <span className={`font-bold text-base ${theme === 'dark' ? 'text-white' : 'text-stone-900'}`}>{rootNote}</span>
           </span>
@@ -108,42 +108,39 @@ export default function App() {
           layerOpacity={layerOpacity}
           onNoteClick={handleNoteClick}
         />
-      </div>
 
-      {/* 凡例 */}
-      {baseLabelMode === 'degree' && (
-        <div className={`rounded-xl p-4 ${
-          theme === 'dark' ? 'bg-gray-900' : 'bg-white border border-stone-300 shadow-sm'
-        }`}>
-          <h3 className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>度数の凡例</h3>
-          <div className="flex flex-wrap gap-2">
-            {[
-              ['P1', '#ef4444'],
-              ['m2', '#ec4899'],
-              ['M2', '#84cc16'],
-              ['m3', '#a855f7'],
-              ['M3', '#22c55e'],
-              ['P4', '#06b6d4'],
-              ['b5', '#6b7280'],
-              ['P5', '#3b82f6'],
-              ['m6', '#8b5cf6'],
-              ['M6', '#10b981'],
-              ['m7', '#f97316'],
-              ['M7', '#f59e0b'],
-            ].map(([name, color]) => (
-              <div key={name} className="flex items-center gap-1">
-                <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: color }}
-                >
-                  <span className="text-white text-xs font-bold">{name === 'P1' ? 'P1' : ''}</span>
-                </div>
-                <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-stone-700'}`}>{name}</span>
+        <div className="mt-4 min-h-[5.75rem]">
+          {baseLabelMode === 'degree' && (
+            <>
+              <h3 className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>度数の凡例</h3>
+              <div className="flex flex-wrap justify-center gap-2">
+                {[
+                  ['P1', '#ef4444'],
+                  ['m2', '#ec4899'],
+                  ['M2', '#84cc16'],
+                  ['m3', '#a855f7'],
+                  ['M3', '#22c55e'],
+                  ['P4', '#06b6d4'],
+                  ['b5', '#6b7280'],
+                  ['P5', '#3b82f6'],
+                  ['m6', '#8b5cf6'],
+                  ['M6', '#10b981'],
+                  ['m7', '#f97316'],
+                  ['M7', '#f59e0b'],
+                ].map(([name, color]) => (
+                  <div key={name} className="flex items-center gap-1">
+                    <div
+                      className="w-6 h-6 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
+                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-stone-700'}`}>{name}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
         </div>
-      )}
+      </div>
 
     </div>
   )
