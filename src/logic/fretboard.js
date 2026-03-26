@@ -30,7 +30,7 @@ export function getNoteName(stringIndex, fret, capo = 0) {
 
 // 度数名配列（半音インターバル → 度数表記）
 export const DEGREE_NAMES = [
-  'R',   // 0: ルート
+  'P1',  // 0: 完全1度
   'm2',  // 1: 短2度
   'M2',  // 2: 長2度
   'm3',  // 3: 短3度
@@ -47,7 +47,7 @@ export const DEGREE_NAMES = [
 
 // 実際に使う度数マップ（0〜11の半音 → 度数名）
 export const SEMITONE_TO_DEGREE = [
-  'R',   // 0
+  'P1',  // 0
   'm2',  // 1
   'M2',  // 2
   'm3',  // 3
@@ -74,7 +74,7 @@ export function getDegreeName(noteIndex, rootIndex) {
 
 // 度数の色マッピング
 export const DEGREE_COLORS = {
-  'R':   { bg: '#ef4444', text: '#fff' },   // 赤: ルート
+  'P1':  { bg: '#ef4444', text: '#fff' },   // 赤: 完全1度
   'P5':  { bg: '#3b82f6', text: '#fff' },   // 青: 5度
   'M3':  { bg: '#22c55e', text: '#fff' },   // 緑: 長3度
   'm3':  { bg: '#a855f7', text: '#fff' },   // 紫: 短3度

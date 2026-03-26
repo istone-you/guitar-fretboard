@@ -22,7 +22,7 @@ const STRING_COUNT = 6
 export default function Fretboard({
   rootNote,
   capo,
-  showDegree,
+  baseLabelMode,
   showChord,
   showScale,
   scaleType,
@@ -106,7 +106,7 @@ export default function Fretboard({
             stringIdx={stringIdx}
             capo={capo}
             rootIndex={rootIndex}
-            showDegree={showDegree}
+            baseLabelMode={baseLabelMode}
             showScale={showScale}
             scaleType={scaleType}
             showPowerChord={showPowerChord}
@@ -153,7 +153,7 @@ function StringRow({
   stringIdx,
   capo,
   rootIndex,
-  showDegree,
+  baseLabelMode,
   showScale,
   scaleType,
   showPowerChord,
@@ -184,10 +184,19 @@ function StringRow({
         const inChord = chordPositions.has(`${stringIdx}-${fret}`)
         const inPenta = isInPenta(semitone, scaleType === 'minor-penta' ? 'minor' : 'major')
         const cagedCell = cagedPositions.get(`${stringIdx}-${fret}`)
-
-        // 度数は枠表示（他レイヤーの下に常時表示）
-        const degreeRing = showDegree
-          ? { color: (DEGREE_COLORS[degreeName] || { bg: '#6b7280' }).bg, label: degreeName }
+        const baseLabel = baseLabelMode === 'degree'
+          ? {
+              text: degreeName,
+              color: (DEGREE_COLORS[degreeName] || { bg: '#6b7280' }).bg,
+              isDegree: true,
+            }
+          : {
+              text: noteName,
+              color: isRoot ? '#f87171' : '#6b7280',
+              isDegree: false,
+            }
+        const degreeRing = baseLabelMode === 'degree'
+          ? { color: baseLabel.color, label: degreeName }
           : null
 
         // メインオーバーレイ（後勝ち = ボタン後半が前面に来る）
@@ -229,6 +238,7 @@ function StringRow({
           <FretCell
             key={fret}
             fret={fret}
+            baseLabel={baseLabel}
             noteName={noteName}
             degreeRing={degreeRing}
             overlayColor={overlayColor}
@@ -247,6 +257,7 @@ function StringRow({
 
 function FretCell({
   fret,
+  baseLabel,
   noteName,
   degreeRing,
   overlayColor,
@@ -257,6 +268,8 @@ function FretCell({
   opacity,
   onClick,
 }) {
+  const shouldShowBaseLabel = !overlayColor && !inChord
+
   return (
     <div
       className={`w-14 h-10 shrink-0 relative flex items-center justify-center
@@ -277,25 +290,23 @@ function FretCell({
         <div className="absolute inset-1 rounded-full border-2 border-red-500/60 z-5" />
       )}
 
-      {/* ベース音名（常に表示） */}
-      <span className={`absolute text-sm font-mono z-0 select-none
-        ${isRoot && !overlayColor && !inChord ? 'text-red-400 font-bold' : 'text-gray-500'}
-      `}>
-        {noteName}
-      </span>
+      {/* ベースレイヤー表示（音名 or 度数） */}
+      {shouldShowBaseLabel && (
+        <span className={`absolute text-sm font-mono z-0 select-none
+          ${baseLabel.isDegree || isRoot ? 'font-bold' : ''}
+        `}>
+          <span style={{ color: baseLabel.color }}>
+            {baseLabel.text}
+          </span>
+        </span>
+      )}
 
-      {/* 度数枠（他レイヤーの下に表示） */}
+      {/* 度数表示時の色枠 */}
       {degreeRing && (
         <div
-          className="absolute inset-0.5 rounded-full border-2 flex items-center justify-center z-[8]"
+          className="absolute inset-0.5 rounded-full border-2 z-[8]"
           style={{ borderColor: degreeRing.color, opacity }}
-        >
-          {!overlayColor && (
-            <span className="text-xs font-bold leading-none" style={{ color: degreeRing.color }}>
-              {degreeRing.label}
-            </span>
-          )}
-        </div>
+        />
       )}
 
       {/* メインオーバーレイ（スケール / CAGED / パワーコード） */}

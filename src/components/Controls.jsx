@@ -7,8 +7,8 @@ export default function Controls({
   setRootNote,
   capo,
   setCapo,
-  showDegree,
-  setShowDegree,
+  baseLabelMode,
+  setBaseLabelMode,
   showChord,
   setShowChord,
   showScale,
@@ -103,6 +103,26 @@ export default function Controls({
             ))}
           </select>
         </label>
+
+        <div className="flex items-center gap-2 bg-gray-800 rounded-lg p-1">
+          <span className="text-sm font-semibold text-gray-300 px-2">表示</span>
+          {[
+            { value: 'note', label: '音名' },
+            { value: 'degree', label: '度数' },
+          ].map(({ value, label }) => (
+            <button
+              key={value}
+              onClick={() => setBaseLabelMode(value)}
+              className={`px-3 py-1 rounded text-sm font-semibold transition-all
+                ${baseLabelMode === value
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
+                }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* レイヤー切り替え */}
@@ -130,12 +150,6 @@ export default function Controls({
           color="bg-sky-600"
           active={showPowerChord}
           onToggle={() => setShowPowerChord(!showPowerChord)}
-        />
-        <LayerToggle
-          label="度数"
-          color="bg-indigo-600"
-          active={showDegree}
-          onToggle={() => setShowDegree(!showDegree)}
         />
       </div>
 

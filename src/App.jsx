@@ -7,9 +7,10 @@ export default function App() {
   const [rootNote, setRootNote] = useState('C')
   // カポ（0=なし）
   const [capo, setCapo] = useState(0)
+  // ベースレイヤー表示
+  const [baseLabelMode, setBaseLabelMode] = useState('note')
 
   // レイヤー表示フラグ
-  const [showDegree, setShowDegree] = useState(false)
   const [showChord, setShowChord] = useState(false)
   const [showScale, setShowScale] = useState(false)
   const [showPowerChord, setShowPowerChord] = useState(false)
@@ -48,8 +49,8 @@ export default function App() {
         setRootNote={setRootNote}
         capo={capo}
         setCapo={setCapo}
-        showDegree={showDegree}
-        setShowDegree={setShowDegree}
+        baseLabelMode={baseLabelMode}
+        setBaseLabelMode={setBaseLabelMode}
         showChord={showChord}
         setShowChord={setShowChord}
         showScale={showScale}
@@ -87,7 +88,7 @@ export default function App() {
         <Fretboard
           rootNote={rootNote}
           capo={capo}
-          showDegree={showDegree}
+          baseLabelMode={baseLabelMode}
           showChord={showChord}
           showScale={showScale}
           scaleType={scaleType}
@@ -102,12 +103,12 @@ export default function App() {
       </div>
 
       {/* 凡例 */}
-      {showDegree && (
+      {baseLabelMode === 'degree' && (
         <div className="bg-gray-900 rounded-xl p-4">
           <h3 className="text-gray-400 text-sm mb-3">度数の凡例</h3>
           <div className="flex flex-wrap gap-2">
             {[
-              ['R', '#ef4444'],
+              ['P1', '#ef4444'],
               ['m2', '#ec4899'],
               ['M2', '#84cc16'],
               ['m3', '#a855f7'],
@@ -125,7 +126,7 @@ export default function App() {
                   className="w-6 h-6 rounded-full flex items-center justify-center"
                   style={{ backgroundColor: color }}
                 >
-                  <span className="text-white text-xs font-bold">{name === 'R' ? 'R' : ''}</span>
+                  <span className="text-white text-xs font-bold">{name === 'P1' ? 'P1' : ''}</span>
                 </div>
                 <span className="text-gray-300 text-xs">{name}</span>
               </div>
