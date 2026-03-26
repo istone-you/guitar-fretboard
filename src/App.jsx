@@ -7,6 +7,7 @@ export default function App() {
   const [rootNote, setRootNote] = useState('C')
   // カポ（0=なし）
   const [capo, setCapo] = useState(0)
+  const [theme, setTheme] = useState('dark')
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState('note')
 
@@ -43,8 +44,12 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-4 flex flex-col gap-4">
+    <div className={`min-h-screen p-4 flex flex-col gap-4 ${
+      theme === 'dark' ? 'bg-gray-950' : 'bg-stone-100'
+    }`}>
       <Controls
+        theme={theme}
+        setTheme={setTheme}
         rootNote={rootNote}
         setRootNote={setRootNote}
         capo={capo}
@@ -71,21 +76,24 @@ export default function App() {
         setLayerOpacity={setLayerOpacity}
       />
 
-      <div className="bg-gray-900 rounded-xl p-4">
+      <div className={`rounded-xl p-4 ${
+        theme === 'dark' ? 'bg-gray-900' : 'bg-white border border-stone-300 shadow-sm'
+      }`}>
         <div className="mb-2 flex items-center gap-3">
-          <span className="text-gray-400 text-sm">
-            Root: <span className="text-white font-bold text-base">{rootNote}</span>
+          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>
+            Root: <span className={`font-bold text-base ${theme === 'dark' ? 'text-white' : 'text-stone-900'}`}>{rootNote}</span>
           </span>
           {capo > 0 && (
             <span className="text-yellow-400 text-sm">
               Capo {capo}フレット
             </span>
           )}
-          <span className="text-gray-600 text-xs">
+          <span className={`text-xs ${theme === 'dark' ? 'text-gray-600' : 'text-stone-500'}`}>
             （指板の音をクリックしてルートを変更）
           </span>
         </div>
         <Fretboard
+          theme={theme}
           rootNote={rootNote}
           capo={capo}
           baseLabelMode={baseLabelMode}
@@ -104,8 +112,10 @@ export default function App() {
 
       {/* 凡例 */}
       {baseLabelMode === 'degree' && (
-        <div className="bg-gray-900 rounded-xl p-4">
-          <h3 className="text-gray-400 text-sm mb-3">度数の凡例</h3>
+        <div className={`rounded-xl p-4 ${
+          theme === 'dark' ? 'bg-gray-900' : 'bg-white border border-stone-300 shadow-sm'
+        }`}>
+          <h3 className={`text-sm mb-3 ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>度数の凡例</h3>
           <div className="flex flex-wrap gap-2">
             {[
               ['P1', '#ef4444'],
@@ -114,7 +124,7 @@ export default function App() {
               ['m3', '#a855f7'],
               ['M3', '#22c55e'],
               ['P4', '#06b6d4'],
-              ['#4', '#6b7280'],
+              ['b5', '#6b7280'],
               ['P5', '#3b82f6'],
               ['m6', '#8b5cf6'],
               ['M6', '#10b981'],
@@ -128,12 +138,13 @@ export default function App() {
                 >
                   <span className="text-white text-xs font-bold">{name === 'P1' ? 'P1' : ''}</span>
                 </div>
-                <span className="text-gray-300 text-xs">{name}</span>
+                <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-stone-700'}`}>{name}</span>
               </div>
             ))}
           </div>
         </div>
       )}
+
     </div>
   )
 }
