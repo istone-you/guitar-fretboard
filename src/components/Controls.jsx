@@ -31,49 +31,13 @@ export default function Controls({
   return (
     <div className="bg-gray-900 text-white p-4 rounded-xl space-y-4">
       {/* タイトル */}
-      <div className="text-center pb-2 border-b border-gray-700">
-        {/* ギター弦を模したデコレーションライン */}
-        <div className="flex justify-center gap-px mb-3" aria-hidden="true">
-          {[
-            'bg-amber-300',
-            'bg-amber-400',
-            'bg-gray-300',
-            'bg-gray-300',
-            'bg-gray-400',
-            'bg-gray-500',
-          ].map((color, i) => (
-            <div
-              key={i}
-              className={`${color} rounded-full`}
-              style={{
-                width: `${1.5 + i * 0.5}px`,
-                height: '28px',
-                opacity: 0.7,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* メインタイトル */}
-        <h1
-          className="text-2xl font-black tracking-widest uppercase"
-          style={{
-            background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 30%, #e2e8f0 55%, #fbbf24 80%, #f59e0b 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '0.12em',
-            textShadow: 'none',
-            filter: 'drop-shadow(0 2px 6px rgba(251,191,36,0.3))',
-          }}
-        >
+      <div className="text-center pb-3 border-b border-gray-800">
+        <h1 className="text-3xl font-semibold tracking-[0.08em] text-slate-100">
           Guitar Fretboard
         </h1>
-
-        {/* サブタイトル */}
-        <p className="text-xs tracking-[0.35em] uppercase text-gray-400 mt-1 font-semibold">
-          Interactive Layer
-        </p>
+        <div className="mt-3 flex justify-center" aria-hidden="true">
+          <div className="h-px w-28 bg-gradient-to-r from-transparent via-slate-500 to-transparent" />
+        </div>
       </div>
 
       {/* ルート音 & カポ */}
