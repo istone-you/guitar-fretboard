@@ -265,11 +265,13 @@ export function isInPenta(semitone, type) {
 // anchorString: ルート音を探す基準弦（0=6弦, 1=5弦, 2=4弦）
 // positions: ルート位置からの相対フレットオフセット + 度数ラベル
 //   degree: 'R'=ルート, '3'=長3度, '5'=完全5度
+const CAGED_COLOR = '#7c3aed'
+
 export const CAGED_FORMS = {
   // オープンEコード形: 0-2-2-1-0-0
   E: {
     label: 'E',
-    color: '#3b82f6',
+    color: CAGED_COLOR,
     anchorString: 0,
     positions: [
       { string: 0, fretOffset: 0, degree: 'R' },
@@ -283,7 +285,7 @@ export const CAGED_FORMS = {
   // オープンDコード形: x-x-0-2-3-2
   D: {
     label: 'D',
-    color: '#ef4444',
+    color: CAGED_COLOR,
     anchorString: 2,
     positions: [
       { string: 2, fretOffset: 0, degree: 'R' },
@@ -295,7 +297,7 @@ export const CAGED_FORMS = {
   // オープンCコード形: x-3-2-0-1-0
   C: {
     label: 'C',
-    color: '#f59e0b',
+    color: CAGED_COLOR,
     anchorString: 1,
     positions: [
       { string: 1, fretOffset: 0,  degree: 'R' },
@@ -308,7 +310,7 @@ export const CAGED_FORMS = {
   // オープンAコード形: x-0-2-2-2-0
   A: {
     label: 'A',
-    color: '#a855f7',
+    color: CAGED_COLOR,
     anchorString: 1,
     positions: [
       { string: 1, fretOffset: 0, degree: 'R' },
@@ -321,7 +323,7 @@ export const CAGED_FORMS = {
   // オープンGコード形: 3-2-0-0-0-3
   G: {
     label: 'G',
-    color: '#10b981',
+    color: CAGED_COLOR,
     anchorString: 0,
     positions: [
       { string: 0, fretOffset: 0,  degree: 'R' },
