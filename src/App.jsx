@@ -13,15 +13,14 @@ export default function App() {
   const [showChord, setShowChord] = useState(false)
   const [showScale, setShowScale] = useState(false)
   const [showPowerChord, setShowPowerChord] = useState(false)
-  const [showPenta, setShowPenta] = useState(false)
   const [showCaged, setShowCaged] = useState(false)
 
   // コードフォーム設定
   const [chordType, setChordType] = useState('Major')
   const [chordRootString, setChordRootString] = useState(0)
 
-  // ペンタトニック設定
-  const [pentaType, setPentaType] = useState('minor')
+  // スケール設定
+  const [scaleType, setScaleType] = useState('major')
 
   // CAGED設定（複数選択可）
   const [cagedForms, setCagedForms] = useState(new Set(['E']))
@@ -55,12 +54,10 @@ export default function App() {
         setShowChord={setShowChord}
         showScale={showScale}
         setShowScale={setShowScale}
+        scaleType={scaleType}
+        setScaleType={setScaleType}
         showPowerChord={showPowerChord}
         setShowPowerChord={setShowPowerChord}
-        showPenta={showPenta}
-        setShowPenta={setShowPenta}
-        pentaType={pentaType}
-        setPentaType={setPentaType}
         showCaged={showCaged}
         setShowCaged={setShowCaged}
         cagedForms={cagedForms}
@@ -93,9 +90,8 @@ export default function App() {
           showDegree={showDegree}
           showChord={showChord}
           showScale={showScale}
+          scaleType={scaleType}
           showPowerChord={showPowerChord}
-          showPenta={showPenta}
-          pentaType={pentaType}
           showCaged={showCaged}
           cagedForms={cagedForms}
           chordType={chordType}

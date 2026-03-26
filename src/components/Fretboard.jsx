@@ -24,9 +24,8 @@ export default function Fretboard({
   showDegree,
   showChord,
   showScale,
+  scaleType,
   showPowerChord,
-  showPenta,
-  pentaType,
   showCaged,
   cagedForms,
   chordType,
@@ -108,9 +107,8 @@ export default function Fretboard({
             rootIndex={rootIndex}
             showDegree={showDegree}
             showScale={showScale}
+            scaleType={scaleType}
             showPowerChord={showPowerChord}
-            showPenta={showPenta}
-            pentaType={pentaType}
             cagedPositions={cagedPositions}
             chordPositions={chordPositions}
             opacity={opacity}
@@ -156,16 +154,13 @@ function StringRow({
   rootIndex,
   showDegree,
   showScale,
+  scaleType,
   showPowerChord,
-  showPenta,
-  pentaType,
   cagedPositions,
   chordPositions,
   opacity,
   onNoteClick,
 }) {
-  // 弦名（6弦から1弦）
-  const stringNames = ['6', '5', '4', '3', '2', '1']
   const openStringNotes = ['E', 'A', 'D', 'G', 'B', 'E']
 
   return (
@@ -185,7 +180,7 @@ function StringRow({
         const inMajorScale = isInMajorScale(semitone)
         const inPowerChord = isInPowerChord(semitone)
         const inChord = chordPositions.has(`${stringIdx}-${fret}`)
-        const inPenta = isInPenta(semitone, pentaType)
+        const inPenta = isInPenta(semitone, scaleType === 'minor-penta' ? 'minor' : 'major')
         const cagedCell = cagedPositions.get(`${stringIdx}-${fret}`)
 
         // 度数は枠表示（他レイヤーの下に常時表示）
@@ -194,21 +189,20 @@ function StringRow({
           : null
 
         // メインオーバーレイ（後勝ち = ボタン後半が前面に来る）
-        // ボタン順: メジャー(1番) < ペンタ < CAGED < パワーコード(5番) → 後ろほど前面
+        // ボタン順: スケール < CAGED < パワーコード → 後ろほど前面
         let overlayColor = null
         let overlayLabel = noteName
 
-        if (showScale && inMajorScale) {
-          overlayColor = isRoot
-            ? { bg: '#ef4444', text: '#fff' }
-            : { bg: '#22c55e', text: '#fff' }
-          overlayLabel = noteName
-        }
-        if (showPenta && inPenta) {
-          overlayColor = isRoot
-            ? { bg: '#ef4444', text: '#fff' }
-            : { bg: '#f97316', text: '#fff' }
-          overlayLabel = noteName
+        if (showScale) {
+          const inSelectedScale = scaleType === 'major' ? inMajorScale : inPenta
+          if (inSelectedScale) {
+            overlayColor = isRoot
+              ? { bg: '#ef4444', text: '#fff' }
+              : scaleType === 'major'
+                ? { bg: '#22c55e', text: '#fff' }
+                : { bg: '#f97316', text: '#fff' }
+            overlayLabel = noteName
+          }
         }
         if (cagedCell) {
           overlayColor = { bg: cagedCell.color, text: '#fff' }
@@ -296,7 +290,7 @@ function FretCell({
         </div>
       )}
 
-      {/* メインオーバーレイ（スケール / パワーコード / ペンタ / CAGED） */}
+      {/* メインオーバーレイ（スケール / CAGED / パワーコード） */}
       {overlayColor && (
         <div
           className="absolute inset-1 rounded-full flex items-center justify-center z-10"

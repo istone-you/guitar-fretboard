@@ -1,0 +1,4 @@
+[tools]
+"aqua:openai/codex"           = "0.116.0"
+"aqua:anthropics/claude-code" = "2.1.81"
+"npm:@google/gemini-cli"      = "0.34.0"

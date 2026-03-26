@@ -13,12 +13,10 @@ export default function Controls({
   setShowChord,
   showScale,
   setShowScale,
+  scaleType,
+  setScaleType,
   showPowerChord,
   setShowPowerChord,
-  showPenta,
-  setShowPenta,
-  pentaType,
-  setPentaType,
   showCaged,
   setShowCaged,
   cagedForms,
@@ -110,16 +108,10 @@ export default function Controls({
       {/* レイヤー切り替え */}
       <div className="flex flex-wrap gap-3 justify-center">
         <LayerToggle
-          label="メジャースケール"
+          label="スケール"
           color="bg-emerald-600"
           active={showScale}
           onToggle={() => setShowScale(!showScale)}
-        />
-        <LayerToggle
-          label="ペンタトニック"
-          color="bg-orange-500"
-          active={showPenta}
-          onToggle={() => setShowPenta(!showPenta)}
         />
         <LayerToggle
           label="CAGED"
@@ -176,20 +168,21 @@ export default function Controls({
         </div>
       )}
 
-      {/* ペンタトニック設定 */}
-      {showPenta && (
+      {/* スケール設定 */}
+      {showScale && (
         <div className="flex gap-2 items-center justify-center bg-gray-800 rounded-lg p-3">
           <span className="text-sm text-gray-300">種類</span>
           {[
-            { value: 'minor', label: 'マイナーペンタ' },
-            { value: 'major', label: 'メジャーペンタ' },
+            { value: 'major', label: 'メジャースケール' },
+            { value: 'minor-penta', label: 'マイナーペンタ' },
+            { value: 'major-penta', label: 'メジャーペンタ' },
           ].map(({ value, label }) => (
             <button
               key={value}
-              onClick={() => setPentaType(value)}
+              onClick={() => setScaleType(value)}
               className={`px-3 py-1 rounded text-sm font-semibold transition-all
-                ${pentaType === value
-                  ? 'bg-orange-500 text-white'
+                ${scaleType === value
+                  ? 'bg-emerald-600 text-white'
                   : 'bg-gray-700 text-gray-400 hover:bg-gray-600'
                 }`}
             >
