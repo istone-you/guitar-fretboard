@@ -268,7 +268,7 @@ export function isInPenta(semitone, type) {
 // anchorString: ルート音を探す基準弦（0=6弦, 1=5弦, 2=4弦）
 // positions: ルート位置からの相対フレットオフセット + 度数ラベル
 //   degree: 'R'=ルート, '3'=長3度, '5'=完全5度
-const CAGED_COLOR = '#7c3aed'
+const CAGED_COLOR = '#6366f1'
 
 export const CAGED_FORMS = {
   // オープンEコード形: 0-2-2-1-0-0

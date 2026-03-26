@@ -111,7 +111,7 @@ export default function Controls({
         />
         <LayerToggle
           label="CAGED"
-          color="bg-violet-600"
+          color="bg-indigo-500"
           active={showCaged}
           theme={theme}
           onToggle={() => setShowCaged(!showCaged)}
