@@ -13,12 +13,12 @@ export default function Controls({
   setBaseLabelMode,
   showChord,
   setShowChord,
+  chordDisplayMode,
+  setChordDisplayMode,
   showScale,
   setShowScale,
   scaleType,
   setScaleType,
-  showPowerChord,
-  setShowPowerChord,
   showCaged,
   setShowCaged,
   cagedForms,
@@ -117,33 +117,50 @@ export default function Controls({
           onToggle={() => setShowCaged(!showCaged)}
         />
         <LayerToggle
-          label="コードフォーム"
+          label="コード"
           color="bg-amber-500"
           active={showChord}
           theme={theme}
           onToggle={() => setShowChord(!showChord)}
         />
-        <LayerToggle
-          label="パワーコード"
-          color="bg-sky-600"
-          active={showPowerChord}
-          theme={theme}
-          onToggle={() => setShowPowerChord(!showPowerChord)}
-        />
       </div>
 
-      {/* コードフォーム設定 */}
+      {/* コード設定 */}
       {showChord && (
         <div className={`flex flex-wrap gap-3 items-center justify-center rounded-lg p-3 ${isDark ? 'bg-gray-800' : 'bg-stone-100'}`}>
           <label className="flex items-center gap-2">
-            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>コード</span>
+            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>表示方式</span>
             <select
-              value={chordType}
-              onChange={(e) => setChordType(e.target.value)}
+              value={chordDisplayMode}
+              onChange={(e) => setChordDisplayMode(e.target.value)}
               className={`rounded px-2 py-1 text-sm border ${
                 isDark ? 'bg-gray-700 text-white border-gray-500' : 'bg-white text-stone-900 border-stone-300'
               }`}
             >
+              <option value="barre">バレーコード</option>
+              <option value="power">パワーコード</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2">
+            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>コード</span>
+            <select
+              value={chordDisplayMode === 'barre' ? chordType : ''}
+              onChange={(e) => setChordType(e.target.value)}
+              disabled={chordDisplayMode !== 'barre'}
+              className={`rounded px-2 py-1 text-sm border ${
+                chordDisplayMode !== 'barre'
+                  ? isDark
+                    ? 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed'
+                    : 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed'
+                  : isDark
+                    ? 'bg-gray-700 text-white border-gray-500'
+                    : 'bg-white text-stone-900 border-stone-300'
+              }`}
+            >
+              {chordDisplayMode !== 'barre' && (
+                <option value="">--</option>
+              )}
               {CHORD_TYPES.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}

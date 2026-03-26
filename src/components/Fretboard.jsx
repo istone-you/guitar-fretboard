@@ -9,9 +9,9 @@ import {
   DEGREE_COLORS,
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
+  POWER_CHORD_FORMS,
   isInMajorScale,
   isInNaturalMinorScale,
-  isInPowerChord,
   isInPenta,
   calcCagedPositions,
   getRootIndex,
@@ -25,9 +25,9 @@ export default function Fretboard({
   capo,
   baseLabelMode,
   showChord,
+  chordDisplayMode,
   showScale,
   scaleType,
-  showPowerChord,
   showCaged,
   cagedForms,
   chordType,
@@ -41,8 +41,9 @@ export default function Fretboard({
   // コードフォームのポジションをセット化（弦×フレット → key）
   const chordPositions = useMemo(() => {
     if (!showChord) return new Set()
-    const forms = chordRootString === 0 ? CHORD_FORMS_6TH : CHORD_FORMS_5TH
-    const form = forms[chordType]
+    const form = chordDisplayMode === 'power'
+      ? POWER_CHORD_FORMS[chordRootString]
+      : (chordRootString === 0 ? CHORD_FORMS_6TH : CHORD_FORMS_5TH)[chordType]
     if (!form) return new Set()
 
     // ルート音が指板上でどのフレットにあるかを探す（カポ考慮）
@@ -64,7 +65,7 @@ export default function Fretboard({
       }
     })
     return set
-  }, [showChord, chordType, chordRootString, rootIndex, capo])
+  }, [showChord, chordDisplayMode, chordType, chordRootString, rootIndex, capo])
 
   // CAGEDポジションマップ（選択中の全フォームをマージ）
   const cagedPositions = useMemo(() => {
@@ -112,7 +113,6 @@ export default function Fretboard({
             baseLabelMode={baseLabelMode}
             showScale={showScale}
             scaleType={scaleType}
-            showPowerChord={showPowerChord}
             cagedPositions={cagedPositions}
             chordPositions={chordPositions}
             opacity={opacity}
@@ -162,7 +162,6 @@ function StringRow({
   baseLabelMode,
   showScale,
   scaleType,
-  showPowerChord,
   cagedPositions,
   chordPositions,
   opacity,
@@ -187,7 +186,6 @@ function StringRow({
         const isRoot = semitone === 0
         const inMajorScale = isInMajorScale(semitone)
         const inNaturalMinorScale = isInNaturalMinorScale(semitone)
-        const inPowerChord = isInPowerChord(semitone)
         const inChord = chordPositions.has(`${stringIdx}-${fret}`)
         const inPenta = isInPenta(semitone, scaleType === 'minor-penta' ? 'minor' : 'major')
         const cagedCell = cagedPositions.get(`${stringIdx}-${fret}`)
@@ -207,7 +205,7 @@ function StringRow({
           : null
 
         // メインオーバーレイ（後勝ち = ボタン後半が前面に来る）
-        // ボタン順: スケール < CAGED < パワーコード → 後ろほど前面
+        // ボタン順: スケール < CAGED → 後ろほど前面
         let overlayColor = null
         let overlayLabel = noteName
 
@@ -224,10 +222,6 @@ function StringRow({
         }
         if (cagedCell) {
           overlayColor = { bg: cagedCell.color, text: '#fff' }
-          overlayLabel = noteName
-        }
-        if (showPowerChord && inPowerChord) {
-          overlayColor = { bg: '#3b82f6', text: '#fff' }
           overlayLabel = noteName
         }
 
@@ -312,7 +306,7 @@ function FretCell({
         />
       )}
 
-      {/* メインオーバーレイ（スケール / CAGED / パワーコード） */}
+      {/* メインオーバーレイ（スケール / CAGED） */}
       {overlayColor && (
         <div
           className="absolute inset-1 rounded-full flex items-center justify-center z-10"

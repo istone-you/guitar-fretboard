@@ -14,10 +14,10 @@ export default function App() {
   // レイヤー表示フラグ
   const [showChord, setShowChord] = useState(false)
   const [showScale, setShowScale] = useState(false)
-  const [showPowerChord, setShowPowerChord] = useState(false)
   const [showCaged, setShowCaged] = useState(false)
 
   // コードフォーム設定
+  const [chordDisplayMode, setChordDisplayMode] = useState('barre')
   const [chordType, setChordType] = useState('Major')
   const [chordRootString, setChordRootString] = useState(0)
 
@@ -58,12 +58,12 @@ export default function App() {
         setBaseLabelMode={setBaseLabelMode}
         showChord={showChord}
         setShowChord={setShowChord}
+        chordDisplayMode={chordDisplayMode}
+        setChordDisplayMode={setChordDisplayMode}
         showScale={showScale}
         setShowScale={setShowScale}
         scaleType={scaleType}
         setScaleType={setScaleType}
-        showPowerChord={showPowerChord}
-        setShowPowerChord={setShowPowerChord}
         showCaged={showCaged}
         setShowCaged={setShowCaged}
         cagedForms={cagedForms}
@@ -98,9 +98,9 @@ export default function App() {
           capo={capo}
           baseLabelMode={baseLabelMode}
           showChord={showChord}
+          chordDisplayMode={chordDisplayMode}
           showScale={showScale}
           scaleType={scaleType}
-          showPowerChord={showPowerChord}
           showCaged={showCaged}
           cagedForms={cagedForms}
           chordType={chordType}
