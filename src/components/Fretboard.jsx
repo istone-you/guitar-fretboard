@@ -10,6 +10,7 @@ import {
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
   isInMajorScale,
+  isInNaturalMinorScale,
   isInPowerChord,
   isInPenta,
   calcCagedPositions,
@@ -178,6 +179,7 @@ function StringRow({
 
         const isRoot = semitone === 0
         const inMajorScale = isInMajorScale(semitone)
+        const inNaturalMinorScale = isInNaturalMinorScale(semitone)
         const inPowerChord = isInPowerChord(semitone)
         const inChord = chordPositions.has(`${stringIdx}-${fret}`)
         const inPenta = isInPenta(semitone, scaleType === 'minor-penta' ? 'minor' : 'major')
@@ -194,12 +196,18 @@ function StringRow({
         let overlayLabel = noteName
 
         if (showScale) {
-          const inSelectedScale = scaleType === 'major' ? inMajorScale : inPenta
+          const inSelectedScale = scaleType === 'major'
+            ? inMajorScale
+            : scaleType === 'natural-minor'
+              ? inNaturalMinorScale
+              : inPenta
           if (inSelectedScale) {
             overlayColor = isRoot
               ? { bg: '#ef4444', text: '#fff' }
               : scaleType === 'major'
                 ? { bg: '#22c55e', text: '#fff' }
+                : scaleType === 'natural-minor'
+                  ? { bg: '#8b5cf6', text: '#fff' }
                 : { bg: '#f97316', text: '#fff' }
             overlayLabel = noteName
           }

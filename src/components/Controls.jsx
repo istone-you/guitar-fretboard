@@ -174,6 +174,7 @@ export default function Controls({
           <span className="text-sm text-gray-300">種類</span>
           {[
             { value: 'major', label: 'メジャースケール' },
+            { value: 'natural-minor', label: 'ナチュラルマイナー' },
             { value: 'minor-penta', label: 'マイナーペンタ' },
             { value: 'major-penta', label: 'メジャーペンタ' },
           ].map(({ value, label }) => (

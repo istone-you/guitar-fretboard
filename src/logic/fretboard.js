@@ -224,6 +224,8 @@ export const CHORD_FORMS_5TH = {
 // ===== スケールフォーム定義 =====
 // メジャースケール（イオニアン）の度数パターン: R, M2, M3, P4, P5, M6, M7
 export const MAJOR_SCALE_DEGREES = new Set([0, 2, 4, 5, 7, 9, 11])
+// ナチュラルマイナー（エオリアン）の度数パターン: R, M2, m3, P4, P5, m6, m7
+export const NATURAL_MINOR_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 8, 10])
 
 // パワーコード度数パターン: R, P5
 export const POWER_CHORD_DEGREES = new Set([0, 7])
@@ -231,6 +233,10 @@ export const POWER_CHORD_DEGREES = new Set([0, 7])
 // スケールに含まれるか判定
 export function isInMajorScale(semitone) {
   return MAJOR_SCALE_DEGREES.has(semitone)
+}
+
+export function isInNaturalMinorScale(semitone) {
+  return NATURAL_MINOR_SCALE_DEGREES.has(semitone)
 }
 
 export function isInPowerChord(semitone) {
