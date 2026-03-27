@@ -614,10 +614,17 @@ function ScaleSelect({ theme, value, onChange, options, groups }: ScaleSelectPro
 
       {open && (
         <>
-          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
+          <div
+            className="fixed inset-0 z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(false);
+            }}
+          />
           <div
             role="dialog"
             aria-label={t("scaleDialog")}
+            onClick={(e) => e.stopPropagation()}
             className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             }`}
@@ -728,8 +735,15 @@ export function DropdownSelect({
 
       {open && !disabled && (
         <>
-          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
           <div
+            className="fixed inset-0 z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(false);
+            }}
+          />
+          <div
+            onClick={(e) => e.stopPropagation()}
             className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             }`}

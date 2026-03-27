@@ -192,6 +192,16 @@ describe("Controls", () => {
     expect(props.setDiatonicChordSize).toHaveBeenCalledWith("seventh");
   });
 
+  it("プルダウン外クリックで閉じても親パネルは非活性化しない", () => {
+    const props = makeProps({ showChord: true, chordDisplayMode: "diatonic" as ChordDisplayMode });
+    render(<Controls {...props} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: "メジャー" })[0]);
+    fireEvent.click(document.querySelector(".fixed.inset-0.z-20")!);
+
+    expect(props.setShowChord).not.toHaveBeenCalled();
+  });
+
   it("トライアドモードでは弦と転回のドロップダウンが機能する", () => {
     const props = makeProps({ showChord: true, chordDisplayMode: "triad" as ChordDisplayMode });
     render(<Controls {...props} />);
