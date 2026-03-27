@@ -1,27 +1,28 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import Controls from './Controls'
+import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from '../types'
 
-function makeProps(overrides = {}) {
+function makeProps(overrides: Record<string, unknown> = {}) {
   return {
-    theme: 'dark',
+    theme: 'dark' as Theme,
     rootNote: 'C',
     setRootNote: vi.fn(),
-    accidental: 'flat',
+    accidental: 'flat' as Accidental,
     onAccidentalChange: vi.fn(),
     showChord: false,
     setShowChord: vi.fn(),
-    chordDisplayMode: 'form',
+    chordDisplayMode: 'form' as ChordDisplayMode,
     setChordDisplayMode: vi.fn(),
     showScale: false,
     setShowScale: vi.fn(),
-    scaleType: 'major',
+    scaleType: 'major' as ScaleType,
     setScaleType: vi.fn(),
     showCaged: false,
     setShowCaged: vi.fn(),
     cagedForms: new Set(['E']),
     toggleCagedForm: vi.fn(),
-    chordType: 'Major',
+    chordType: 'Major' as ChordType,
     setChordType: vi.fn(),
     triadStringSet: '1-3',
     setTriadStringSet: vi.fn(),
@@ -33,6 +34,7 @@ function makeProps(overrides = {}) {
     setDiatonicChordSize: vi.fn(),
     diatonicDegree: 'I',
     setDiatonicDegree: vi.fn(),
+    onThemeChange: vi.fn(),
     ...overrides,
   }
 }
@@ -63,7 +65,7 @@ describe('Controls', () => {
   })
 
   it('♭ボタンをクリックすると onAccidentalChange("flat") が呼ばれる', () => {
-    const props = makeProps({ accidental: 'sharp' })
+    const props = makeProps({ accidental: 'sharp' as Accidental })
     render(<Controls {...props} />)
     fireEvent.click(screen.getByTitle('設定'))
     fireEvent.click(screen.getByText('♭'))
@@ -76,7 +78,7 @@ describe('Controls', () => {
     render(<Controls {...props} />)
     // LayerRow の div をクリック（ラベル span の親）
     const label = screen.getByText('スケール')
-    fireEvent.click(label.closest('div[class*="rounded-lg"]'))
+    fireEvent.click(label.closest('div[class*="rounded-lg"]')!)
     expect(props.setShowScale).toHaveBeenCalled()
   })
 
@@ -84,7 +86,7 @@ describe('Controls', () => {
     const props = makeProps()
     render(<Controls {...props} />)
     const label = screen.getByText('CAGED')
-    fireEvent.click(label.closest('div[class*="rounded-lg"]'))
+    fireEvent.click(label.closest('div[class*="rounded-lg"]')!)
     expect(props.setShowCaged).toHaveBeenCalled()
   })
 
@@ -94,7 +96,7 @@ describe('Controls', () => {
     const labels = screen.getAllByText('コード')
     // LayerRow の span badge を探してその親パネルをクリック
     const badge = labels.find((el) => el.tagName === 'SPAN')
-    fireEvent.click(badge.closest('div[class*="rounded-lg"]'))
+    fireEvent.click(badge!.closest('div[class*="rounded-lg"]')!)
     expect(props.setShowChord).toHaveBeenCalled()
   })
 
@@ -114,7 +116,7 @@ describe('Controls', () => {
     // 丸ボタン（w-9 h-9）の C を探してクリック
     const allC = screen.getAllByText('C')
     const cagedBtn = allC.find((el) => el.tagName === 'BUTTON' && el.className.includes('w-9'))
-    fireEvent.click(cagedBtn)
+    fireEvent.click(cagedBtn!)
     expect(props.toggleCagedForm).toHaveBeenCalledWith('C')
   })
 

@@ -1,20 +1,21 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import Fretboard from './Fretboard'
+import type { Theme, Accidental, BaseLabelMode, ChordDisplayMode, ScaleType, ChordType } from '../types'
 
-function makeProps(overrides = {}) {
+function makeProps(overrides: Record<string, unknown> = {}) {
   return {
-    theme: 'dark',
+    theme: 'dark' as Theme,
     rootNote: 'C',
-    accidental: 'flat',
-    baseLabelMode: 'note',
+    accidental: 'flat' as Accidental,
+    baseLabelMode: 'note' as BaseLabelMode,
     showChord: false,
-    chordDisplayMode: 'form',
+    chordDisplayMode: 'form' as ChordDisplayMode,
     showScale: false,
-    scaleType: 'major',
+    scaleType: 'major' as ScaleType,
     showCaged: false,
-    cagedForms: new Set(),
-    chordType: 'Major',
+    cagedForms: new Set<string>(),
+    chordType: 'Major' as ChordType,
     triadPosition: '1-3-root',
     diatonicScaleType: 'major-triad',
     diatonicDegree: 'I',
@@ -43,13 +44,13 @@ describe('Fretboard', () => {
   })
 
   it('音名モードで C が表示される', () => {
-    render(<Fretboard {...makeProps({ rootNote: 'C', baseLabelMode: 'note' })} />)
+    render(<Fretboard {...makeProps({ rootNote: 'C', baseLabelMode: 'note' as BaseLabelMode })} />)
     const cells = screen.getAllByText('C')
     expect(cells.length).toBeGreaterThan(0)
   })
 
   it('度数モードで P1 が表示される', () => {
-    render(<Fretboard {...makeProps({ baseLabelMode: 'degree' })} />)
+    render(<Fretboard {...makeProps({ baseLabelMode: 'degree' as BaseLabelMode })} />)
     const cells = screen.getAllByText('P1')
     expect(cells.length).toBeGreaterThan(0)
   })
@@ -75,24 +76,24 @@ describe('Fretboard', () => {
 
   // ===== ♯/♭表示切り替え =====
   it('♯モードで C♯ が表示される', () => {
-    render(<Fretboard {...makeProps({ accidental: 'sharp' })} />)
+    render(<Fretboard {...makeProps({ accidental: 'sharp' as Accidental })} />)
     const cells = screen.getAllByText('C♯')
     expect(cells.length).toBeGreaterThan(0)
   })
 
   it('♭モードで D♭ が表示される', () => {
-    render(<Fretboard {...makeProps({ accidental: 'flat' })} />)
+    render(<Fretboard {...makeProps({ accidental: 'flat' as Accidental })} />)
     const cells = screen.getAllByText('D♭')
     expect(cells.length).toBeGreaterThan(0)
   })
 
   it('♯モードで D♭ が表示されない', () => {
-    render(<Fretboard {...makeProps({ accidental: 'sharp' })} />)
+    render(<Fretboard {...makeProps({ accidental: 'sharp' as Accidental })} />)
     expect(screen.queryAllByText('D♭')).toHaveLength(0)
   })
 
   it('♭モードで C♯ が表示されない', () => {
-    render(<Fretboard {...makeProps({ accidental: 'flat' })} />)
+    render(<Fretboard {...makeProps({ accidental: 'flat' as Accidental })} />)
     expect(screen.queryAllByText('C♯')).toHaveLength(0)
   })
 

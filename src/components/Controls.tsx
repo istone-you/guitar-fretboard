@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   NOTES_SHARP,
   NOTES_FLAT,
@@ -10,10 +10,11 @@ import {
   getDiatonicChord,
   getRootIndex,
 } from "../logic/fretboard";
+import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
 
-const CHORD_TYPES = ["Major", "Minor", "7th", "maj7", "m7", "m7(b5)", "dim7", "m(maj7)"];
+const CHORD_TYPES: ChordType[] = ["Major", "Minor", "7th", "maj7", "m7", "m7(b5)", "dim7", "m(maj7)"];
 const TRIAD_CHORD_TYPES = ["Major", "Minor", "Diminished", "Augmented"];
-const CHORD_DISPLAY_OPTIONS = [
+const CHORD_DISPLAY_OPTIONS: { value: ChordDisplayMode; label: string }[] = [
   { value: "form", label: "コードフォーム" },
   { value: "power", label: "パワーコード" },
   { value: "triad", label: "トライアド" },
@@ -27,13 +28,45 @@ const DIATONIC_CHORD_SIZE_OPTIONS = [
   { value: "triad", label: "3和音" },
   { value: "seventh", label: "4和音" },
 ];
-const SCALE_OPTIONS = [
+const SCALE_OPTIONS: { value: ScaleType; label: string }[] = [
   { value: "major", label: "メジャースケール" },
   { value: "natural-minor", label: "ナチュラルマイナー" },
   { value: "major-penta", label: "メジャーペンタ" },
   { value: "minor-penta", label: "マイナーペンタ" },
   { value: "blues", label: "ブルーノート" },
 ];
+
+interface ControlsProps {
+  theme: Theme;
+  onThemeChange: () => void;
+  rootNote: string;
+  accidental: Accidental;
+  onAccidentalChange: (mode: Accidental) => void;
+  showChord: boolean;
+  setShowChord: (value: boolean) => void;
+  chordDisplayMode: ChordDisplayMode;
+  setChordDisplayMode: (value: string) => void;
+  showScale: boolean;
+  setShowScale: (value: boolean) => void;
+  scaleType: ScaleType;
+  setScaleType: (value: string) => void;
+  showCaged: boolean;
+  setShowCaged: (value: boolean) => void;
+  cagedForms: Set<string>;
+  toggleCagedForm: (key: string) => void;
+  chordType: ChordType;
+  setChordType: (value: string) => void;
+  triadStringSet: string;
+  setTriadStringSet: (value: string) => void;
+  triadInversion: string;
+  setTriadInversion: (value: string) => void;
+  diatonicKeyType: string;
+  setDiatonicKeyType: (value: string) => void;
+  diatonicChordSize: string;
+  setDiatonicChordSize: (value: string) => void;
+  diatonicDegree: string;
+  setDiatonicDegree: (value: string) => void;
+}
 
 export default function Controls({
   theme,
@@ -65,7 +98,7 @@ export default function Controls({
   setDiatonicChordSize,
   diatonicDegree,
   setDiatonicDegree,
-}) {
+}: ControlsProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const isDark = theme === "dark";
@@ -74,7 +107,7 @@ export default function Controls({
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
   const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {
     const chord = getDiatonicChord(rootIndex, diatonicScaleType, value);
-    const suffixMap = {
+    const suffixMap: Record<string, string> = {
       Major: "",
       Minor: "m",
       "7th": "7",
@@ -158,8 +191,8 @@ export default function Controls({
                 <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>♯/♭</span>
                 <div className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}>
                   {[
-                    { value: "sharp", label: "♯" },
-                    { value: "flat", label: "♭" },
+                    { value: "sharp" as Accidental, label: "♯" },
+                    { value: "flat" as Accidental, label: "♭" },
                   ].map(({ value, label }) => (
                     <button
                       key={value}
@@ -362,7 +395,16 @@ export default function Controls({
   );
 }
 
-function LayerRow({ label, color, active, onToggle, theme, children }) {
+interface LayerRowProps {
+  label: string;
+  color: string;
+  active: boolean;
+  onToggle: () => void;
+  theme: Theme;
+  children: ReactNode;
+}
+
+function LayerRow({ label, color, active, onToggle, theme, children }: LayerRowProps) {
   const isDark = theme === "dark";
 
   return (
@@ -372,7 +414,7 @@ function LayerRow({ label, color, active, onToggle, theme, children }) {
       } ${active ? "opacity-100" : "opacity-45"}`}
       onClick={(e) => {
         if (!active) { onToggle(); return; }
-        if (!e.target.closest('button, [role="listbox"], [role="option"]')) onToggle();
+        if (!(e.target as HTMLElement).closest('button, [role="listbox"], [role="option"]')) onToggle();
       }}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
@@ -387,6 +429,16 @@ function LayerRow({ label, color, active, onToggle, theme, children }) {
   );
 }
 
+export interface DropdownSelectProps {
+  theme: Theme;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  disabled?: boolean;
+  widthClass?: string;
+  keepOpen?: boolean;
+}
+
 export function DropdownSelect({
   theme,
   value,
@@ -395,7 +447,7 @@ export function DropdownSelect({
   disabled = false,
   widthClass = "w-32",
   keepOpen = false,
-}) {
+}: DropdownSelectProps) {
   const [open, setOpen] = useState(false);
   const isDark = theme === "dark";
   const selected = options.find((option) => option.value === value) ?? options[0];

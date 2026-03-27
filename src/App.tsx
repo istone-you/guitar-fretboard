@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
 import {
@@ -7,14 +7,15 @@ import {
   MINOR_PENTA_DEGREES, MAJOR_PENTA_DEGREES, BLUES_SCALE_DEGREES,
   CHORD_SEMITONES, getDiatonicChord,
 } from "./logic/fretboard";
+import type { Theme, Accidental, BaseLabelMode, ChordDisplayMode, ScaleType, ChordType, DegreeName } from "./types";
 
 export default function App() {
   // ルート音
   const [rootNote, setRootNote] = useState("C");
   // 臨時記号表示（sharp / flat）
-  const [accidental, setAccidental] = useState("flat");
+  const [accidental, setAccidental] = useState<Accidental>("flat");
   // ベースレイヤー表示
-  const [baseLabelMode, setBaseLabelMode] = useState("note");
+  const [baseLabelMode, setBaseLabelMode] = useState<BaseLabelMode>("note");
 
   // レイヤー表示フラグ
   const [showChord, setShowChord] = useState(false);
@@ -22,8 +23,8 @@ export default function App() {
   const [showCaged, setShowCaged] = useState(false);
 
   // コードフォーム設定
-  const [chordDisplayMode, setChordDisplayMode] = useState("form");
-  const [chordType, setChordType] = useState("Major");
+  const [chordDisplayMode, setChordDisplayMode] = useState<ChordDisplayMode>("form");
+  const [chordType, setChordType] = useState<ChordType>("Major");
   const [triadStringSet, setTriadStringSet] = useState("1-3");
   const [triadInversion, setTriadInversion] = useState("root");
   const [diatonicKeyType, setDiatonicKeyType] = useState("major");
@@ -31,12 +32,12 @@ export default function App() {
   const [diatonicDegree, setDiatonicDegree] = useState("I");
 
   // スケール設定
-  const [scaleType, setScaleType] = useState("major");
+  const [scaleType, setScaleType] = useState<ScaleType>("major");
 
   // CAGED設定（複数選択可）
   const [cagedForms, setCagedForms] = useState(new Set(["E"]));
 
-  const toggleCagedForm = (key) => {
+  const toggleCagedForm = (key: string) => {
     setCagedForms((prev) => {
       const next = new Set(prev);
       if (next.has(key)) { next.delete(key) } else { next.add(key) }
@@ -45,7 +46,7 @@ export default function App() {
   };
 
   // 臨時記号モード切り替え時にルート音の表記を変換
-  const handleAccidentalChange = (mode) => {
+  const handleAccidentalChange = (mode: Accidental) => {
     const idx = getRootIndex(rootNote);
     const notes = mode === "sharp" ? NOTES_SHARP : NOTES_FLAT;
     setRootNote(notes[idx]);
@@ -53,27 +54,27 @@ export default function App() {
   };
 
   // 指板の音をクリックしてルートを設定
-  const handleNoteClick = (noteName) => {
+  const handleNoteClick = (noteName: string) => {
     setRootNote(noteName);
   };
 
-  const handleDiatonicKeyTypeChange = (value) => {
+  const handleDiatonicKeyTypeChange = (value: string) => {
     const validDegrees = DIATONIC_CHORDS[`${value}-${diatonicChordSize}`].map((item) => item.value);
     setDiatonicKeyType(value);
     if (!validDegrees.includes(diatonicDegree)) setDiatonicDegree(validDegrees[0]);
   };
 
-  const handleDiatonicChordSizeChange = (value) => {
+  const handleDiatonicChordSizeChange = (value: string) => {
     const validDegrees = DIATONIC_CHORDS[`${diatonicKeyType}-${value}`].map((item) => item.value);
     setDiatonicChordSize(value);
     if (!validDegrees.includes(diatonicDegree)) setDiatonicDegree(validDegrees[0]);
   };
 
-  const [theme, setTheme] = useState("dark");
-  const [hiddenDegrees, setHiddenDegrees] = useState(new Set());
+  const [theme, setTheme] = useState<Theme>("dark");
+  const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
 
-  const DEGREE_BY_SEMITONE = ["P1","m2","M2","m3","M3","P4","b5","P5","m6","M6","m7","M7"];
-  const SCALE_SEMITONES = {
+  const DEGREE_BY_SEMITONE: DegreeName[] = ["P1","m2","M2","m3","M3","P4","b5","P5","m6","M6","m7","M7"];
+  const SCALE_SEMITONES: Record<ScaleType, Set<number>> = {
     major: MAJOR_SCALE_DEGREES,
     "natural-minor": NATURAL_MINOR_SCALE_DEGREES,
     "major-penta": MAJOR_PENTA_DEGREES,
@@ -82,7 +83,7 @@ export default function App() {
   };
 
   const handleAutoFilter = () => {
-    const active = new Set();
+    const active = new Set<number>();
     if (showScale) {
       for (const s of SCALE_SEMITONES[scaleType] ?? []) active.add(s);
     }
@@ -90,7 +91,7 @@ export default function App() {
       for (const s of CHORD_SEMITONES.Major) active.add(s);
     }
     if (showChord) {
-      let semitones;
+      let semitones: Set<number> | undefined;
       if (chordDisplayMode === "power") {
         semitones = CHORD_SEMITONES.power;
       } else if (chordDisplayMode === "diatonic") {
@@ -105,7 +106,7 @@ export default function App() {
     setHiddenDegrees(new Set(DEGREE_BY_SEMITONE.filter((_, i) => !active.has(i))));
   };
 
-  const toggleDegree = (name) => {
+  const toggleDegree = (name: string) => {
     setHiddenDegrees((prev) => {
       const next = new Set(prev);
       if (next.has(name)) { next.delete(name); } else { next.add(name); }
@@ -135,17 +136,17 @@ export default function App() {
           showChord={showChord}
           setShowChord={setShowChord}
           chordDisplayMode={chordDisplayMode}
-          setChordDisplayMode={setChordDisplayMode}
+          setChordDisplayMode={(value) => setChordDisplayMode(value as ChordDisplayMode)}
           showScale={showScale}
           setShowScale={setShowScale}
           scaleType={scaleType}
-          setScaleType={setScaleType}
+          setScaleType={(value) => setScaleType(value as ScaleType)}
           showCaged={showCaged}
           setShowCaged={setShowCaged}
           cagedForms={cagedForms}
           toggleCagedForm={toggleCagedForm}
           chordType={chordType}
-          setChordType={setChordType}
+          setChordType={(value) => setChordType(value as ChordType)}
           triadStringSet={triadStringSet}
           setTriadStringSet={setTriadStringSet}
           triadInversion={triadInversion}
@@ -167,8 +168,8 @@ export default function App() {
               表示
             </span>
             {[
-              { value: "note", label: "音名" },
-              { value: "degree", label: "度数" },
+              { value: "note" as BaseLabelMode, label: "音名" },
+              { value: "degree" as BaseLabelMode, label: "度数" },
             ].map(({ value, label }) => (
               <button
                 key={value}

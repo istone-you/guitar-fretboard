@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   FRET_COUNT,
   NOTES_SHARP,
@@ -20,13 +20,46 @@ import {
   isInBluesScale,
   calcCagedPositions,
   getRootIndex,
+  type FretCell,
+  type CagedPositionValue,
 } from "../logic/fretboard";
+import type { Theme, Accidental, BaseLabelMode, ChordDisplayMode, ScaleType, ChordType, DegreeName } from "../types";
 
 const STRING_COUNT = 6;
 const FRET_CELL_WIDTH = 56;
 const STRING_LABEL_WIDTH = 32;
 const STRING_ROW_HEIGHT = 40;
 const STRING_ROW_GAP = 1;
+
+interface ChordGroup {
+  id: string;
+  kind: string;
+  cells: FretCell[];
+  minFret: number;
+  maxFret: number;
+  minString: number;
+  maxString: number;
+  rootStringIdx?: number;
+}
+
+interface FretboardProps {
+  theme: Theme;
+  rootNote: string;
+  accidental: Accidental;
+  baseLabelMode: BaseLabelMode;
+  showChord: boolean;
+  chordDisplayMode: ChordDisplayMode;
+  showScale: boolean;
+  scaleType: ScaleType;
+  showCaged: boolean;
+  cagedForms: Set<string>;
+  chordType: ChordType;
+  triadPosition: string;
+  diatonicScaleType: string;
+  diatonicDegree: string;
+  onNoteClick: (noteName: string) => void;
+  hiddenDegrees?: Set<string>;
+}
 
 export default function Fretboard({
   theme,
@@ -45,17 +78,17 @@ export default function Fretboard({
   diatonicDegree,
   onNoteClick,
   hiddenDegrees = new Set(),
-}) {
+}: FretboardProps) {
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
     chordDisplayMode === "diatonic"
       ? getDiatonicChord(rootIndex, diatonicScaleType, diatonicDegree)
       : null;
   const effectiveDisplayMode = chordDisplayMode === "diatonic" ? "form" : chordDisplayMode;
-  const effectiveRootIndex = chordDisplayMode === "diatonic" ? diatonicChord.rootIndex : rootIndex;
-  const effectiveChordType = chordDisplayMode === "diatonic" ? diatonicChord.chordType : chordType;
+  const effectiveRootIndex = diatonicChord != null ? diatonicChord.rootIndex : rootIndex;
+  const effectiveChordType: ChordType = diatonicChord != null ? diatonicChord.chordType : chordType;
 
-  const chordGroups = useMemo(() => {
+  const chordGroups = useMemo<ChordGroup[]>(() => {
     if (!showChord) return [];
 
     if (chordDisplayMode === "triad") {
@@ -77,7 +110,7 @@ export default function Fretboard({
       ];
     }
 
-    const movableGroups = [0, 1].flatMap((rootStringIdx) => {
+    const movableGroups: ChordGroup[] = [0, 1].flatMap((rootStringIdx) => {
       const fullForm =
         effectiveDisplayMode === "power"
           ? POWER_CHORD_FORMS[rootStringIdx]
@@ -145,7 +178,7 @@ export default function Fretboard({
   ]);
 
   const chordPositions = useMemo(() => {
-    const set = new Set();
+    const set = new Set<string>();
     chordGroups.forEach((group) => {
       group.cells.forEach(({ string, fret }) => {
         set.add(`${string}-${fret}`);
@@ -156,8 +189,8 @@ export default function Fretboard({
 
   // CAGEDポジションマップ（選択中の全フォームをマージ）
   const cagedPositions = useMemo(() => {
-    if (!showCaged || cagedForms.size === 0) return new Map();
-    const merged = new Map();
+    if (!showCaged || cagedForms.size === 0) return new Map<string, CagedPositionValue>();
+    const merged = new Map<string, CagedPositionValue>();
     for (const key of cagedForms) {
       for (const [cell, val] of calcCagedPositions(key, rootIndex)) {
         if (!merged.has(cell) || val.degree === "R") {
@@ -234,7 +267,12 @@ export default function Fretboard({
   );
 }
 
-function FretHeader({ fret, theme }) {
+interface FretHeaderProps {
+  fret: number;
+  theme: Theme;
+}
+
+function FretHeader({ fret, theme }: FretHeaderProps) {
   const isDark = theme === "dark";
   return (
     <div
@@ -247,7 +285,12 @@ function FretHeader({ fret, theme }) {
   );
 }
 
-function PositionMark({ fret, theme }) {
+interface PositionMarkProps {
+  fret: number;
+  theme: Theme;
+}
+
+function PositionMark({ fret, theme }: PositionMarkProps) {
   const isDark = theme === "dark";
   const mark = POSITION_MARKS[fret];
   if (!mark) return <div className="w-14 shrink-0 h-5" />;
@@ -265,6 +308,21 @@ function PositionMark({ fret, theme }) {
   );
 }
 
+interface StringRowProps {
+  theme: Theme;
+  stringIdx: number;
+  accidental: Accidental;
+  rootIndex: number;
+  baseLabelMode: BaseLabelMode;
+  showScale: boolean;
+  scaleType: ScaleType;
+  cagedPositions: Map<string, CagedPositionValue>;
+  chordPositions: Set<string>;
+  opacity: number;
+  onNoteClick: (noteName: string) => void;
+  hiddenDegrees: Set<string>;
+}
+
 function StringRow({
   theme,
   stringIdx,
@@ -278,7 +336,7 @@ function StringRow({
   opacity,
   onNoteClick,
   hiddenDegrees,
-}) {
+}: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
   const openStringNotes = ["E", "A", "D", "G", "B", "E"];
@@ -321,7 +379,7 @@ function StringRow({
 
         // メインオーバーレイ（後勝ち = ボタン後半が前面に来る）
         // ボタン順: スケール < CAGED → 後ろほど前面
-        let overlayColor = null;
+        let overlayColor: { bg: string; text: string } | null = null;
         let overlayLabel = noteName;
 
         if (showScale) {
@@ -346,7 +404,7 @@ function StringRow({
         const degreeHidden = hiddenDegrees.has(degreeName);
 
         return (
-          <FretCell
+          <FretCellComponent
             key={fret}
             fret={fret}
             baseLabel={baseLabel}
@@ -367,7 +425,33 @@ function StringRow({
   );
 }
 
-function FretCell({
+interface BaseLabelInfo {
+  text: string;
+  color: string;
+  isDegree: boolean;
+}
+
+interface DegreeRingInfo {
+  color: string;
+  label: DegreeName;
+}
+
+interface FretCellComponentProps {
+  fret: number;
+  baseLabel: BaseLabelInfo;
+  noteName: string;
+  degreeRing: DegreeRingInfo | null;
+  overlayColor: { bg: string; text: string } | null;
+  overlayLabel: string;
+  inChord: boolean;
+  isRoot: boolean;
+  hidden: boolean;
+  opacity: number;
+  theme: Theme;
+  onClick: () => void;
+}
+
+function FretCellComponent({
   fret,
   baseLabel,
   noteName,
@@ -380,7 +464,7 @@ function FretCell({
   opacity,
   theme,
   onClick,
-}) {
+}: FretCellComponentProps) {
   const isDark = theme === "dark";
   const shouldShowBaseLabel = !overlayColor && !inChord && !hidden;
 

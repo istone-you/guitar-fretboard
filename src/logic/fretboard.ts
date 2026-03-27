@@ -1,17 +1,19 @@
+import type { ChordType, TriadChordType, DegreeName } from '../types';
+
 // 音名配列（半音12音）
-export const NOTES_SHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
-export const NOTES_FLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
+export const NOTES_SHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"] as const;
+export const NOTES_FLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"] as const;
 export const NOTES = NOTES_FLAT; // 後方互換
 
 // スタンダードチューニング（6弦から1弦、開放弦の音名インデックス）
 // 6弦=E2, 5弦=A2, 4弦=D3, 3弦=G3, 2弦=B3, 1弦=E4
-export const OPEN_STRINGS = [4, 9, 2, 7, 11, 4]; // E, A, D, G, B, E
+export const OPEN_STRINGS = [4, 9, 2, 7, 11, 4] as const; // E, A, D, G, B, E
 
 // フレット数（0〜14フレット = 15フレット分）
 export const FRET_COUNT = 15;
 
 // ポジションマーク（シングル: 3,5,7,9、ダブル: 12）
-export const POSITION_MARKS = {
+export const POSITION_MARKS: Record<number, 'single' | 'double'> = {
   3: "single",
   5: "single",
   7: "single",
@@ -19,19 +21,18 @@ export const POSITION_MARKS = {
   12: "double",
 };
 
-// 指定弦・フレットの音名インデックスを返す（カポ考慮）
-export function getNoteIndex(stringIndex, fret, capo = 0) {
-  const effectiveFret = fret + capo;
-  return (OPEN_STRINGS[stringIndex] + effectiveFret) % 12;
+// 指定弦・フレットの音名インデックスを返す
+export function getNoteIndex(stringIndex: number, fret: number): number {
+  return (OPEN_STRINGS[stringIndex] + fret) % 12;
 }
 
 // 指定弦・フレットの音名を返す
-export function getNoteName(stringIndex, fret, capo = 0) {
-  return NOTES[getNoteIndex(stringIndex, fret, capo)];
+export function getNoteName(stringIndex: number, fret: number): string {
+  return NOTES[getNoteIndex(stringIndex, fret)];
 }
 
 // 度数名配列（半音インターバル → 度数表記）
-export const DEGREE_NAMES = [
+export const DEGREE_NAMES: DegreeName[] = [
   "P1", // 0: 完全1度
   "m2", // 1: 短2度
   "M2", // 2: 長2度
@@ -47,7 +48,7 @@ export const DEGREE_NAMES = [
 ];
 
 // 実際に使う度数マップ（0〜11の半音 → 度数名）
-export const SEMITONE_TO_DEGREE = [
+export const SEMITONE_TO_DEGREE: DegreeName[] = [
   "P1", // 0
   "m2", // 1
   "M2", // 2
@@ -63,18 +64,18 @@ export const SEMITONE_TO_DEGREE = [
 ];
 
 // 度数計算: (TargetNoteIndex - RootNoteIndex + 12) % 12
-export function calcDegree(noteIndex, rootIndex) {
+export function calcDegree(noteIndex: number, rootIndex: number): number {
   return (noteIndex - rootIndex + 12) % 12;
 }
 
 // 度数名を返す
-export function getDegreeName(noteIndex, rootIndex) {
+export function getDegreeName(noteIndex: number, rootIndex: number): DegreeName {
   const semitone = calcDegree(noteIndex, rootIndex);
   return SEMITONE_TO_DEGREE[semitone];
 }
 
 // 度数の色マッピング
-export const DEGREE_COLORS = {
+export const DEGREE_COLORS: Partial<Record<DegreeName, { bg: string; text: string }>> = {
   P1: { bg: "#ef4444", text: "#fff" }, // 赤: 完全1度
   P5: { bg: "#3b82f6", text: "#fff" }, // 青: 5度
   M3: { bg: "#22c55e", text: "#fff" }, // 緑: 長3度
@@ -94,8 +95,18 @@ export const DEGREE_COLORS = {
 // rootString: 0=6弦, 1=5弦
 // positions: [{string, fretOffset}] fretOffsetはルートフレットからの差分
 
+export interface FretPosition {
+  string: number;
+  fretOffset: number;
+}
+
+export interface FretCell {
+  string: number;
+  fret: number;
+}
+
 // 6弦ルートのバレーコードフォーム
-export const CHORD_FORMS_6TH = {
+export const CHORD_FORMS_6TH: Partial<Record<ChordType, FretPosition[]>> = {
   Major: [
     { string: 0, fretOffset: 0 }, // 6弦ルート
     { string: 1, fretOffset: 2 }, // 5弦
@@ -163,7 +174,7 @@ export const CHORD_FORMS_6TH = {
 };
 
 // 5弦ルートのバレーコードフォーム
-export const CHORD_FORMS_5TH = {
+export const CHORD_FORMS_5TH: Partial<Record<ChordType, FretPosition[]>> = {
   Major: [
     { string: 1, fretOffset: 0 }, // 5弦ルート
     { string: 2, fretOffset: 2 },
@@ -221,7 +232,7 @@ export const CHORD_FORMS_5TH = {
   ],
 };
 
-export const POWER_CHORD_FORMS = {
+export const POWER_CHORD_FORMS: Record<number, FretPosition[]> = {
   0: [
     { string: 0, fretOffset: 0 },
     { string: 1, fretOffset: 2 },
@@ -232,20 +243,38 @@ export const POWER_CHORD_FORMS = {
   ],
 };
 
-export const TRIAD_STRING_SET_OPTIONS = [
+export interface TriadOption {
+  value: string;
+  label: string;
+  strings: number[];
+}
+
+export const TRIAD_STRING_SET_OPTIONS: TriadOption[] = [
   { value: "1-3", label: "1~3弦", strings: [3, 4, 5] },
   { value: "2-4", label: "2~4弦", strings: [2, 3, 4] },
   { value: "3-5", label: "3~5弦", strings: [1, 2, 3] },
   { value: "4-6", label: "4~6弦", strings: [0, 1, 2] },
 ];
 
-export const TRIAD_INVERSION_OPTIONS = [
+export interface InversionOption {
+  value: string;
+  label: string;
+}
+
+export const TRIAD_INVERSION_OPTIONS: InversionOption[] = [
   { value: "root", label: "基本" },
   { value: "first", label: "第一転回" },
   { value: "second", label: "第二転回" },
 ];
 
-export const TRIAD_LAYOUT_OPTIONS = TRIAD_STRING_SET_OPTIONS.flatMap((stringSet) =>
+export interface TriadLayoutOption {
+  value: string;
+  label: string;
+  strings: number[];
+  inversion: string;
+}
+
+export const TRIAD_LAYOUT_OPTIONS: TriadLayoutOption[] = TRIAD_STRING_SET_OPTIONS.flatMap((stringSet) =>
   TRIAD_INVERSION_OPTIONS.map((inversion) => ({
     value: `${stringSet.value}-${inversion.value}`,
     label: `${stringSet.label}（${inversion.label}）`,
@@ -254,13 +283,18 @@ export const TRIAD_LAYOUT_OPTIONS = TRIAD_STRING_SET_OPTIONS.flatMap((stringSet)
   })),
 );
 
-export function getTriadLayout(layoutValue) {
+export function getTriadLayout(layoutValue: string): TriadLayoutOption {
   return (
     TRIAD_LAYOUT_OPTIONS.find((option) => option.value === layoutValue) ?? TRIAD_LAYOUT_OPTIONS[0]
   );
 }
 
-const TRIAD_SHAPES = {
+interface TriadShapeEntry {
+  anchorString: number;
+  positions: FretPosition[];
+}
+
+const TRIAD_SHAPES: Record<string, Partial<Record<TriadChordType, TriadShapeEntry>>> = {
   "1-3-root": {
     Major: {
       anchorString: 3,
@@ -671,13 +705,14 @@ const TRIAD_SHAPES = {
   },
 };
 
-export function buildTriadVoicing(rootIndex, chordType, layoutValue) {
-  const shape = TRIAD_SHAPES[layoutValue]?.[chordType];
+export function buildTriadVoicing(rootIndex: number, chordType: string, layoutValue: string): FretCell[] {
+  const shapeGroup = TRIAD_SHAPES[layoutValue];
+  const shape = shapeGroup?.[chordType as TriadChordType];
   if (!shape) return [];
 
-  let best = null;
+  let best: { cells: FretCell[]; score: number } | null = null;
   for (let anchorFret = 0; anchorFret < FRET_COUNT; anchorFret++) {
-    if (getNoteIndex(shape.anchorString, anchorFret, 0) !== rootIndex) continue;
+    if (getNoteIndex(shape.anchorString, anchorFret) !== rootIndex) continue;
 
     const cells = shape.positions.map(({ string, fretOffset }) => ({
       string,
@@ -696,7 +731,7 @@ export function buildTriadVoicing(rootIndex, chordType, layoutValue) {
   return best?.cells ?? [];
 }
 
-export const OPEN_CHORD_FORMS = {
+export const OPEN_CHORD_FORMS: Partial<Record<ChordType, Record<string, FretCell[]>>> = {
   Major: {
     C: [
       { string: 1, fret: 3 },
@@ -868,12 +903,17 @@ export const OPEN_CHORD_FORMS = {
   },
 };
 
-export function getOpenChordForm(rootIndex, chordType, capo = 0) {
-  const physicalRoot = NOTES[(rootIndex - capo + 12) % 12];
-  return OPEN_CHORD_FORMS[chordType]?.[physicalRoot] ?? null;
+export function getOpenChordForm(rootIndex: number, chordType: ChordType): FretCell[] | null {
+  return OPEN_CHORD_FORMS[chordType]?.[NOTES[rootIndex]] ?? null;
 }
 
-export const DIATONIC_CHORDS = {
+export interface DiatonicChordEntry {
+  value: string;
+  offset: number;
+  chordType: ChordType;
+}
+
+export const DIATONIC_CHORDS: Record<string, DiatonicChordEntry[]> = {
   "major-triad": [
     { value: "I", offset: 0, chordType: "Major" },
     { value: "ii", offset: 2, chordType: "Minor" },
@@ -912,7 +952,12 @@ export const DIATONIC_CHORDS = {
   ],
 };
 
-export function getDiatonicChord(rootIndex, scaleType, degreeValue) {
+export interface DiatonicChordResult {
+  rootIndex: number;
+  chordType: ChordType;
+}
+
+export function getDiatonicChord(rootIndex: number, scaleType: string, degreeValue: string): DiatonicChordResult {
   const progression = DIATONIC_CHORDS[scaleType] ?? DIATONIC_CHORDS["major-triad"];
   const selected = progression.find((item) => item.value === degreeValue) ?? progression[0];
   return {
@@ -928,18 +973,18 @@ export const MAJOR_SCALE_DEGREES = new Set([0, 2, 4, 5, 7, 9, 11]);
 export const NATURAL_MINOR_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 8, 10]);
 
 // スケールに含まれるか判定
-export function isInMajorScale(semitone) {
+export function isInMajorScale(semitone: number): boolean {
   return MAJOR_SCALE_DEGREES.has(semitone);
 }
 
-export function isInNaturalMinorScale(semitone) {
+export function isInNaturalMinorScale(semitone: number): boolean {
   return NATURAL_MINOR_SCALE_DEGREES.has(semitone);
 }
 
 // ルート音のノートインデックスを返す（♯・♭どちらの表記でも対応）
-export function getRootIndex(rootNote) {
-  const idx = NOTES_SHARP.indexOf(rootNote);
-  return idx !== -1 ? idx : NOTES_FLAT.indexOf(rootNote);
+export function getRootIndex(rootNote: string): number {
+  const idx = NOTES_SHARP.indexOf(rootNote as typeof NOTES_SHARP[number]);
+  return idx !== -1 ? idx : NOTES_FLAT.indexOf(rootNote as typeof NOTES_FLAT[number]);
 }
 
 // ===== ペンタトニックスケール =====
@@ -948,7 +993,7 @@ export const MINOR_PENTA_DEGREES = new Set([0, 3, 5, 7, 10]);
 // メジャーペンタ: R, M2, M3, P5, M6 → 半音: 0, 2, 4, 7, 9
 export const MAJOR_PENTA_DEGREES = new Set([0, 2, 4, 7, 9]);
 
-export function isInPenta(semitone, type) {
+export function isInPenta(semitone: number, type: 'minor' | 'major'): boolean {
   return type === "minor" ? MINOR_PENTA_DEGREES.has(semitone) : MAJOR_PENTA_DEGREES.has(semitone);
 }
 
@@ -956,7 +1001,7 @@ export function isInPenta(semitone, type) {
 export const BLUES_SCALE_DEGREES = new Set([0, 3, 5, 6, 7, 10]);
 
 // コード種別ごとの構成音（半音）
-export const CHORD_SEMITONES = {
+export const CHORD_SEMITONES: Record<string, Set<number>> = {
   Major:     new Set([0, 4, 7]),
   Minor:     new Set([0, 3, 7]),
   "7th":     new Set([0, 4, 7, 10]),
@@ -970,7 +1015,7 @@ export const CHORD_SEMITONES = {
   power:      new Set([0, 7]),
 };
 
-export function isInBluesScale(semitone) {
+export function isInBluesScale(semitone: number): boolean {
   return BLUES_SCALE_DEGREES.has(semitone);
 }
 
@@ -981,7 +1026,25 @@ export function isInBluesScale(semitone) {
 //   degree: 'R'=ルート, '3'=長3度, '5'=完全5度
 const CAGED_COLOR = "#6366f1";
 
-export const CAGED_FORMS = {
+export interface CagedFormPosition {
+  string: number;
+  fretOffset: number;
+  degree: string;
+}
+
+export interface CagedForm {
+  label: string;
+  color: string;
+  anchorString: number;
+  positions: CagedFormPosition[];
+}
+
+export interface CagedPositionValue {
+  color: string;
+  degree: string;
+}
+
+export const CAGED_FORMS: Record<string, CagedForm> = {
   // オープンEコード形: 0-2-2-1-0-0
   E: {
     label: "E",
@@ -1051,18 +1114,18 @@ export const CAGED_FORMS = {
 };
 
 // CAGED表示順（ネック上で低フレット→高フレットの順）
-export const CAGED_ORDER = ["C", "A", "G", "E", "D"];
+export const CAGED_ORDER = ["C", "A", "G", "E", "D"] as const;
 
 // 指定フォームの表示セルを返す: Map<"string-fret", { color, degree }>
-export function calcCagedPositions(formKey, rootIndex, capo) {
+export function calcCagedPositions(formKey: string, rootIndex: number): Map<string, CagedPositionValue> {
   const form = CAGED_FORMS[formKey];
   if (!form) return new Map();
 
-  const map = new Map();
+  const map = new Map<string, CagedPositionValue>();
 
   // anchor弦でルートが出現するフレットを全探索
   for (let f = 0; f < FRET_COUNT; f++) {
-    if (getNoteIndex(form.anchorString, f, capo) !== rootIndex) continue;
+    if (getNoteIndex(form.anchorString, f) !== rootIndex) continue;
 
     // このルートフレットを基準にフォームの全ポジションを展開
     for (const { string, fretOffset, degree } of form.positions) {

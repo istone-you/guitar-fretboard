@@ -249,7 +249,7 @@ describe('getOpenChordForm', () => {
   it('Cメジャーのオープンフォームが存在する', () => {
     const form = getOpenChordForm(0, 'Major')
     expect(form).not.toBeNull()
-    expect(form.length).toBeGreaterThan(0)
+    expect(form!.length).toBeGreaterThan(0)
   })
 
   it('Eメジャーのオープンフォームが存在する', () => {
