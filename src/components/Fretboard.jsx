@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
 import {
   FRET_COUNT,
-  NOTES,
+  NOTES_SHARP,
+  NOTES_FLAT,
   POSITION_MARKS,
   getNoteIndex,
   getDegreeName,
@@ -29,6 +30,7 @@ const STRING_ROW_GAP = 1
 export default function Fretboard({
   theme,
   rootNote,
+  accidental,
   baseLabelMode,
   showChord,
   chordDisplayMode,
@@ -114,7 +116,6 @@ export default function Fretboard({
     return [
       ...movableGroups,
       {
-        id: `open-${effectiveChordType}-${effectiveRootIndex}-${capo}`,
         id: `open-${effectiveChordType}-${effectiveRootIndex}`,
         kind: 'open',
         cells: openForm,
@@ -194,6 +195,7 @@ export default function Fretboard({
                 key={stringIdx}
                 theme={theme}
                 stringIdx={stringIdx}
+                accidental={accidental}
                 rootIndex={rootIndex}
                 baseLabelMode={baseLabelMode}
                 showScale={showScale}
@@ -243,6 +245,7 @@ function PositionMark({ fret, theme }) {
 function StringRow({
   theme,
   stringIdx,
+  accidental,
   rootIndex,
   baseLabelMode,
   showScale,
@@ -253,6 +256,7 @@ function StringRow({
   onNoteClick,
 }) {
   const isDark = theme === 'dark'
+  const NOTES = accidental === 'sharp' ? NOTES_SHARP : NOTES_FLAT
   const openStringNotes = ['E', 'A', 'D', 'G', 'B', 'E']
 
   return (

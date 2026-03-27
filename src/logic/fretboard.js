@@ -1,5 +1,7 @@
 // 音名配列（半音12音）
-export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+export const NOTES_SHARP = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B']
+export const NOTES_FLAT  = ['C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭', 'A', 'B♭', 'B']
+export const NOTES = NOTES_FLAT // 後方互換
 
 // スタンダードチューニング（6弦から1弦、開放弦の音名インデックス）
 // 6弦=E2, 5弦=A2, 4弦=D3, 3弦=G3, 2弦=B3, 1弦=E4
@@ -932,9 +934,10 @@ export function isInNaturalMinorScale(semitone) {
   return NATURAL_MINOR_SCALE_DEGREES.has(semitone)
 }
 
-// ルート音のノートインデックスを返す
+// ルート音のノートインデックスを返す（♯・♭どちらの表記でも対応）
 export function getRootIndex(rootNote) {
-  return NOTES.indexOf(rootNote)
+  const idx = NOTES_SHARP.indexOf(rootNote)
+  return idx !== -1 ? idx : NOTES_FLAT.indexOf(rootNote)
 }
 
 // ===== ペンタトニックスケール =====

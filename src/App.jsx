@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Controls from './components/Controls'
 import Fretboard from './components/Fretboard'
-import { DIATONIC_CHORDS } from './logic/fretboard'
+import { DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex } from './logic/fretboard'
 
 export default function App() {
   // ルート音
   const [rootNote, setRootNote] = useState('C')
+  // 臨時記号表示（sharp / flat）
+  const [accidental, setAccidental] = useState('flat')
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState('note')
 
@@ -37,6 +39,14 @@ export default function App() {
     })
   }
 
+  // 臨時記号モード切り替え時にルート音の表記を変換
+  const handleAccidentalChange = (mode) => {
+    const idx = getRootIndex(rootNote)
+    const notes = mode === 'sharp' ? NOTES_SHARP : NOTES_FLAT
+    setRootNote(notes[idx])
+    setAccidental(mode)
+  }
+
   // 指板の音をクリックしてルートを設定
   const handleNoteClick = (noteName) => {
     setRootNote(noteName)
@@ -65,6 +75,8 @@ export default function App() {
           theme={theme}
           rootNote={rootNote}
           setRootNote={setRootNote}
+          accidental={accidental}
+          onAccidentalChange={handleAccidentalChange}
           baseLabelMode={baseLabelMode}
           setBaseLabelMode={setBaseLabelMode}
           showChord={showChord}
@@ -104,6 +116,7 @@ export default function App() {
         <Fretboard
           theme={theme}
           rootNote={rootNote}
+          accidental={accidental}
           baseLabelMode={baseLabelMode}
           showChord={showChord}
           chordDisplayMode={chordDisplayMode}
