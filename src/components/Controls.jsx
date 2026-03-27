@@ -36,6 +36,7 @@ const SCALE_OPTIONS = [
 
 export default function Controls({
   theme,
+  onThemeChange,
   rootNote,
   setRootNote,
   accidental,
@@ -93,6 +94,25 @@ export default function Controls({
     <div className={`space-y-4 pt-4 ${isDark ? "text-white" : "text-stone-900"}`}>
       {/* ルート音 */}
       <div className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
+        <button
+          onClick={onThemeChange}
+          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+            isDark ? "text-gray-300 hover:text-white" : "text-stone-500 hover:text-stone-900"
+          }`}
+          title={isDark ? "ライトモードに切り替え" : "ダークモードに切り替え"}
+        >
+          {isDark ? (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
+            </svg>
+          ) : (
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+          )}
+        </button>
+
         <label className="flex items-center gap-2">
           <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>
             ルート
@@ -110,7 +130,7 @@ export default function Controls({
           className={`inline-flex items-center justify-between gap-2 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
         >
           <span
-            className={`w-8 px-1 text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
+            className={`w-12 px-2 text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
           >
             ♯/♭
           </span>
@@ -121,7 +141,7 @@ export default function Controls({
             <button
               key={value}
               onClick={() => onAccidentalChange(value)}
-              className={`w-10 whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all
+              className={`w-[4rem] whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all
                 ${
                   accidental === value
                     ? "bg-indigo-600 text-white"
@@ -379,10 +399,14 @@ function LayerRow({ label, color, active, onToggle, theme, children }) {
       <div
         className={`w-full max-w-2xl rounded-lg p-3 transition-opacity sm:max-w-none sm:flex-1 ${
           isDark ? "bg-gray-800" : "bg-stone-100"
-        } ${active ? "opacity-100" : "opacity-45 pointer-events-none"}`}
+        } ${active ? "opacity-100" : "opacity-45 cursor-pointer"}`}
         aria-disabled={!active}
+        onClick={(e) => {
+          if (!active) { onToggle(); return }
+          if (!e.target.closest('button, [role="listbox"], [role="option"]')) onToggle()
+        }}
       >
-        <div className="flex justify-center">{children}</div>
+        <div className={`flex justify-center ${!active ? "pointer-events-none" : ""}`}>{children}</div>
       </div>
     </div>
   );

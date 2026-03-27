@@ -60,7 +60,7 @@ export default function App() {
     }
   }, [diatonicKeyType, diatonicChordSize, diatonicDegree]);
 
-  const theme = "dark";
+  const [theme, setTheme] = useState("dark");
   const triadLayout = `${triadStringSet}-${triadInversion}`;
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
 
@@ -77,6 +77,7 @@ export default function App() {
       >
         <Controls
           theme={theme}
+          onThemeChange={() => setTheme((t) => t === "dark" ? "light" : "dark")}
           rootNote={rootNote}
           setRootNote={setRootNote}
           accidental={accidental}
