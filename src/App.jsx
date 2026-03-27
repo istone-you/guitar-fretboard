@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
-import { DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex } from "./logic/fretboard";
+import {
+  DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex,
+  MAJOR_SCALE_DEGREES, NATURAL_MINOR_SCALE_DEGREES,
+  MINOR_PENTA_DEGREES, MAJOR_PENTA_DEGREES, BLUES_SCALE_DEGREES,
+  CHORD_SEMITONES, getDiatonicChord,
+} from "./logic/fretboard";
 
 export default function App() {
   // ルート音
@@ -65,6 +70,48 @@ export default function App() {
   };
 
   const [theme, setTheme] = useState("dark");
+  const [hiddenDegrees, setHiddenDegrees] = useState(new Set());
+
+  const DEGREE_BY_SEMITONE = ["P1","m2","M2","m3","M3","P4","b5","P5","m6","M6","m7","M7"];
+  const SCALE_SEMITONES = {
+    major: MAJOR_SCALE_DEGREES,
+    "natural-minor": NATURAL_MINOR_SCALE_DEGREES,
+    "major-penta": MAJOR_PENTA_DEGREES,
+    "minor-penta": MINOR_PENTA_DEGREES,
+    blues: BLUES_SCALE_DEGREES,
+  };
+
+  const handleAutoFilter = () => {
+    const active = new Set();
+    if (showScale) {
+      for (const s of SCALE_SEMITONES[scaleType] ?? []) active.add(s);
+    }
+    if (showCaged) {
+      for (const s of CHORD_SEMITONES.Major) active.add(s);
+    }
+    if (showChord) {
+      let semitones;
+      if (chordDisplayMode === "power") {
+        semitones = CHORD_SEMITONES.power;
+      } else if (chordDisplayMode === "diatonic") {
+        const chord = getDiatonicChord(getRootIndex(rootNote), diatonicScaleType, diatonicDegree);
+        semitones = CHORD_SEMITONES[chord.chordType];
+      } else {
+        semitones = CHORD_SEMITONES[chordType];
+      }
+      for (const s of semitones ?? []) active.add(s);
+    }
+    if (active.size === 0) { setHiddenDegrees(new Set()); return; }
+    setHiddenDegrees(new Set(DEGREE_BY_SEMITONE.filter((_, i) => !active.has(i))));
+  };
+
+  const toggleDegree = (name) => {
+    setHiddenDegrees((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) { next.delete(name); } else { next.add(name); }
+      return next;
+    });
+  };
   const triadLayout = `${triadStringSet}-${triadInversion}`;
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
 
@@ -155,16 +202,40 @@ export default function App() {
           diatonicScaleType={diatonicScaleType}
           diatonicDegree={diatonicDegree}
           onNoteClick={handleNoteClick}
+          hiddenDegrees={hiddenDegrees}
         />
 
         <div className="mt-4 min-h-[5.75rem]">
           {baseLabelMode === "degree" && (
             <>
-              <h3
-                className={`text-sm mb-3 text-center ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}
-              >
-                度数の凡例
-              </h3>
+              <div className="flex items-center justify-center gap-2 mb-3">
+                <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>度数</h3>
+                <button
+                  onClick={handleAutoFilter}
+                  title="表示中のオーバーレイに合わせて絞り込む"
+                  className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
+                    theme === "dark"
+                      ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
+                      : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
+                  }`}
+                >
+                  絞り込む
+                </button>
+                <button
+                  onClick={() =>
+                    hiddenDegrees.size > 0
+                      ? setHiddenDegrees(new Set())
+                      : setHiddenDegrees(new Set(DEGREE_BY_SEMITONE))
+                  }
+                  className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
+                    theme === "dark"
+                      ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
+                      : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
+                  }`}
+                >
+                  {hiddenDegrees.size > 0 ? "リセット" : "全非表示"}
+                </button>
+              </div>
               <div className="flex flex-wrap justify-center gap-2">
                 {[
                   ["P1", "#ef4444"],
@@ -179,16 +250,22 @@ export default function App() {
                   ["M6", "#10b981"],
                   ["m7", "#f97316"],
                   ["M7", "#f59e0b"],
-                ].map(([name, color]) => (
-                  <div key={name} className="flex items-center gap-1">
-                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
-                    <span
-                      className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
+                ].map(([name, color]) => {
+                  const hidden = hiddenDegrees.has(name);
+                  return (
+                    <div
+                      key={name}
+                      className="flex items-center gap-1 cursor-pointer select-none"
+                      style={{ opacity: hidden ? 0.3 : 1 }}
+                      onClick={() => toggleDegree(name)}
                     >
-                      {name}
-                    </span>
-                  </div>
-                ))}
+                      <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
+                      <span className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}>
+                        {name}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}

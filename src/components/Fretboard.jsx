@@ -44,6 +44,7 @@ export default function Fretboard({
   diatonicScaleType,
   diatonicDegree,
   onNoteClick,
+  hiddenDegrees = new Set(),
 }) {
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
@@ -223,6 +224,7 @@ export default function Fretboard({
                   chordPositions={chordPositions}
                   opacity={opacity}
                   onNoteClick={onNoteClick}
+                  hiddenDegrees={hiddenDegrees}
                 />
               ),
             )}
@@ -275,6 +277,7 @@ function StringRow({
   chordPositions,
   opacity,
   onNoteClick,
+  hiddenDegrees,
 }) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -340,17 +343,20 @@ function StringRow({
           overlayLabel = noteName;
         }
 
+        const degreeHidden = hiddenDegrees.has(degreeName);
+
         return (
           <FretCell
             key={fret}
             fret={fret}
             baseLabel={baseLabel}
             noteName={noteName}
-            degreeRing={degreeRing}
+            degreeRing={degreeHidden ? null : degreeRing}
             overlayColor={overlayColor}
             overlayLabel={overlayLabel}
             inChord={inChord}
             isRoot={isRoot}
+            hidden={degreeHidden}
             opacity={opacity}
             theme={theme}
             onClick={() => onNoteClick(noteName)}
@@ -370,12 +376,13 @@ function FretCell({
   overlayLabel,
   inChord,
   isRoot,
+  hidden,
   opacity,
   theme,
   onClick,
 }) {
   const isDark = theme === "dark";
-  const shouldShowBaseLabel = !overlayColor && !inChord;
+  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden;
 
   return (
     <div

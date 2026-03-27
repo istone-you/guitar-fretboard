@@ -955,6 +955,21 @@ export function isInPenta(semitone, type) {
 // ブルーノートスケール: R, m3, P4, b5, P5, m7 → 半音: 0, 3, 5, 6, 7, 10
 export const BLUES_SCALE_DEGREES = new Set([0, 3, 5, 6, 7, 10]);
 
+// コード種別ごとの構成音（半音）
+export const CHORD_SEMITONES = {
+  Major:     new Set([0, 4, 7]),
+  Minor:     new Set([0, 3, 7]),
+  "7th":     new Set([0, 4, 7, 10]),
+  maj7:      new Set([0, 4, 7, 11]),
+  m7:        new Set([0, 3, 7, 10]),
+  "m7(b5)":  new Set([0, 3, 6, 10]),
+  dim7:      new Set([0, 3, 6, 9]),
+  "m(maj7)": new Set([0, 3, 7, 11]),
+  Diminished: new Set([0, 3, 6]),
+  Augmented:  new Set([0, 4, 8]),
+  power:      new Set([0, 7]),
+};
+
 export function isInBluesScale(semitone) {
   return BLUES_SCALE_DEGREES.has(semitone);
 }

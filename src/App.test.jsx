@@ -10,16 +10,16 @@ describe('App', () => {
     expect(screen.getByText('度数')).toBeTruthy()
   })
 
-  it('度数ボタンをクリックすると度数の凡例が表示される', () => {
+  it('度数ボタンをクリックすると絞り込むボタンが表示される', () => {
     render(<App />)
     fireEvent.click(screen.getByText('度数'))
-    expect(screen.getByText('度数の凡例')).toBeTruthy()
+    expect(screen.getByText('絞り込む')).toBeTruthy()
   })
 
-  it('音名ボタンをクリックすると度数の凡例が非表示になる', () => {
+  it('音名ボタンをクリックすると度数セクションが非表示になる', () => {
     render(<App />)
     fireEvent.click(screen.getByText('度数'))
     fireEvent.click(screen.getByText('音名'))
-    expect(screen.queryByText('度数の凡例')).toBeNull()
+    expect(screen.queryByText('絞り込む')).toBeNull()
   })
 })
