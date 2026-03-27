@@ -65,6 +65,18 @@ export default function Controls({
   diatonicDegree,
   setDiatonicDegree,
 }) {
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef(null);
+
+  useEffect(() => {
+    if (!settingsOpen) return undefined;
+    const handlePointerDown = (e) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false);
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [settingsOpen]);
+
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
   const rootIndex = getRootIndex(rootNote);
@@ -88,57 +100,79 @@ export default function Controls({
   });
 
   return (
-    <div className={`space-y-4 pt-4 max-w-4xl mx-auto ${isDark ? "text-white" : "text-stone-900"}`}>
-      {/* ルート音 */}
-      <div className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
-        <button
-          onClick={onThemeChange}
-          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-            isDark ? "text-gray-300 hover:text-white" : "text-stone-500 hover:text-stone-900"
-          }`}
-          title={isDark ? "ライトモードに切り替え" : "ダークモードに切り替え"}
-        >
-          {isDark ? (
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <circle cx="12" cy="12" r="4" />
-              <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" />
-            </svg>
-          ) : (
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-        </button>
-
-        <div
-          className={`inline-flex items-center justify-between gap-2 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
-        >
-          <span
-            className={`w-12 px-2 text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
+    <div className={`space-y-4 pt-4 max-w-[840px] mx-auto ${isDark ? "text-white" : "text-stone-900"}`}>
+      {/* 設定ボタン */}
+      <div className="flex justify-end" ref={settingsRef}>
+        <div className="relative">
+          <button
+            onClick={() => setSettingsOpen((prev) => !prev)}
+            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
+              isDark ? "text-gray-400 hover:text-white" : "text-stone-500 hover:text-stone-900"
+            }`}
+            title="設定"
           >
-            ♯/♭
-          </span>
-          {[
-            { value: "sharp", label: "♯" },
-            { value: "flat", label: "♭" },
-          ].map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => onAccidentalChange(value)}
-              className={`w-[4rem] whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all
-                ${
-                  accidental === value
-                    ? "bg-indigo-600 text-white"
-                    : isDark
-                      ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
-                      : "bg-white text-stone-600 hover:bg-stone-200"
-                }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
 
+          {settingsOpen && (
+            <div className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-56 space-y-4 ${
+              isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
+            }`}>
+              {/* テーマ */}
+              <div className="flex items-center justify-between gap-3">
+                <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>テーマ</span>
+                <div className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}>
+                  {[
+                    { value: "dark", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg> },
+                    { value: "light", icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="2" strokeLinecap="round" fill="none" /></svg> },
+                  ].map(({ value, icon }) => (
+                    <button
+                      key={value}
+                      onClick={() => { if ((value === "dark") !== isDark) onThemeChange(); }}
+                      className={`w-10 flex items-center justify-center py-1 rounded text-sm font-semibold transition-all ${
+                        (value === "dark") === isDark
+                          ? "bg-indigo-600 text-white"
+                          : isDark
+                            ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                            : "bg-white text-stone-600 hover:bg-stone-200"
+                      }`}
+                    >
+                      {icon}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ♯/♭ */}
+              <div className="flex items-center justify-between gap-3">
+                <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>♯/♭</span>
+                <div className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}>
+                  {[
+                    { value: "sharp", label: "♯" },
+                    { value: "flat", label: "♭" },
+                  ].map(({ value, label }) => (
+                    <button
+                      key={value}
+                      onClick={() => onAccidentalChange(value)}
+                      className={`w-10 px-2 py-1 rounded text-sm font-semibold transition-all ${
+                        accidental === value
+                          ? "bg-indigo-600 text-white"
+                          : isDark
+                            ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                            : "bg-white text-stone-600 hover:bg-stone-200"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3">

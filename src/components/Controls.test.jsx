@@ -39,8 +39,9 @@ function makeProps(overrides = {}) {
 
 describe('Controls', () => {
   // ===== レンダリング =====
-  it('♯/♭トグルが表示される', () => {
+  it('設定ボタンをクリックすると♯/♭トグルが表示される', () => {
     render(<Controls {...makeProps()} />)
+    fireEvent.click(screen.getByTitle('設定'))
     expect(screen.getByText('♯')).toBeTruthy()
     expect(screen.getByText('♭')).toBeTruthy()
   })
@@ -56,6 +57,7 @@ describe('Controls', () => {
   it('♯ボタンをクリックすると onAccidentalChange("sharp") が呼ばれる', () => {
     const props = makeProps()
     render(<Controls {...props} />)
+    fireEvent.click(screen.getByTitle('設定'))
     fireEvent.click(screen.getByText('♯'))
     expect(props.onAccidentalChange).toHaveBeenCalledWith('sharp')
   })
@@ -63,6 +65,7 @@ describe('Controls', () => {
   it('♭ボタンをクリックすると onAccidentalChange("flat") が呼ばれる', () => {
     const props = makeProps({ accidental: 'sharp' })
     render(<Controls {...props} />)
+    fireEvent.click(screen.getByTitle('設定'))
     fireEvent.click(screen.getByText('♭'))
     expect(props.onAccidentalChange).toHaveBeenCalledWith('flat')
   })
