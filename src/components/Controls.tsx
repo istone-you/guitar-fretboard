@@ -229,6 +229,7 @@ export default function Controls({
                   >
                     {[
                       t("howToUseItems.changeRoot"),
+                      t("howToUseItems.switchLabels"),
                       t("howToUseItems.togglePanel"),
                       t("howToUseItems.switchMode"),
                       t("howToUseItems.toggleDegree"),

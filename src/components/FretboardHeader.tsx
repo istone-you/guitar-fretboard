@@ -19,7 +19,7 @@ export default function FretboardHeader({
   const isEnglish = i18n.language === "en";
 
   return (
-    <div className="mb-2 flex flex-wrap items-center justify-center gap-3">
+    <div className="mb-2 flex flex-wrap items-center justify-center gap-6">
       <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
         {t("header.root")}:{" "}
         <span
@@ -33,13 +33,6 @@ export default function FretboardHeader({
           theme === "dark" ? "bg-gray-800" : "bg-stone-100"
         }`}
       >
-        <span
-          className={`${isEnglish ? "whitespace-nowrap px-2" : "w-12 px-2"} text-center text-sm font-semibold ${
-            theme === "dark" ? "text-gray-300" : "text-stone-700"
-          }`}
-        >
-          {t("header.display")}
-        </span>
         {[
           { value: "note" as BaseLabelMode, label: t("header.note") },
           { value: "degree" as BaseLabelMode, label: t("header.degree") },

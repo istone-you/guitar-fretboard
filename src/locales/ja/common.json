@@ -3,10 +3,11 @@
   "howToUse": "使い方",
   "howToUseItems": {
     "changeRoot": "指板の音をクリックしてルートを変更",
-    "togglePanel": "各パネルをクリックしてオン/オフ",
+    "switchLabels": "「音名 / 度数」で表示内容を切り替え",
+    "togglePanel": "各パネルをクリックして表示 / 非表示を切り替え",
     "switchMode": "パネル内のコントロールでモードを切り替え",
-    "toggleDegree": "度数モード時、各度数をクリックして指板上の表示をオン/オフ",
-    "filterOverlay": "「絞り込む」で有効なオーバーレイの構成音のみ表示"
+    "toggleDegree": "度数モード時、下の度数ボタンをクリックして表示 / 非表示を切り替え",
+    "filterOverlay": "「絞り込む」で表示中のスケールやコードに含まれない度数を非表示"
   },
   "theme": "テーマ",
   "language": "言語",

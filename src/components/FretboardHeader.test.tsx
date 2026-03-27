@@ -19,7 +19,6 @@ describe("FretboardHeader", () => {
 
     expect(screen.getByText("ルート:")).toBeTruthy();
     expect(screen.getByText("C")).toBeTruthy();
-    expect(screen.getByText("表示")).toBeTruthy();
     expect(screen.getByRole("button", { name: "音名" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "度数" })).toBeTruthy();
   });
