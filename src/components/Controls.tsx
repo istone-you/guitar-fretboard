@@ -423,6 +423,7 @@ export default function Controls({
                 value={chordDisplayMode}
                 onChange={setChordDisplayMode}
                 options={chordDisplayOptions}
+                accent="amber"
                 widthClass="w-36"
               />
             </div>
@@ -461,6 +462,7 @@ export default function Controls({
                         : [{ value: "", label: "--" }]
                 }
                 disabled={chordDisplayMode === "power"}
+                accent="amber"
                 widthClass="w-36"
               />
             </div>
@@ -489,6 +491,7 @@ export default function Controls({
                       : [{ value: "", label: "--" }]
                 }
                 disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
+                accent="amber"
                 widthClass="w-36"
               />
             </div>
@@ -517,6 +520,7 @@ export default function Controls({
                       : [{ value: "", label: "--" }]
                 }
                 disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
+                accent="amber"
                 widthClass="w-36"
               />
             </div>
@@ -680,6 +684,7 @@ export interface DropdownSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
+  accent?: "neutral" | "amber";
   disabled?: boolean;
   widthClass?: string;
   keepOpen?: boolean;
@@ -690,6 +695,7 @@ export function DropdownSelect({
   value,
   onChange,
   options,
+  accent = "neutral",
   disabled = false,
   widthClass = "w-32",
   keepOpen = false,
@@ -705,6 +711,20 @@ export function DropdownSelect({
     : isDark
       ? "bg-gray-700/90 text-white border-gray-500 hover:border-gray-300"
       : "bg-white/95 text-stone-900 border-stone-300 hover:border-stone-400";
+  const openClass =
+    accent === "amber"
+      ? isDark
+        ? "border-gray-500 bg-gray-700 text-white"
+        : "border-stone-400 bg-white text-stone-900"
+      : isDark
+        ? "border-gray-500 bg-gray-700"
+        : "border-stone-400 bg-white";
+  const activeOptionClass =
+    accent === "amber"
+      ? "bg-amber-500 text-white"
+      : isDark
+        ? "bg-gray-800 text-white"
+        : "bg-stone-100 text-stone-900";
 
   return (
     <div className={`relative ${widthClass}`}>
@@ -713,11 +733,7 @@ export function DropdownSelect({
         disabled={disabled}
         onClick={() => !disabled && setOpen((prev) => !prev)}
         className={`flex w-full items-center justify-between gap-2 rounded-xl border px-2.5 py-1.5 text-left text-sm font-medium shadow-sm transition-all ${
-          open && !disabled
-            ? isDark
-              ? "border-gray-500 bg-gray-700"
-              : "border-stone-400 bg-white"
-            : buttonClass
+          open && !disabled ? openClass : buttonClass
         }`}
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -761,9 +777,7 @@ export function DropdownSelect({
                     }}
                     className={`flex w-full items-center rounded-xl px-3 py-2 text-sm transition-colors ${
                       active
-                        ? isDark
-                          ? "bg-gray-800 text-white"
-                          : "bg-stone-100 text-stone-900"
+                        ? activeOptionClass
                         : isDark
                           ? "text-gray-300 hover:bg-gray-800/80"
                           : "text-stone-700 hover:bg-stone-50"
