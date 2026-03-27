@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   NOTES_SHARP,
   NOTES_FLAT,
@@ -66,16 +66,6 @@ export default function Controls({
   setDiatonicDegree,
 }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const settingsRef = useRef(null);
-
-  useEffect(() => {
-    if (!settingsOpen) return undefined;
-    const handlePointerDown = (e) => {
-      if (settingsRef.current && !settingsRef.current.contains(e.target)) setSettingsOpen(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [settingsOpen]);
 
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -102,7 +92,7 @@ export default function Controls({
   return (
     <div className={`space-y-4 pt-4 max-w-[840px] mx-auto ${isDark ? "text-white" : "text-stone-900"}`}>
       {/* 設定ボタン */}
-      <div className="flex justify-end" ref={settingsRef}>
+      <div className="flex justify-end">
         <div className="relative">
           <button
             onClick={() => setSettingsOpen((prev) => !prev)}
@@ -118,7 +108,9 @@ export default function Controls({
           </button>
 
           {settingsOpen && (
-            <div className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-64 space-y-4 ${
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setSettingsOpen(false)} />
+              <div className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-64 space-y-4 ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             }`}>
               {/* 使い方 */}
@@ -183,6 +175,7 @@ export default function Controls({
                 </div>
               </div>
             </div>
+            </>
           )}
         </div>
       </div>
@@ -401,30 +394,8 @@ export function DropdownSelect({
   keepOpen = false,
 }) {
   const [open, setOpen] = useState(false);
-  const rootRef = useRef(null);
   const isDark = theme === "dark";
   const selected = options.find((option) => option.value === value) ?? options[0];
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const handlePointerDown = (event) => {
-      if (rootRef.current && !rootRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-
-    document.addEventListener("mousedown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [open]);
 
   const buttonClass = disabled
     ? isDark
@@ -435,7 +406,7 @@ export function DropdownSelect({
       : "bg-white/95 text-stone-900 border-stone-300 hover:border-stone-400";
 
   return (
-    <div ref={rootRef} className={`relative ${widthClass}`}>
+    <div className={`relative ${widthClass}`}>
       <button
         type="button"
         disabled={disabled}
@@ -462,8 +433,10 @@ export function DropdownSelect({
       </button>
 
       {open && !disabled && (
-        <div
-          className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
+          <div
+            className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
             isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
           }`}
         >
@@ -494,6 +467,7 @@ export function DropdownSelect({
             })}
           </div>
         </div>
+        </>
       )}
     </div>
   );

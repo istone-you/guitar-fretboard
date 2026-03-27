@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
 import { DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex } from "./logic/fretboard";
@@ -52,13 +52,17 @@ export default function App() {
     setRootNote(noteName);
   };
 
-  useEffect(() => {
-    const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
-    const validDegrees = DIATONIC_CHORDS[diatonicScaleType].map((item) => item.value);
-    if (!validDegrees.includes(diatonicDegree)) {
-      setDiatonicDegree(validDegrees[0]);
-    }
-  }, [diatonicKeyType, diatonicChordSize, diatonicDegree]);
+  const handleDiatonicKeyTypeChange = (value) => {
+    const validDegrees = DIATONIC_CHORDS[`${value}-${diatonicChordSize}`].map((item) => item.value);
+    setDiatonicKeyType(value);
+    if (!validDegrees.includes(diatonicDegree)) setDiatonicDegree(validDegrees[0]);
+  };
+
+  const handleDiatonicChordSizeChange = (value) => {
+    const validDegrees = DIATONIC_CHORDS[`${diatonicKeyType}-${value}`].map((item) => item.value);
+    setDiatonicChordSize(value);
+    if (!validDegrees.includes(diatonicDegree)) setDiatonicDegree(validDegrees[0]);
+  };
 
   const [theme, setTheme] = useState("dark");
   const triadLayout = `${triadStringSet}-${triadInversion}`;
@@ -100,9 +104,9 @@ export default function App() {
           triadInversion={triadInversion}
           setTriadInversion={setTriadInversion}
           diatonicKeyType={diatonicKeyType}
-          setDiatonicKeyType={setDiatonicKeyType}
+          setDiatonicKeyType={handleDiatonicKeyTypeChange}
           diatonicChordSize={diatonicChordSize}
-          setDiatonicChordSize={setDiatonicChordSize}
+          setDiatonicChordSize={handleDiatonicChordSizeChange}
           diatonicDegree={diatonicDegree}
           setDiatonicDegree={setDiatonicDegree}
         />
