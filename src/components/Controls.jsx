@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { NOTES, CAGED_FORMS, CAGED_ORDER } from '../logic/fretboard'
+import { NOTES, CAGED_FORMS, CAGED_ORDER, DIATONIC_CHORDS, getDiatonicChord } from '../logic/fretboard'
 
 const CHORD_TYPES = ['Major', 'Minor', '7th', 'maj7', 'm7', 'm7(b5)', 'dim7', 'm(maj7)']
 const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
@@ -7,12 +7,15 @@ const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   label: i === 0 ? 'なし' : `${i}フレット`,
 }))
 const CHORD_DISPLAY_OPTIONS = [
-  { value: 'barre', label: 'バレーコード' },
+  { value: 'form', label: 'コードフォーム' },
   { value: 'power', label: 'パワーコード' },
+  { value: 'diatonic', label: 'ダイアトニック' },
 ]
-const CHORD_ROOT_OPTIONS = [
-  { value: 0, label: '6弦ルート' },
-  { value: 1, label: '5弦ルート' },
+const DIATONIC_KEY_OPTIONS = [
+  { value: 'major-triad', label: 'メジャー（3和音）' },
+  { value: 'major-seventh', label: 'メジャー（4和音）' },
+  { value: 'natural-minor-triad', label: 'マイナー（3和音）' },
+  { value: 'natural-minor-seventh', label: 'マイナー（4和音）' },
 ]
 const SCALE_OPTIONS = [
   { value: 'major', label: 'メジャースケール' },
@@ -43,12 +46,29 @@ export default function Controls({
   toggleCagedForm,
   chordType,
   setChordType,
-  chordRootString,
-  setChordRootString,
+  diatonicScaleType,
+  setDiatonicScaleType,
+  diatonicDegree,
+  setDiatonicDegree,
   layerOpacity,
   setLayerOpacity,
 }) {
   const isDark = theme === 'dark'
+  const rootIndex = NOTES.indexOf(rootNote)
+  const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {
+    const chord = getDiatonicChord(rootIndex, diatonicScaleType, value)
+    const suffixMap = {
+      Major: '',
+      Minor: 'm',
+      '7th': '7',
+      maj7: 'maj7',
+      m7: 'm7',
+      'm7(b5)': 'm7(b5)',
+      dim7: 'dim',
+      'm(maj7)': 'm(maj7)',
+    }
+    return { value, label: `${value} (${NOTES[chord.rootIndex]}${suffixMap[chord.chordType] ?? chord.chordType})` }
+  })
 
   return (
     <div className={`space-y-4 pt-4 ${isDark ? 'text-white' : 'text-stone-900'}`}>
@@ -162,7 +182,7 @@ export default function Controls({
                 value={chordDisplayMode}
                 onChange={setChordDisplayMode}
                 options={CHORD_DISPLAY_OPTIONS}
-                widthClass="w-36"
+                widthClass="w-44"
               />
             </label>
 
@@ -170,26 +190,35 @@ export default function Controls({
               <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>コード</span>
               <DropdownSelect
                 theme={theme}
-                value={chordDisplayMode === 'barre' ? chordType : ''}
-                onChange={setChordType}
+                value={
+                  chordDisplayMode === 'form'
+                    ? chordType
+                    : chordDisplayMode === 'diatonic'
+                      ? diatonicDegree
+                      : ''
+                }
+                onChange={chordDisplayMode === 'diatonic' ? setDiatonicDegree : setChordType}
                 options={
-                  chordDisplayMode === 'barre'
+                  chordDisplayMode === 'form'
                     ? CHORD_TYPES.map((chord) => ({ value: chord, label: chord }))
+                    : chordDisplayMode === 'diatonic'
+                      ? diatonicCodeOptions
                     : [{ value: '', label: '--' }]
                 }
-                disabled={chordDisplayMode !== 'barre'}
-                widthClass="w-32"
+                disabled={chordDisplayMode === 'power'}
+                widthClass="w-44"
               />
             </label>
 
             <label className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>ルート弦</span>
+              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>キー</span>
               <DropdownSelect
                 theme={theme}
-                value={chordRootString}
-                onChange={setChordRootString}
-                options={CHORD_ROOT_OPTIONS}
-                widthClass="w-32"
+                value={chordDisplayMode === 'diatonic' ? diatonicScaleType : ''}
+                onChange={setDiatonicScaleType}
+                options={chordDisplayMode === 'diatonic' ? DIATONIC_KEY_OPTIONS : [{ value: '', label: '--' }]}
+                disabled={chordDisplayMode !== 'diatonic'}
+                widthClass="w-44"
               />
             </label>
           </div>

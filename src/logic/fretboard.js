@@ -145,9 +145,9 @@ export const CHORD_FORMS_6TH = {
   'dim7':     [
     { string: 0, fretOffset: 0 },
     { string: 1, fretOffset: 1 },
-    { string: 2, fretOffset: 0 },
-    { string: 3, fretOffset: 0 }, // bb7 = M6 から-1
-    { string: 4, fretOffset: -1 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 0 },
+    { string: 4, fretOffset: 2 },
     { string: 5, fretOffset: 0 },
   ],
   'm(maj7)':  [
@@ -179,7 +179,7 @@ export const CHORD_FORMS_5TH = {
   '7th':     [
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 2 },
-    { string: 3, fretOffset: 1 },
+    { string: 3, fretOffset: 0 },
     { string: 4, fretOffset: 2 },
     { string: 5, fretOffset: 0 },
   ],
@@ -187,35 +187,34 @@ export const CHORD_FORMS_5TH = {
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 2 },
     { string: 3, fretOffset: 1 },
-    { string: 4, fretOffset: 1 },
+    { string: 4, fretOffset: 2 },
     { string: 5, fretOffset: 0 },
   ],
   'm7':      [
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 2 },
-    { string: 3, fretOffset: 1 },
+    { string: 3, fretOffset: 0 },
     { string: 4, fretOffset: 1 },
     { string: 5, fretOffset: 0 },
   ],
   'm7(b5)': [
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 1 },
-    { string: 3, fretOffset: 1 },
+    { string: 3, fretOffset: 0 },
     { string: 4, fretOffset: 1 },
-    { string: 5, fretOffset: 0 },
   ],
   'dim7':    [
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 1 },
-    { string: 3, fretOffset: 0 },
+    { string: 3, fretOffset: 2 },
     { string: 4, fretOffset: 1 },
-    { string: 5, fretOffset: 0 },
+    { string: 5, fretOffset: 2 },
   ],
   'm(maj7)': [
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 2 },
     { string: 3, fretOffset: 1 },
-    { string: 4, fretOffset: 0 },
+    { string: 4, fretOffset: 1 },
     { string: 5, fretOffset: 0 },
   ],
 }
@@ -229,6 +228,231 @@ export const POWER_CHORD_FORMS = {
     { string: 1, fretOffset: 0 },
     { string: 2, fretOffset: 2 },
   ],
+}
+
+export const OPEN_CHORD_FORMS = {
+  Major: {
+    C: [
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 3 },
+      { string: 5, fret: 2 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    G: [
+      { string: 0, fret: 3 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 0 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 3 },
+    ],
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 2 },
+      { string: 5, fret: 0 },
+    ],
+  },
+  Minor: {
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 3 },
+      { string: 5, fret: 1 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+  },
+  '7th': {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 2 },
+      { string: 5, fret: 0 },
+    ],
+    B: [
+      { string: 1, fret: 2 },
+      { string: 2, fret: 1 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 2 },
+    ],
+    C: [
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 3 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 2 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 0 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    G: [
+      { string: 0, fret: 1 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 0 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 1 },
+    ],
+  },
+  maj7: {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 2 },
+      { string: 5, fret: 0 },
+    ],
+    C: [
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 1 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    F: [
+      { string: 0, fret: 1 },
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+    G: [
+      { string: 0, fret: 2 },
+      { string: 1, fret: 0 },
+      { string: 2, fret: 0 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 2 },
+    ],
+  },
+  m7: {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 1 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 0 },
+      { string: 3, fret: 0 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+  },
+}
+
+export function getOpenChordForm(rootIndex, chordType, capo = 0) {
+  const physicalRoot = NOTES[(rootIndex - capo + 12) % 12]
+  return OPEN_CHORD_FORMS[chordType]?.[physicalRoot] ?? null
+}
+
+export const DIATONIC_CHORDS = {
+  'major-triad': [
+    { value: 'I', offset: 0, chordType: 'Major' },
+    { value: 'ii', offset: 2, chordType: 'Minor' },
+    { value: 'iii', offset: 4, chordType: 'Minor' },
+    { value: 'IV', offset: 5, chordType: 'Major' },
+    { value: 'V', offset: 7, chordType: 'Major' },
+    { value: 'vi', offset: 9, chordType: 'Minor' },
+    { value: 'vii', offset: 11, chordType: 'dim7' },
+  ],
+  'major-seventh': [
+    { value: 'I', offset: 0, chordType: 'maj7' },
+    { value: 'ii', offset: 2, chordType: 'm7' },
+    { value: 'iii', offset: 4, chordType: 'm7' },
+    { value: 'IV', offset: 5, chordType: 'maj7' },
+    { value: 'V', offset: 7, chordType: '7th' },
+    { value: 'vi', offset: 9, chordType: 'm7' },
+    { value: 'vii', offset: 11, chordType: 'm7(b5)' },
+  ],
+  'natural-minor-triad': [
+    { value: 'i', offset: 0, chordType: 'Minor' },
+    { value: 'ii', offset: 2, chordType: 'dim7' },
+    { value: 'III', offset: 3, chordType: 'Major' },
+    { value: 'iv', offset: 5, chordType: 'Minor' },
+    { value: 'v', offset: 7, chordType: 'Minor' },
+    { value: 'VI', offset: 8, chordType: 'Major' },
+    { value: 'VII', offset: 10, chordType: 'Major' },
+  ],
+  'natural-minor-seventh': [
+    { value: 'i', offset: 0, chordType: 'm7' },
+    { value: 'ii', offset: 2, chordType: 'm7(b5)' },
+    { value: 'III', offset: 3, chordType: 'maj7' },
+    { value: 'iv', offset: 5, chordType: 'm7' },
+    { value: 'v', offset: 7, chordType: 'm7' },
+    { value: 'VI', offset: 8, chordType: 'maj7' },
+    { value: 'VII', offset: 10, chordType: '7th' },
+  ],
+}
+
+export function getDiatonicChord(rootIndex, scaleType, degreeValue) {
+  const progression = DIATONIC_CHORDS[scaleType] ?? DIATONIC_CHORDS['major-triad']
+  const selected = progression.find((item) => item.value === degreeValue) ?? progression[0]
+  return {
+    rootIndex: (rootIndex + selected.offset) % 12,
+    chordType: selected.chordType,
+  }
 }
 
 // ===== スケールフォーム定義 =====

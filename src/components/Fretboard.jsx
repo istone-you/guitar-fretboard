@@ -10,6 +10,8 @@ import {
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
   POWER_CHORD_FORMS,
+  getDiatonicChord,
+  getOpenChordForm,
   isInMajorScale,
   isInNaturalMinorScale,
   isInPenta,
@@ -18,6 +20,10 @@ import {
 } from '../logic/fretboard'
 
 const STRING_COUNT = 6
+const FRET_CELL_WIDTH = 56
+const STRING_LABEL_WIDTH = 32
+const STRING_ROW_HEIGHT = 40
+const STRING_ROW_GAP = 1
 
 export default function Fretboard({
   theme,
@@ -31,41 +37,86 @@ export default function Fretboard({
   showCaged,
   cagedForms,
   chordType,
-  chordRootString,
+  diatonicScaleType,
+  diatonicDegree,
   layerOpacity,
   onNoteClick,
 }) {
   const rootIndex = getRootIndex(rootNote)
-  const isDark = theme === 'dark'
+  const diatonicChord = chordDisplayMode === 'diatonic'
+    ? getDiatonicChord(rootIndex, diatonicScaleType, diatonicDegree)
+    : null
+  const effectiveDisplayMode = chordDisplayMode === 'diatonic' ? 'form' : chordDisplayMode
+  const effectiveRootIndex = chordDisplayMode === 'diatonic' ? diatonicChord.rootIndex : rootIndex
+  const effectiveChordType = chordDisplayMode === 'diatonic' ? diatonicChord.chordType : chordType
 
-  // コードフォームのポジションをセット化（弦×フレット → key）
+  const chordGroups = useMemo(() => {
+    if (!showChord) return []
+
+    const movableGroups = [0, 1].flatMap((rootStringIdx) => {
+      const form = effectiveDisplayMode === 'power'
+        ? POWER_CHORD_FORMS[rootStringIdx]
+        : (rootStringIdx === 0 ? CHORD_FORMS_6TH : CHORD_FORMS_5TH)[effectiveChordType]
+      if (!form) return []
+
+      let rootFret = -1
+      for (let fret = 0; fret < FRET_COUNT; fret++) {
+        if (getNoteIndex(rootStringIdx, fret, capo) === effectiveRootIndex) {
+          rootFret = fret
+          break
+        }
+      }
+      if (rootFret === -1) return []
+
+      const cells = form
+        .map(({ string, fretOffset }) => ({ string, fret: rootFret + fretOffset }))
+        .filter(({ fret }) => fret >= 0 && fret < FRET_COUNT)
+      if (cells.length === 0) return []
+
+      const frets = cells.map((cell) => cell.fret)
+      const strings = cells.map((cell) => cell.string)
+      return [{
+        id: `${rootStringIdx}-${effectiveDisplayMode}-${effectiveChordType}-${effectiveRootIndex}`,
+        kind: rootStringIdx === 0 ? '6th' : '5th',
+        rootStringIdx,
+        cells,
+        minFret: Math.min(...frets),
+        maxFret: Math.max(...frets),
+        minString: Math.min(...strings),
+        maxString: Math.max(...strings),
+      }]
+    })
+
+    if (effectiveDisplayMode !== 'form') return movableGroups
+
+    const openForm = getOpenChordForm(effectiveRootIndex, effectiveChordType, capo)
+    if (!openForm) return movableGroups
+
+    const frets = openForm.map((cell) => cell.fret)
+    const strings = openForm.map((cell) => cell.string)
+    return [
+      ...movableGroups,
+      {
+        id: `open-${effectiveChordType}-${effectiveRootIndex}-${capo}`,
+        kind: 'open',
+        cells: openForm,
+        minFret: Math.min(...frets),
+        maxFret: Math.max(...frets),
+        minString: Math.min(...strings),
+        maxString: Math.max(...strings),
+      },
+    ]
+  }, [showChord, effectiveDisplayMode, effectiveChordType, effectiveRootIndex, capo])
+
   const chordPositions = useMemo(() => {
-    if (!showChord) return new Set()
-    const form = chordDisplayMode === 'power'
-      ? POWER_CHORD_FORMS[chordRootString]
-      : (chordRootString === 0 ? CHORD_FORMS_6TH : CHORD_FORMS_5TH)[chordType]
-    if (!form) return new Set()
-
-    // ルート音が指板上でどのフレットにあるかを探す（カポ考慮）
-    const rootStringIdx = chordRootString // 0=6弦, 1=5弦
-    let rootFret = -1
-    for (let f = 0; f < FRET_COUNT; f++) {
-      if (getNoteIndex(rootStringIdx, f, capo) === rootIndex) {
-        rootFret = f
-        break
-      }
-    }
-    if (rootFret === -1) return new Set()
-
     const set = new Set()
-    form.forEach(({ string, fretOffset }) => {
-      const fret = rootFret + fretOffset
-      if (fret >= 0 && fret < FRET_COUNT) {
+    chordGroups.forEach((group) => {
+      group.cells.forEach(({ string, fret }) => {
         set.add(`${string}-${fret}`)
-      }
+      })
     })
     return set
-  }, [showChord, chordDisplayMode, chordType, chordRootString, rootIndex, capo])
+  }, [chordGroups])
 
   // CAGEDポジションマップ（選択中の全フォームをマージ）
   const cagedPositions = useMemo(() => {
@@ -104,22 +155,43 @@ export default function Fretboard({
           </div>
 
           {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
-          {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
-            <StringRow
-              key={stringIdx}
-              theme={theme}
-              stringIdx={stringIdx}
-              capo={capo}
-              rootIndex={rootIndex}
-              baseLabelMode={baseLabelMode}
-              showScale={showScale}
-              scaleType={scaleType}
-              cagedPositions={cagedPositions}
-              chordPositions={chordPositions}
-              opacity={opacity}
-              onNoteClick={onNoteClick}
-            />
-          ))}
+          <div className="relative">
+            {chordGroups.map((group) => {
+              const top = (STRING_COUNT - 1 - group.maxString) * (STRING_ROW_HEIGHT + STRING_ROW_GAP)
+              const left = STRING_LABEL_WIDTH + group.minFret * FRET_CELL_WIDTH
+              const width = (group.maxFret - group.minFret + 1) * FRET_CELL_WIDTH
+              const height = (group.maxString - group.minString + 1) * STRING_ROW_HEIGHT + (group.maxString - group.minString) * STRING_ROW_GAP
+
+              return (
+                <div
+                  key={group.id}
+                  className={`pointer-events-none absolute rounded-2xl border-2 z-[6] ${
+                    group.kind === 'open'
+                      ? 'border-emerald-300/60 bg-emerald-300/8'
+                      : 'border-amber-300/60 bg-amber-300/8'
+                  }`}
+                  style={{ top, left, width, height }}
+                />
+              )
+            })}
+
+            {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
+              <StringRow
+                key={stringIdx}
+                theme={theme}
+                stringIdx={stringIdx}
+                capo={capo}
+                rootIndex={rootIndex}
+                baseLabelMode={baseLabelMode}
+                showScale={showScale}
+                scaleType={scaleType}
+                cagedPositions={cagedPositions}
+                chordPositions={chordPositions}
+                opacity={opacity}
+                onNoteClick={onNoteClick}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

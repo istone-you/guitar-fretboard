@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Controls from './components/Controls'
 import Fretboard from './components/Fretboard'
+import { DIATONIC_CHORDS } from './logic/fretboard'
 
 export default function App() {
   // ルート音
@@ -16,9 +17,10 @@ export default function App() {
   const [showCaged, setShowCaged] = useState(false)
 
   // コードフォーム設定
-  const [chordDisplayMode, setChordDisplayMode] = useState('barre')
+  const [chordDisplayMode, setChordDisplayMode] = useState('form')
   const [chordType, setChordType] = useState('Major')
-  const [chordRootString, setChordRootString] = useState(0)
+  const [diatonicScaleType, setDiatonicScaleType] = useState('major-triad')
+  const [diatonicDegree, setDiatonicDegree] = useState('I')
 
   // スケール設定
   const [scaleType, setScaleType] = useState('major')
@@ -41,6 +43,13 @@ export default function App() {
   const handleNoteClick = (noteName) => {
     setRootNote(noteName)
   }
+
+  useEffect(() => {
+    const validDegrees = DIATONIC_CHORDS[diatonicScaleType].map((item) => item.value)
+    if (!validDegrees.includes(diatonicDegree)) {
+      setDiatonicDegree(validDegrees[0])
+    }
+  }, [diatonicScaleType, diatonicDegree])
 
   const theme = 'dark'
 
@@ -73,8 +82,10 @@ export default function App() {
           toggleCagedForm={toggleCagedForm}
           chordType={chordType}
           setChordType={setChordType}
-          chordRootString={chordRootString}
-          setChordRootString={setChordRootString}
+          diatonicScaleType={diatonicScaleType}
+          setDiatonicScaleType={setDiatonicScaleType}
+          diatonicDegree={diatonicDegree}
+          setDiatonicDegree={setDiatonicDegree}
           layerOpacity={layerOpacity}
           setLayerOpacity={setLayerOpacity}
         />
@@ -104,7 +115,8 @@ export default function App() {
           showCaged={showCaged}
           cagedForms={cagedForms}
           chordType={chordType}
-          chordRootString={chordRootString}
+          diatonicScaleType={diatonicScaleType}
+          diatonicDegree={diatonicDegree}
           layerOpacity={layerOpacity}
           onNoteClick={handleNoteClick}
         />
