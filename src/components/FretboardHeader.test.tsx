@@ -41,4 +41,15 @@ describe("FretboardHeader", () => {
 
     expect(props.onBaseLabelModeChange).toHaveBeenCalledWith("degree");
   });
+
+  it("ライトテーマと degree 選択状態でも表示できる", () => {
+    render(
+      <FretboardHeader
+        {...makeProps({ theme: "light" as Theme, baseLabelMode: "degree" as BaseLabelMode })}
+      />,
+    );
+
+    expect(screen.getByText("ルート:")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "度数" })).toBeTruthy();
+  });
 });

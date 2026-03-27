@@ -13,6 +13,9 @@ import {
   isInPenta,
   getDiatonicChord,
   getDiatonicChordSemitones,
+  getTriadLayout,
+  CHORD_SEMITONES,
+  calcCagedPositions,
   getOpenChordForm,
   buildTriadVoicing,
 } from "./fretboard";
@@ -262,6 +265,29 @@ describe("getDiatonicChordSemitones", () => {
     expect(
       [...getDiatonicChordSemitones(9, "natural-minor-seventh", "III")].sort((a, b) => a - b),
     ).toEqual([3, 7, 10, 2].sort((a, b) => a - b));
+  });
+
+  it("コード種別の半音定義が欠けている場合は空集合になる", () => {
+    const original = CHORD_SEMITONES.Major;
+    delete CHORD_SEMITONES.Major;
+
+    try {
+      expect(getDiatonicChordSemitones(0, "major-triad", "I").size).toBe(0);
+    } finally {
+      CHORD_SEMITONES.Major = original;
+    }
+  });
+});
+
+describe("getTriadLayout", () => {
+  it("不明なレイアウト値では先頭レイアウトを返す", () => {
+    expect(getTriadLayout("unknown-layout").value).toBe("1-3-root");
+  });
+});
+
+describe("calcCagedPositions", () => {
+  it("不明なフォームでは空マップを返す", () => {
+    expect(calcCagedPositions("Z", 0).size).toBe(0);
   });
 });
 

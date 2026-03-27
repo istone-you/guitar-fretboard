@@ -110,4 +110,136 @@ describe("Fretboard", () => {
     const cells = screen.getAllByText("A");
     expect(cells.length).toBeGreaterThan(0);
   });
+
+  it("メジャースケール表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ showScale: true, scaleType: "major" as ScaleType })} />);
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("ナチュラルマイナー表示でもレンダリングできる", () => {
+    render(
+      <Fretboard {...makeProps({ showScale: true, scaleType: "natural-minor" as ScaleType })} />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("ブルース表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ showScale: true, scaleType: "blues" as ScaleType })} />);
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("メジャーペンタ表示でもレンダリングできる", () => {
+    render(
+      <Fretboard {...makeProps({ showScale: true, scaleType: "major-penta" as ScaleType })} />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("マイナーペンタ表示でもレンダリングできる", () => {
+    render(
+      <Fretboard {...makeProps({ showScale: true, scaleType: "minor-penta" as ScaleType })} />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("CAGED表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ showCaged: true, cagedForms: new Set(["C", "A"]) })} />);
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("コードフォーム表示でもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({ showChord: true, chordDisplayMode: "form" as ChordDisplayMode })}
+      />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("パワーコード表示でもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({ showChord: true, chordDisplayMode: "power" as ChordDisplayMode })}
+      />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("トライアド表示でもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "triad" as ChordDisplayMode,
+          chordType: "Major" as ChordType,
+          triadPosition: "1-3-root",
+        })}
+      />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("ダイアトニック表示でもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "diatonic" as ChordDisplayMode,
+          diatonicScaleType: "major-seventh",
+          diatonicDegree: "V",
+        })}
+      />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("hiddenDegrees に含まれる度数は非表示になる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          baseLabelMode: "degree" as BaseLabelMode,
+          hiddenDegrees: new Set(["P1"]),
+        })}
+      />,
+    );
+    expect(screen.queryAllByText("P1")).toHaveLength(0);
+    expect(screen.getAllByText("P5").length).toBeGreaterThan(0);
+  });
+
+  it("ライトテーマでもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ theme: "light" as Theme })} />);
+    expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("空の CAGED フォーム集合でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ showCaged: true, cagedForms: new Set<string>() })} />);
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("不正なトライアド種別でもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "triad" as ChordDisplayMode,
+          chordType: "7th" as ChordType,
+        })}
+      />,
+    );
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("オープンフォームがないルートでもレンダリングできる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          rootNote: "D♭",
+          chordType: "Major" as ChordType,
+        })}
+      />,
+    );
+    expect(screen.getAllByText("D♭").length).toBeGreaterThan(0);
+  });
 });
