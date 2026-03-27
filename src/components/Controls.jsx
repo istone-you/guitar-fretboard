@@ -127,7 +127,6 @@ export default function Controls({
           onToggle={() => setShowScale(!showScale)}
         >
           <div className="flex flex-wrap gap-2 items-center">
-            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>種類</span>
             <DropdownSelect
               theme={theme}
               value={scaleType}
@@ -146,7 +145,6 @@ export default function Controls({
           onToggle={() => setShowCaged(!showCaged)}
         >
           <div className="flex flex-wrap gap-2 items-center">
-            <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>フォーム</span>
             {CAGED_ORDER.map((key) => {
               const active = cagedForms.has(key)
               return (
@@ -175,8 +173,8 @@ export default function Controls({
           onToggle={() => setShowChord(!showChord)}
         >
           <div className="flex flex-wrap gap-3 items-center">
-            <label className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>表示方式</span>
+            <div className="flex flex-col gap-1">
+              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'}`}>表示形式</span>
               <DropdownSelect
                 theme={theme}
                 value={chordDisplayMode}
@@ -184,10 +182,12 @@ export default function Controls({
                 options={CHORD_DISPLAY_OPTIONS}
                 widthClass="w-44"
               />
-            </label>
+            </div>
 
-            <label className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>コード</span>
+            <div className="flex flex-col gap-1">
+              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${chordDisplayMode === 'power' ? 'invisible' : ''}`}>
+                {chordDisplayMode === 'diatonic' ? '度数' : 'コード'}
+              </span>
               <DropdownSelect
                 theme={theme}
                 value={
@@ -208,10 +208,10 @@ export default function Controls({
                 disabled={chordDisplayMode === 'power'}
                 widthClass="w-44"
               />
-            </label>
+            </div>
 
-            <label className="flex items-center gap-2">
-              <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>キー</span>
+            <div className="flex flex-col gap-1">
+              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${chordDisplayMode === 'diatonic' ? '' : 'invisible'}`}>キー</span>
               <DropdownSelect
                 theme={theme}
                 value={chordDisplayMode === 'diatonic' ? diatonicScaleType : ''}
@@ -220,7 +220,7 @@ export default function Controls({
                 disabled={chordDisplayMode !== 'diatonic'}
                 widthClass="w-44"
               />
-            </label>
+            </div>
           </div>
         </LayerRow>
       </div>
