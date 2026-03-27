@@ -142,7 +142,7 @@ export default function Controls({
           <button
             onClick={() => setSettingsOpen((prev) => !prev)}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-              isDark ? "text-gray-400 hover:text-white" : "text-stone-500 hover:text-stone-900"
+              isDark ? "text-gray-200 hover:text-white" : "text-stone-600 hover:text-stone-900"
             }`}
             title="設定"
           >
@@ -171,12 +171,12 @@ export default function Controls({
                 {/* 使い方 */}
                 <div className="space-y-2">
                   <span
-                    className={`text-xs font-bold uppercase tracking-wide ${isDark ? "text-gray-500" : "text-stone-400"}`}
+                    className={`text-xs font-bold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-stone-600"}`}
                   >
                     使い方
                   </span>
                   <ul
-                    className={`text-xs space-y-1.5 ${isDark ? "text-gray-400" : "text-stone-600"}`}
+                    className={`text-xs space-y-1.5 ${isDark ? "text-gray-200" : "text-stone-700"}`}
                   >
                     <li>・指板の音をクリックしてルートを変更</li>
                     <li>・各パネルをクリックしてオン/オフ</li>
@@ -232,7 +232,7 @@ export default function Controls({
                           (value === "dark") === isDark
                             ? "bg-indigo-600 text-white"
                             : isDark
-                              ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                              ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
                               : "bg-white text-stone-600 hover:bg-stone-200"
                         }`}
                       >
@@ -263,7 +263,7 @@ export default function Controls({
                           accidental === value
                             ? "bg-indigo-600 text-white"
                             : isDark
-                              ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                              ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
                               : "bg-white text-stone-600 hover:bg-stone-200"
                         }`}
                       >
@@ -317,7 +317,7 @@ export default function Controls({
                         active
                           ? "text-white border-transparent scale-110 shadow-lg"
                           : isDark
-                            ? "bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-400"
+                            ? "bg-gray-700 text-gray-100 border-gray-500 hover:border-gray-300"
                             : "bg-white text-stone-600 border-stone-300 hover:border-stone-500"
                       }`}
                     style={active ? { backgroundColor: CAGED_FORMS[key].color } : {}}
@@ -340,7 +340,7 @@ export default function Controls({
           <div className="flex flex-wrap gap-3 items-center justify-center">
             <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
-                className={`text-center sm:text-left text-xs ${isDark ? "text-gray-500" : "text-stone-500"}`}
+                className={`text-center sm:text-left text-xs ${isDark ? "text-gray-200" : "text-stone-600"}`}
               >
                 表示形式
               </span>
@@ -355,7 +355,7 @@ export default function Controls({
 
             <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
-                className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "power" ? "invisible" : ""}`}
+                className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "power" ? "invisible" : ""}`}
               >
                 {chordDisplayMode === "diatonic" ? "度数" : "コード"}
               </span>
@@ -393,7 +393,7 @@ export default function Controls({
 
             <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
-                className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
+                className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
                 {chordDisplayMode === "triad" ? "弦" : "キー"}
               </span>
@@ -424,7 +424,7 @@ export default function Controls({
 
             <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
-                className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
+                className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
                 {chordDisplayMode === "triad" ? "転回" : "和音"}
               </span>
@@ -487,7 +487,7 @@ function LayerRow({ label, color, active, onToggle, theme, children }: LayerRowP
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
         <span
-          className={`self-center text-xs font-bold px-2 py-0.5 rounded-full ${active ? `${color} text-white` : isDark ? "bg-gray-700 text-gray-400" : "bg-stone-200 text-stone-500"}`}
+          className={`self-center text-xs font-bold px-2 py-0.5 rounded-full ${active ? `${color} text-white` : isDark ? "bg-gray-700 text-gray-100" : "bg-stone-200 text-stone-700"}`}
         >
           {label}
         </span>
@@ -526,10 +526,10 @@ export function DropdownSelect({
 
   const buttonClass = disabled
     ? isDark
-      ? "bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed"
-      : "bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed"
+      ? "bg-gray-800 text-gray-300 border-gray-600 cursor-not-allowed"
+      : "bg-stone-100 text-stone-500 border-stone-300 cursor-not-allowed"
     : isDark
-      ? "bg-gray-700/90 text-white border-gray-600 hover:border-gray-500"
+      ? "bg-gray-700/90 text-white border-gray-500 hover:border-gray-300"
       : "bg-white/95 text-stone-900 border-stone-300 hover:border-stone-400";
 
   return (
@@ -551,7 +551,7 @@ export function DropdownSelect({
         <span className="truncate">{selected?.label}</span>
         <span
           className={`text-xs transition-transform ${open ? "rotate-180" : ""} ${
-            isDark ? "text-gray-400" : "text-stone-500"
+            isDark ? "text-gray-200" : "text-stone-600"
           }`}
           aria-hidden="true"
         >

@@ -180,7 +180,7 @@ export default function App() {
         theme === "dark" ? "bg-gray-950" : "bg-stone-100"
       }`}
     >
-      <div
+      <main
         className={`rounded-xl p-4 space-y-4 ${
           theme === "dark" ? "bg-gray-900" : "bg-white border border-stone-300 shadow-sm"
         }`}
@@ -317,7 +317,7 @@ export default function App() {
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
