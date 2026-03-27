@@ -9,8 +9,6 @@ function makeProps(overrides = {}) {
     setRootNote: vi.fn(),
     accidental: 'flat',
     onAccidentalChange: vi.fn(),
-    baseLabelMode: 'note',
-    setBaseLabelMode: vi.fn(),
     showChord: false,
     setShowChord: vi.fn(),
     chordDisplayMode: 'form',
@@ -47,17 +45,10 @@ describe('Controls', () => {
     expect(screen.getByText('♭')).toBeTruthy()
   })
 
-  it('音名/度数トグルが表示される', () => {
-    render(<Controls {...makeProps()} />)
-    expect(screen.getByText('音名')).toBeTruthy()
-    expect(screen.getByText('度数')).toBeTruthy()
-  })
-
-  it('スケール・CAGED・コードのトグルボタンが表示される', () => {
+  it('スケール・CAGED・コードのラベルが表示される', () => {
     render(<Controls {...makeProps()} />)
     expect(screen.getByText('スケール')).toBeTruthy()
     expect(screen.getByText('CAGED')).toBeTruthy()
-    // 「コード」はボタンとラベルで複数存在する
     expect(screen.getAllByText('コード').length).toBeGreaterThan(0)
   })
 
@@ -76,43 +67,31 @@ describe('Controls', () => {
     expect(props.onAccidentalChange).toHaveBeenCalledWith('flat')
   })
 
-  // ===== 表示切り替え =====
-  it('度数ボタンをクリックすると setBaseLabelMode("degree") が呼ばれる', () => {
-    const props = makeProps()
-    render(<Controls {...props} />)
-    fireEvent.click(screen.getByText('度数'))
-    expect(props.setBaseLabelMode).toHaveBeenCalledWith('degree')
-  })
-
-  it('音名ボタンをクリックすると setBaseLabelMode("note") が呼ばれる', () => {
-    const props = makeProps({ baseLabelMode: 'degree' })
-    render(<Controls {...props} />)
-    fireEvent.click(screen.getByText('音名'))
-    expect(props.setBaseLabelMode).toHaveBeenCalledWith('note')
-  })
-
   // ===== レイヤートグル =====
-  it('スケールトグルをクリックすると setShowScale が呼ばれる', () => {
+  it('スケールパネルをクリックすると setShowScale が呼ばれる', () => {
     const props = makeProps()
     render(<Controls {...props} />)
-    fireEvent.click(screen.getByText('スケール'))
+    // LayerRow の div をクリック（ラベル span の親）
+    const label = screen.getByText('スケール')
+    fireEvent.click(label.closest('div[class*="rounded-lg"]'))
     expect(props.setShowScale).toHaveBeenCalled()
   })
 
-  it('CAGEDトグルをクリックすると setShowCaged が呼ばれる', () => {
+  it('CAGEDパネルをクリックすると setShowCaged が呼ばれる', () => {
     const props = makeProps()
     render(<Controls {...props} />)
-    fireEvent.click(screen.getByText('CAGED'))
+    const label = screen.getByText('CAGED')
+    fireEvent.click(label.closest('div[class*="rounded-lg"]'))
     expect(props.setShowCaged).toHaveBeenCalled()
   })
 
-  it('コードトグルをクリックすると setShowChord が呼ばれる', () => {
+  it('コードパネルをクリックすると setShowChord が呼ばれる', () => {
     const props = makeProps()
     render(<Controls {...props} />)
-    // 「コード」ボタンは button 要素の最初のもの
-    const buttons = screen.getAllByText('コード')
-    const btn = buttons.find((el) => el.tagName === 'BUTTON')
-    fireEvent.click(btn)
+    const labels = screen.getAllByText('コード')
+    // LayerRow の span badge を探してその親パネルをクリック
+    const badge = labels.find((el) => el.tagName === 'SPAN')
+    fireEvent.click(badge.closest('div[class*="rounded-lg"]'))
     expect(props.setShowChord).toHaveBeenCalled()
   })
 

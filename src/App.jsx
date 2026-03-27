@@ -81,8 +81,6 @@ export default function App() {
           rootNote={rootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
-          baseLabelMode={baseLabelMode}
-          setBaseLabelMode={setBaseLabelMode}
           showChord={showChord}
           setShowChord={setShowChord}
           chordDisplayMode={chordDisplayMode}
@@ -109,13 +107,36 @@ export default function App() {
           setDiatonicDegree={setDiatonicDegree}
         />
 
-        <div className="mb-2 flex items-center justify-center gap-3">
+        <div className="mb-2 flex items-center justify-center gap-3 flex-wrap">
           <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
             Root: <span className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}>{rootNote}</span>
           </span>
           <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-stone-500"}`}>
             （指板の音をクリックしてルートを変更）
           </span>
+          <div className={`inline-flex items-center gap-2 rounded-lg p-1 ${theme === "dark" ? "bg-gray-800" : "bg-stone-100"}`}>
+            <span className={`w-12 px-2 text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}>
+              表示
+            </span>
+            {[
+              { value: "note", label: "音名" },
+              { value: "degree", label: "度数" },
+            ].map(({ value, label }) => (
+              <button
+                key={value}
+                onClick={() => setBaseLabelMode(value)}
+                className={`w-[4rem] whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all ${
+                  baseLabelMode === value
+                    ? "bg-indigo-600 text-white"
+                    : theme === "dark"
+                      ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                      : "bg-white text-stone-600 hover:bg-stone-200"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
         <Fretboard
           theme={theme}

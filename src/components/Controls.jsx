@@ -40,8 +40,6 @@ export default function Controls({
   rootNote,
   accidental,
   onAccidentalChange,
-  baseLabelMode,
-  setBaseLabelMode,
   showChord,
   setShowChord,
   chordDisplayMode,
@@ -90,7 +88,7 @@ export default function Controls({
   });
 
   return (
-    <div className={`space-y-4 pt-4 ${isDark ? "text-white" : "text-stone-900"}`}>
+    <div className={`space-y-4 pt-4 max-w-4xl mx-auto ${isDark ? "text-white" : "text-stone-900"}`}>
       {/* ルート音 */}
       <div className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
         <button
@@ -141,34 +139,6 @@ export default function Controls({
           ))}
         </div>
 
-        <div
-          className={`inline-flex items-center justify-between gap-2 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
-        >
-          <span
-            className={`w-12 px-2 text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
-          >
-            表示
-          </span>
-          {[
-            { value: "note", label: "音名" },
-            { value: "degree", label: "度数" },
-          ].map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => setBaseLabelMode(value)}
-              className={`w-[4rem] whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all
-                ${
-                  baseLabelMode === value
-                    ? "bg-indigo-600 text-white"
-                    : isDark
-                      ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
-                      : "bg-white text-stone-600 hover:bg-stone-200"
-                }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className="space-y-3">
@@ -230,9 +200,9 @@ export default function Controls({
           theme={theme}
           onToggle={() => setShowChord(!showChord)}
         >
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex flex-col gap-1">
-              <span className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"}`}>
+          <div className="flex flex-wrap gap-3 items-center justify-center">
+            <div className="flex flex-col gap-1 items-center sm:items-start">
+              <span className={`text-center sm:text-left text-xs ${isDark ? "text-gray-500" : "text-stone-500"}`}>
                 表示形式
               </span>
               <DropdownSelect
@@ -244,7 +214,7 @@ export default function Controls({
               />
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "power" ? "invisible" : ""}`}
               >
@@ -282,7 +252,7 @@ export default function Controls({
               />
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
@@ -313,7 +283,7 @@ export default function Controls({
               />
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-1 items-center sm:items-start">
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
@@ -350,49 +320,26 @@ export default function Controls({
   );
 }
 
-function LayerToggle({ label, color, active, onToggle, theme }) {
-  return (
-    <button
-      onClick={onToggle}
-      className={`w-28 px-3 py-1 rounded-full text-sm font-semibold transition-all border-2
-        ${
-          active
-            ? `${color} text-white border-transparent shadow-lg scale-105`
-            : theme === "dark"
-              ? "bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-400"
-              : "bg-white text-stone-600 border-stone-300 hover:border-stone-500"
-        }`}
-    >
-      {label}
-    </button>
-  );
-}
-
 function LayerRow({ label, color, active, onToggle, theme, children }) {
   const isDark = theme === "dark";
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-3 sm:items-start sm:flex-row">
-      <div className="shrink-0 sm:pt-1">
-        <LayerToggle
-          label={label}
-          color={color}
-          active={active}
-          onToggle={onToggle}
-          theme={theme}
-        />
-      </div>
-      <div
-        className={`w-full max-w-2xl rounded-lg p-3 transition-opacity sm:max-w-none sm:flex-1 ${
-          isDark ? "bg-gray-800" : "bg-stone-100"
-        } ${active ? "opacity-100" : "opacity-45 cursor-pointer"}`}
-        aria-disabled={!active}
-        onClick={(e) => {
-          if (!active) { onToggle(); return }
-          if (!e.target.closest('button, [role="listbox"], [role="option"]')) onToggle()
-        }}
-      >
-        <div className={`flex justify-center ${!active ? "pointer-events-none" : ""}`}>{children}</div>
+    <div
+      className={`w-full rounded-lg px-4 py-3 transition-opacity cursor-pointer ${
+        isDark ? "bg-gray-800" : "bg-stone-100"
+      } ${active ? "opacity-100" : "opacity-45"}`}
+      onClick={(e) => {
+        if (!active) { onToggle(); return; }
+        if (!e.target.closest('button, [role="listbox"], [role="option"]')) onToggle();
+      }}
+    >
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+        <span className={`self-center text-xs font-bold px-2 py-0.5 rounded-full ${active ? `${color} text-white` : isDark ? "bg-gray-700 text-gray-400" : "bg-stone-200 text-stone-500"}`}>
+          {label}
+        </span>
+        <div className={`flex-1 flex flex-wrap gap-3 items-center justify-center ${!active ? "pointer-events-none" : ""}`}>
+          {children}
+        </div>
       </div>
     </div>
   );
