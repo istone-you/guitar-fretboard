@@ -2,12 +2,27 @@ import { useState } from "react";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
 import {
-  DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex,
-  MAJOR_SCALE_DEGREES, NATURAL_MINOR_SCALE_DEGREES,
-  MINOR_PENTA_DEGREES, MAJOR_PENTA_DEGREES, BLUES_SCALE_DEGREES,
-  CHORD_SEMITONES, getDiatonicChord,
+  DIATONIC_CHORDS,
+  NOTES_SHARP,
+  NOTES_FLAT,
+  getRootIndex,
+  MAJOR_SCALE_DEGREES,
+  NATURAL_MINOR_SCALE_DEGREES,
+  MINOR_PENTA_DEGREES,
+  MAJOR_PENTA_DEGREES,
+  BLUES_SCALE_DEGREES,
+  CHORD_SEMITONES,
+  getDiatonicChord,
 } from "./logic/fretboard";
-import type { Theme, Accidental, BaseLabelMode, ChordDisplayMode, ScaleType, ChordType, DegreeName } from "./types";
+import type {
+  Theme,
+  Accidental,
+  BaseLabelMode,
+  ChordDisplayMode,
+  ScaleType,
+  ChordType,
+  DegreeName,
+} from "./types";
 
 export default function App() {
   // ルート音
@@ -40,7 +55,11 @@ export default function App() {
   const toggleCagedForm = (key: string) => {
     setCagedForms((prev) => {
       const next = new Set(prev);
-      if (next.has(key)) { next.delete(key) } else { next.add(key) }
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
       return next;
     });
   };
@@ -73,7 +92,20 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>("dark");
   const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
 
-  const DEGREE_BY_SEMITONE: DegreeName[] = ["P1","m2","M2","m3","M3","P4","b5","P5","m6","M6","m7","M7"];
+  const DEGREE_BY_SEMITONE: DegreeName[] = [
+    "P1",
+    "m2",
+    "M2",
+    "m3",
+    "M3",
+    "P4",
+    "b5",
+    "P5",
+    "m6",
+    "M6",
+    "m7",
+    "M7",
+  ];
   const SCALE_SEMITONES: Record<ScaleType, Set<number>> = {
     major: MAJOR_SCALE_DEGREES,
     "natural-minor": NATURAL_MINOR_SCALE_DEGREES,
@@ -102,14 +134,21 @@ export default function App() {
       }
       for (const s of semitones ?? []) active.add(s);
     }
-    if (active.size === 0) { setHiddenDegrees(new Set()); return; }
+    if (active.size === 0) {
+      setHiddenDegrees(new Set());
+      return;
+    }
     setHiddenDegrees(new Set(DEGREE_BY_SEMITONE.filter((_, i) => !active.has(i))));
   };
 
   const toggleDegree = (name: string) => {
     setHiddenDegrees((prev) => {
       const next = new Set(prev);
-      if (next.has(name)) { next.delete(name); } else { next.add(name); }
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
       return next;
     });
   };
@@ -129,7 +168,7 @@ export default function App() {
       >
         <Controls
           theme={theme}
-          onThemeChange={() => setTheme((t) => t === "dark" ? "light" : "dark")}
+          onThemeChange={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
           rootNote={rootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
@@ -161,10 +200,19 @@ export default function App() {
 
         <div className="mb-2 flex items-center justify-center gap-3 flex-wrap">
           <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-            ルート: <span className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}>{rootNote}</span>
+            ルート:{" "}
+            <span
+              className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}
+            >
+              {rootNote}
+            </span>
           </span>
-          <div className={`inline-flex items-center gap-2 rounded-lg p-1 ${theme === "dark" ? "bg-gray-800" : "bg-stone-100"}`}>
-            <span className={`w-12 px-2 text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}>
+          <div
+            className={`inline-flex items-center gap-2 rounded-lg p-1 ${theme === "dark" ? "bg-gray-800" : "bg-stone-100"}`}
+          >
+            <span
+              className={`w-12 px-2 text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
+            >
               表示
             </span>
             {[
@@ -210,7 +258,9 @@ export default function App() {
           {baseLabelMode === "degree" && (
             <>
               <div className="flex items-center justify-center gap-2 mb-3">
-                <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>度数</h3>
+                <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
+                  度数
+                </h3>
                 <button
                   onClick={handleAutoFilter}
                   title="表示中のオーバーレイに合わせて絞り込む"
@@ -261,7 +311,9 @@ export default function App() {
                       onClick={() => toggleDegree(name)}
                     >
                       <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
-                      <span className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}>
+                      <span
+                        className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
+                      >
                         {name}
                       </span>
                     </div>

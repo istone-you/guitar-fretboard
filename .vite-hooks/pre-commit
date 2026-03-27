@@ -1,0 +1,2 @@
+mise exec -- bun run check
+mise exec -- bun run typecheck

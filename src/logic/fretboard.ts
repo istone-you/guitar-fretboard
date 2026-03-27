@@ -1,8 +1,34 @@
-import type { ChordType, TriadChordType, DegreeName } from '../types';
+import type { ChordType, TriadChordType, DegreeName } from "../types";
 
 // 音名配列（半音12音）
-export const NOTES_SHARP = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"] as const;
-export const NOTES_FLAT = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"] as const;
+export const NOTES_SHARP = [
+  "C",
+  "C♯",
+  "D",
+  "D♯",
+  "E",
+  "F",
+  "F♯",
+  "G",
+  "G♯",
+  "A",
+  "A♯",
+  "B",
+] as const;
+export const NOTES_FLAT = [
+  "C",
+  "D♭",
+  "D",
+  "E♭",
+  "E",
+  "F",
+  "G♭",
+  "G",
+  "A♭",
+  "A",
+  "B♭",
+  "B",
+] as const;
 export const NOTES = NOTES_FLAT; // 後方互換
 
 // スタンダードチューニング（6弦から1弦、開放弦の音名インデックス）
@@ -13,7 +39,7 @@ export const OPEN_STRINGS = [4, 9, 2, 7, 11, 4] as const; // E, A, D, G, B, E
 export const FRET_COUNT = 15;
 
 // ポジションマーク（シングル: 3,5,7,9、ダブル: 12）
-export const POSITION_MARKS: Record<number, 'single' | 'double'> = {
+export const POSITION_MARKS: Record<number, "single" | "double"> = {
   3: "single",
   5: "single",
   7: "single",
@@ -274,13 +300,14 @@ export interface TriadLayoutOption {
   inversion: string;
 }
 
-export const TRIAD_LAYOUT_OPTIONS: TriadLayoutOption[] = TRIAD_STRING_SET_OPTIONS.flatMap((stringSet) =>
-  TRIAD_INVERSION_OPTIONS.map((inversion) => ({
-    value: `${stringSet.value}-${inversion.value}`,
-    label: `${stringSet.label}（${inversion.label}）`,
-    strings: stringSet.strings,
-    inversion: inversion.value,
-  })),
+export const TRIAD_LAYOUT_OPTIONS: TriadLayoutOption[] = TRIAD_STRING_SET_OPTIONS.flatMap(
+  (stringSet) =>
+    TRIAD_INVERSION_OPTIONS.map((inversion) => ({
+      value: `${stringSet.value}-${inversion.value}`,
+      label: `${stringSet.label}（${inversion.label}）`,
+      strings: stringSet.strings,
+      inversion: inversion.value,
+    })),
 );
 
 export function getTriadLayout(layoutValue: string): TriadLayoutOption {
@@ -705,7 +732,11 @@ const TRIAD_SHAPES: Record<string, Partial<Record<TriadChordType, TriadShapeEntr
   },
 };
 
-export function buildTriadVoicing(rootIndex: number, chordType: string, layoutValue: string): FretCell[] {
+export function buildTriadVoicing(
+  rootIndex: number,
+  chordType: string,
+  layoutValue: string,
+): FretCell[] {
   const shapeGroup = TRIAD_SHAPES[layoutValue];
   const shape = shapeGroup?.[chordType as TriadChordType];
   if (!shape) return [];
@@ -957,7 +988,11 @@ export interface DiatonicChordResult {
   chordType: ChordType;
 }
 
-export function getDiatonicChord(rootIndex: number, scaleType: string, degreeValue: string): DiatonicChordResult {
+export function getDiatonicChord(
+  rootIndex: number,
+  scaleType: string,
+  degreeValue: string,
+): DiatonicChordResult {
   const progression = DIATONIC_CHORDS[scaleType] ?? DIATONIC_CHORDS["major-triad"];
   const selected = progression.find((item) => item.value === degreeValue) ?? progression[0];
   return {
@@ -983,8 +1018,8 @@ export function isInNaturalMinorScale(semitone: number): boolean {
 
 // ルート音のノートインデックスを返す（♯・♭どちらの表記でも対応）
 export function getRootIndex(rootNote: string): number {
-  const idx = NOTES_SHARP.indexOf(rootNote as typeof NOTES_SHARP[number]);
-  return idx !== -1 ? idx : NOTES_FLAT.indexOf(rootNote as typeof NOTES_FLAT[number]);
+  const idx = NOTES_SHARP.indexOf(rootNote as (typeof NOTES_SHARP)[number]);
+  return idx !== -1 ? idx : NOTES_FLAT.indexOf(rootNote as (typeof NOTES_FLAT)[number]);
 }
 
 // ===== ペンタトニックスケール =====
@@ -993,7 +1028,7 @@ export const MINOR_PENTA_DEGREES = new Set([0, 3, 5, 7, 10]);
 // メジャーペンタ: R, M2, M3, P5, M6 → 半音: 0, 2, 4, 7, 9
 export const MAJOR_PENTA_DEGREES = new Set([0, 2, 4, 7, 9]);
 
-export function isInPenta(semitone: number, type: 'minor' | 'major'): boolean {
+export function isInPenta(semitone: number, type: "minor" | "major"): boolean {
   return type === "minor" ? MINOR_PENTA_DEGREES.has(semitone) : MAJOR_PENTA_DEGREES.has(semitone);
 }
 
@@ -1002,17 +1037,17 @@ export const BLUES_SCALE_DEGREES = new Set([0, 3, 5, 6, 7, 10]);
 
 // コード種別ごとの構成音（半音）
 export const CHORD_SEMITONES: Record<string, Set<number>> = {
-  Major:     new Set([0, 4, 7]),
-  Minor:     new Set([0, 3, 7]),
-  "7th":     new Set([0, 4, 7, 10]),
-  maj7:      new Set([0, 4, 7, 11]),
-  m7:        new Set([0, 3, 7, 10]),
-  "m7(b5)":  new Set([0, 3, 6, 10]),
-  dim7:      new Set([0, 3, 6, 9]),
+  Major: new Set([0, 4, 7]),
+  Minor: new Set([0, 3, 7]),
+  "7th": new Set([0, 4, 7, 10]),
+  maj7: new Set([0, 4, 7, 11]),
+  m7: new Set([0, 3, 7, 10]),
+  "m7(b5)": new Set([0, 3, 6, 10]),
+  dim7: new Set([0, 3, 6, 9]),
   "m(maj7)": new Set([0, 3, 7, 11]),
   Diminished: new Set([0, 3, 6]),
-  Augmented:  new Set([0, 4, 8]),
-  power:      new Set([0, 7]),
+  Augmented: new Set([0, 4, 8]),
+  power: new Set([0, 7]),
 };
 
 export function isInBluesScale(semitone: number): boolean {
@@ -1117,7 +1152,10 @@ export const CAGED_FORMS: Record<string, CagedForm> = {
 export const CAGED_ORDER = ["C", "A", "G", "E", "D"] as const;
 
 // 指定フォームの表示セルを返す: Map<"string-fret", { color, degree }>
-export function calcCagedPositions(formKey: string, rootIndex: number): Map<string, CagedPositionValue> {
+export function calcCagedPositions(
+  formKey: string,
+  rootIndex: number,
+): Map<string, CagedPositionValue> {
   const form = CAGED_FORMS[formKey];
   if (!form) return new Map();
 

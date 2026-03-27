@@ -1,123 +1,122 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
-import Controls from './Controls'
-import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from '../types'
+import { describe, it, expect, vi } from "vite-plus/test";
+import { render, screen, fireEvent } from "@testing-library/react";
+import Controls from "./Controls";
+import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {
-    theme: 'dark' as Theme,
-    rootNote: 'C',
+    theme: "dark" as Theme,
+    rootNote: "C",
     setRootNote: vi.fn(),
-    accidental: 'flat' as Accidental,
+    accidental: "flat" as Accidental,
     onAccidentalChange: vi.fn(),
     showChord: false,
     setShowChord: vi.fn(),
-    chordDisplayMode: 'form' as ChordDisplayMode,
+    chordDisplayMode: "form" as ChordDisplayMode,
     setChordDisplayMode: vi.fn(),
     showScale: false,
     setShowScale: vi.fn(),
-    scaleType: 'major' as ScaleType,
+    scaleType: "major" as ScaleType,
     setScaleType: vi.fn(),
     showCaged: false,
     setShowCaged: vi.fn(),
-    cagedForms: new Set(['E']),
+    cagedForms: new Set(["E"]),
     toggleCagedForm: vi.fn(),
-    chordType: 'Major' as ChordType,
+    chordType: "Major" as ChordType,
     setChordType: vi.fn(),
-    triadStringSet: '1-3',
+    triadStringSet: "1-3",
     setTriadStringSet: vi.fn(),
-    triadInversion: 'root',
+    triadInversion: "root",
     setTriadInversion: vi.fn(),
-    diatonicKeyType: 'major',
+    diatonicKeyType: "major",
     setDiatonicKeyType: vi.fn(),
-    diatonicChordSize: 'triad',
+    diatonicChordSize: "triad",
     setDiatonicChordSize: vi.fn(),
-    diatonicDegree: 'I',
+    diatonicDegree: "I",
     setDiatonicDegree: vi.fn(),
     onThemeChange: vi.fn(),
     ...overrides,
-  }
+  };
 }
 
-describe('Controls', () => {
+describe("Controls", () => {
   // ===== レンダリング =====
-  it('設定ボタンをクリックすると♯/♭トグルが表示される', () => {
-    render(<Controls {...makeProps()} />)
-    fireEvent.click(screen.getByTitle('設定'))
-    expect(screen.getByText('♯')).toBeTruthy()
-    expect(screen.getByText('♭')).toBeTruthy()
-  })
+  it("設定ボタンをクリックすると♯/♭トグルが表示される", () => {
+    render(<Controls {...makeProps()} />);
+    fireEvent.click(screen.getByTitle("設定"));
+    expect(screen.getByText("♯")).toBeTruthy();
+    expect(screen.getByText("♭")).toBeTruthy();
+  });
 
-  it('スケール・CAGED・コードのラベルが表示される', () => {
-    render(<Controls {...makeProps()} />)
-    expect(screen.getByText('スケール')).toBeTruthy()
-    expect(screen.getByText('CAGED')).toBeTruthy()
-    expect(screen.getAllByText('コード').length).toBeGreaterThan(0)
-  })
+  it("スケール・CAGED・コードのラベルが表示される", () => {
+    render(<Controls {...makeProps()} />);
+    expect(screen.getByText("スケール")).toBeTruthy();
+    expect(screen.getByText("CAGED")).toBeTruthy();
+    expect(screen.getAllByText("コード").length).toBeGreaterThan(0);
+  });
 
   // ===== ♯/♭切り替え =====
   it('♯ボタンをクリックすると onAccidentalChange("sharp") が呼ばれる', () => {
-    const props = makeProps()
-    render(<Controls {...props} />)
-    fireEvent.click(screen.getByTitle('設定'))
-    fireEvent.click(screen.getByText('♯'))
-    expect(props.onAccidentalChange).toHaveBeenCalledWith('sharp')
-  })
+    const props = makeProps();
+    render(<Controls {...props} />);
+    fireEvent.click(screen.getByTitle("設定"));
+    fireEvent.click(screen.getByText("♯"));
+    expect(props.onAccidentalChange).toHaveBeenCalledWith("sharp");
+  });
 
   it('♭ボタンをクリックすると onAccidentalChange("flat") が呼ばれる', () => {
-    const props = makeProps({ accidental: 'sharp' as Accidental })
-    render(<Controls {...props} />)
-    fireEvent.click(screen.getByTitle('設定'))
-    fireEvent.click(screen.getByText('♭'))
-    expect(props.onAccidentalChange).toHaveBeenCalledWith('flat')
-  })
+    const props = makeProps({ accidental: "sharp" as Accidental });
+    render(<Controls {...props} />);
+    fireEvent.click(screen.getByTitle("設定"));
+    fireEvent.click(screen.getByText("♭"));
+    expect(props.onAccidentalChange).toHaveBeenCalledWith("flat");
+  });
 
   // ===== レイヤートグル =====
-  it('スケールパネルをクリックすると setShowScale が呼ばれる', () => {
-    const props = makeProps()
-    render(<Controls {...props} />)
+  it("スケールパネルをクリックすると setShowScale が呼ばれる", () => {
+    const props = makeProps();
+    render(<Controls {...props} />);
     // LayerRow の div をクリック（ラベル span の親）
-    const label = screen.getByText('スケール')
-    fireEvent.click(label.closest('div[class*="rounded-lg"]')!)
-    expect(props.setShowScale).toHaveBeenCalled()
-  })
+    const label = screen.getByText("スケール");
+    fireEvent.click(label.closest('div[class*="rounded-lg"]')!);
+    expect(props.setShowScale).toHaveBeenCalled();
+  });
 
-  it('CAGEDパネルをクリックすると setShowCaged が呼ばれる', () => {
-    const props = makeProps()
-    render(<Controls {...props} />)
-    const label = screen.getByText('CAGED')
-    fireEvent.click(label.closest('div[class*="rounded-lg"]')!)
-    expect(props.setShowCaged).toHaveBeenCalled()
-  })
+  it("CAGEDパネルをクリックすると setShowCaged が呼ばれる", () => {
+    const props = makeProps();
+    render(<Controls {...props} />);
+    const label = screen.getByText("CAGED");
+    fireEvent.click(label.closest('div[class*="rounded-lg"]')!);
+    expect(props.setShowCaged).toHaveBeenCalled();
+  });
 
-  it('コードパネルをクリックすると setShowChord が呼ばれる', () => {
-    const props = makeProps()
-    render(<Controls {...props} />)
-    const labels = screen.getAllByText('コード')
+  it("コードパネルをクリックすると setShowChord が呼ばれる", () => {
+    const props = makeProps();
+    render(<Controls {...props} />);
+    const labels = screen.getAllByText("コード");
     // LayerRow の span badge を探してその親パネルをクリック
-    const badge = labels.find((el) => el.tagName === 'SPAN')
-    fireEvent.click(badge!.closest('div[class*="rounded-lg"]')!)
-    expect(props.setShowChord).toHaveBeenCalled()
-  })
+    const badge = labels.find((el) => el.tagName === "SPAN");
+    fireEvent.click(badge!.closest('div[class*="rounded-lg"]')!);
+    expect(props.setShowChord).toHaveBeenCalled();
+  });
 
   // ===== CAGEDフォームボタン =====
-  it('CAGEDフォームのボタン C/A/G/E/D が表示される', () => {
-    const props = makeProps({ showCaged: true })
-    render(<Controls {...props} />)
+  it("CAGEDフォームのボタン C/A/G/E/D が表示される", () => {
+    const props = makeProps({ showCaged: true });
+    render(<Controls {...props} />);
     // C/A/G/E/D は丸ボタン（w-9 h-9）として存在する
-    ;['C', 'A', 'G', 'E', 'D'].forEach((key) => {
-      expect(screen.getAllByText(key).length).toBeGreaterThan(0)
-    })
-  })
+    ["C", "A", "G", "E", "D"].forEach((key) => {
+      expect(screen.getAllByText(key).length).toBeGreaterThan(0);
+    });
+  });
 
-  it('CAGEDフォームボタンをクリックすると toggleCagedForm が呼ばれる', () => {
-    const props = makeProps({ showCaged: true })
-    render(<Controls {...props} />)
+  it("CAGEDフォームボタンをクリックすると toggleCagedForm が呼ばれる", () => {
+    const props = makeProps({ showCaged: true });
+    render(<Controls {...props} />);
     // 丸ボタン（w-9 h-9）の C を探してクリック
-    const allC = screen.getAllByText('C')
-    const cagedBtn = allC.find((el) => el.tagName === 'BUTTON' && el.className.includes('w-9'))
-    fireEvent.click(cagedBtn!)
-    expect(props.toggleCagedForm).toHaveBeenCalledWith('C')
-  })
-
-})
+    const allC = screen.getAllByText("C");
+    const cagedBtn = allC.find((el) => el.tagName === "BUTTON" && el.className.includes("w-9"));
+    fireEvent.click(cagedBtn!);
+    expect(props.toggleCagedForm).toHaveBeenCalledWith("C");
+  });
+});

@@ -23,7 +23,15 @@ import {
   type FretCell,
   type CagedPositionValue,
 } from "../logic/fretboard";
-import type { Theme, Accidental, BaseLabelMode, ChordDisplayMode, ScaleType, ChordType, DegreeName } from "../types";
+import type {
+  Theme,
+  Accidental,
+  BaseLabelMode,
+  ChordDisplayMode,
+  ScaleType,
+  ChordType,
+  DegreeName,
+} from "../types";
 
 const STRING_COUNT = 6;
 const FRET_CELL_WIDTH = 56;
@@ -206,62 +214,59 @@ export default function Fretboard({
   return (
     <div className="overflow-x-auto">
       <div className="w-fit mx-auto">
-          {/* フレット番号ヘッダー */}
-          <div className="flex mb-1">
-            <div className="w-8 shrink-0" />
-            {Array.from({ length: FRET_COUNT }, (_, fret) => (
-              <FretHeader key={fret} fret={fret} theme={theme} />
-            ))}
-          </div>
+        {/* フレット番号ヘッダー */}
+        <div className="flex mb-1">
+          <div className="w-8 shrink-0" />
+          {Array.from({ length: FRET_COUNT }, (_, fret) => (
+            <FretHeader key={fret} fret={fret} theme={theme} />
+          ))}
+        </div>
 
-          {/* ポジションマーク行 */}
-          <div className="flex mb-2">
-            <div className="w-8 shrink-0" />
-            {Array.from({ length: FRET_COUNT }, (_, fret) => (
-              <PositionMark key={fret} fret={fret} theme={theme} />
-            ))}
-          </div>
+        {/* ポジションマーク行 */}
+        <div className="flex mb-2">
+          <div className="w-8 shrink-0" />
+          {Array.from({ length: FRET_COUNT }, (_, fret) => (
+            <PositionMark key={fret} fret={fret} theme={theme} />
+          ))}
+        </div>
 
-          {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
-          <div className="relative">
-            {chordGroups.map((group) => {
-              const top =
-                (STRING_COUNT - 1 - group.maxString) * (STRING_ROW_HEIGHT + STRING_ROW_GAP);
-              const left = STRING_LABEL_WIDTH + group.minFret * FRET_CELL_WIDTH;
-              const width = (group.maxFret - group.minFret + 1) * FRET_CELL_WIDTH;
-              const height =
-                (group.maxString - group.minString + 1) * STRING_ROW_HEIGHT +
-                (group.maxString - group.minString) * STRING_ROW_GAP;
+        {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
+        <div className="relative">
+          {chordGroups.map((group) => {
+            const top = (STRING_COUNT - 1 - group.maxString) * (STRING_ROW_HEIGHT + STRING_ROW_GAP);
+            const left = STRING_LABEL_WIDTH + group.minFret * FRET_CELL_WIDTH;
+            const width = (group.maxFret - group.minFret + 1) * FRET_CELL_WIDTH;
+            const height =
+              (group.maxString - group.minString + 1) * STRING_ROW_HEIGHT +
+              (group.maxString - group.minString) * STRING_ROW_GAP;
 
-              return (
-                <div
-                  key={group.id}
-                  className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
-                  style={{ top, left, width, height }}
-                />
-              );
-            })}
+            return (
+              <div
+                key={group.id}
+                className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
+                style={{ top, left, width, height }}
+              />
+            );
+          })}
 
-            {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map(
-              (stringIdx) => (
-                <StringRow
-                  key={stringIdx}
-                  theme={theme}
-                  stringIdx={stringIdx}
-                  accidental={accidental}
-                  rootIndex={rootIndex}
-                  baseLabelMode={baseLabelMode}
-                  showScale={showScale}
-                  scaleType={scaleType}
-                  cagedPositions={cagedPositions}
-                  chordPositions={chordPositions}
-                  opacity={opacity}
-                  onNoteClick={onNoteClick}
-                  hiddenDegrees={hiddenDegrees}
-                />
-              ),
-            )}
-          </div>
+          {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
+            <StringRow
+              key={stringIdx}
+              theme={theme}
+              stringIdx={stringIdx}
+              accidental={accidental}
+              rootIndex={rootIndex}
+              baseLabelMode={baseLabelMode}
+              showScale={showScale}
+              scaleType={scaleType}
+              cagedPositions={cagedPositions}
+              chordPositions={chordPositions}
+              opacity={opacity}
+              onNoteClick={onNoteClick}
+              hiddenDegrees={hiddenDegrees}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );
