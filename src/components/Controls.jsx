@@ -11,16 +11,7 @@ import {
   getRootIndex,
 } from "../logic/fretboard";
 
-const CHORD_TYPES = [
-  "Major",
-  "Minor",
-  "7th",
-  "maj7",
-  "m7",
-  "m7(b5)",
-  "dim7",
-  "m(maj7)",
-];
+const CHORD_TYPES = ["Major", "Minor", "7th", "maj7", "m7", "m7(b5)", "dim7", "m(maj7)"];
 const TRIAD_CHORD_TYPES = ["Major", "Minor", "Diminished", "Augmented"];
 const CHORD_DISPLAY_OPTIONS = [
   { value: "form", label: "コードフォーム" },
@@ -80,36 +71,30 @@ export default function Controls({
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
   const rootIndex = getRootIndex(rootNote);
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
-  const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(
-    ({ value }) => {
-      const chord = getDiatonicChord(rootIndex, diatonicScaleType, value);
-      const suffixMap = {
-        Major: "",
-        Minor: "m",
-        "7th": "7",
-        maj7: "maj7",
-        m7: "m7",
-        "m7(b5)": "m7(b5)",
-        dim7: "dim",
-        "m(maj7)": "m(maj7)",
-      };
-      return {
-        value,
-        label: `${value} (${NOTES[chord.rootIndex]}${suffixMap[chord.chordType] ?? chord.chordType})`,
-      };
-    },
-  );
+  const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {
+    const chord = getDiatonicChord(rootIndex, diatonicScaleType, value);
+    const suffixMap = {
+      Major: "",
+      Minor: "m",
+      "7th": "7",
+      maj7: "maj7",
+      m7: "m7",
+      "m7(b5)": "m7(b5)",
+      dim7: "dim",
+      "m(maj7)": "m(maj7)",
+    };
+    return {
+      value,
+      label: `${value} (${NOTES[chord.rootIndex]}${suffixMap[chord.chordType] ?? chord.chordType})`,
+    };
+  });
 
   return (
-    <div
-      className={`space-y-4 pt-4 ${isDark ? "text-white" : "text-stone-900"}`}
-    >
+    <div className={`space-y-4 pt-4 ${isDark ? "text-white" : "text-stone-900"}`}>
       {/* ルート音 */}
       <div className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
         <label className="flex items-center gap-2">
-          <span
-            className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
-          >
+          <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>
             ルート
           </span>
           <DropdownSelect
@@ -222,9 +207,7 @@ export default function Controls({
                             ? "bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-400"
                             : "bg-white text-stone-600 border-stone-300 hover:border-stone-500"
                       }`}
-                    style={
-                      active ? { backgroundColor: CAGED_FORMS[key].color } : {}
-                    }
+                    style={active ? { backgroundColor: CAGED_FORMS[key].color } : {}}
                   >
                     {key}
                   </button>
@@ -243,9 +226,7 @@ export default function Controls({
         >
           <div className="flex flex-wrap gap-3 items-center">
             <div className="flex flex-col gap-1">
-              <span
-                className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"}`}
-              >
+              <span className={`pl-1 text-xs ${isDark ? "text-gray-500" : "text-stone-500"}`}>
                 表示形式
               </span>
               <DropdownSelect
@@ -274,11 +255,7 @@ export default function Controls({
                         ? diatonicDegree
                         : ""
                 }
-                onChange={
-                  chordDisplayMode === "diatonic"
-                    ? setDiatonicDegree
-                    : setChordType
-                }
+                onChange={chordDisplayMode === "diatonic" ? setDiatonicDegree : setChordType}
                 options={
                   chordDisplayMode === "form"
                     ? CHORD_TYPES.map((chord) => ({
@@ -314,11 +291,7 @@ export default function Controls({
                       ? triadStringSet
                       : ""
                 }
-                onChange={
-                  chordDisplayMode === "triad"
-                    ? setTriadStringSet
-                    : setDiatonicKeyType
-                }
+                onChange={chordDisplayMode === "triad" ? setTriadStringSet : setDiatonicKeyType}
                 options={
                   chordDisplayMode === "diatonic"
                     ? DIATONIC_KEY_OPTIONS
@@ -329,10 +302,7 @@ export default function Controls({
                         }))
                       : [{ value: "", label: "--" }]
                 }
-                disabled={
-                  chordDisplayMode !== "diatonic" &&
-                  chordDisplayMode !== "triad"
-                }
+                disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
                 widthClass="w-36"
               />
             </div>
@@ -352,11 +322,7 @@ export default function Controls({
                       ? triadInversion
                       : ""
                 }
-                onChange={
-                  chordDisplayMode === "triad"
-                    ? setTriadInversion
-                    : setDiatonicChordSize
-                }
+                onChange={chordDisplayMode === "triad" ? setTriadInversion : setDiatonicChordSize}
                 options={
                   chordDisplayMode === "diatonic"
                     ? DIATONIC_CHORD_SIZE_OPTIONS
@@ -367,10 +333,7 @@ export default function Controls({
                         }))
                       : [{ value: "", label: "--" }]
                 }
-                disabled={
-                  chordDisplayMode !== "diatonic" &&
-                  chordDisplayMode !== "triad"
-                }
+                disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
                 widthClass="w-36"
               />
             </div>
@@ -436,8 +399,7 @@ function DropdownSelect({
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const isDark = theme === "dark";
-  const selected =
-    options.find((option) => option.value === value) ?? options[0];
+  const selected = options.find((option) => option.value === value) ?? options[0];
 
   useEffect(() => {
     if (!open) return undefined;
@@ -498,9 +460,7 @@ function DropdownSelect({
       {open && !disabled && (
         <div
           className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
-            isDark
-              ? "border-gray-700 bg-gray-900/95"
-              : "border-stone-200 bg-white/95"
+            isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
           }`}
         >
           <div role="listbox" className="space-y-1">

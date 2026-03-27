@@ -1,76 +1,80 @@
-import React, { useEffect, useState } from 'react'
-import Controls from './components/Controls'
-import Fretboard from './components/Fretboard'
-import { DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex } from './logic/fretboard'
+import React, { useEffect, useState } from "react";
+import Controls from "./components/Controls";
+import Fretboard from "./components/Fretboard";
+import { DIATONIC_CHORDS, NOTES_SHARP, NOTES_FLAT, getRootIndex } from "./logic/fretboard";
 
 export default function App() {
   // ルート音
-  const [rootNote, setRootNote] = useState('C')
+  const [rootNote, setRootNote] = useState("C");
   // 臨時記号表示（sharp / flat）
-  const [accidental, setAccidental] = useState('flat')
+  const [accidental, setAccidental] = useState("flat");
   // ベースレイヤー表示
-  const [baseLabelMode, setBaseLabelMode] = useState('note')
+  const [baseLabelMode, setBaseLabelMode] = useState("note");
 
   // レイヤー表示フラグ
-  const [showChord, setShowChord] = useState(false)
-  const [showScale, setShowScale] = useState(false)
-  const [showCaged, setShowCaged] = useState(false)
+  const [showChord, setShowChord] = useState(false);
+  const [showScale, setShowScale] = useState(false);
+  const [showCaged, setShowCaged] = useState(false);
 
   // コードフォーム設定
-  const [chordDisplayMode, setChordDisplayMode] = useState('form')
-  const [chordType, setChordType] = useState('Major')
-  const [triadStringSet, setTriadStringSet] = useState('1-3')
-  const [triadInversion, setTriadInversion] = useState('root')
-  const [diatonicKeyType, setDiatonicKeyType] = useState('major')
-  const [diatonicChordSize, setDiatonicChordSize] = useState('triad')
-  const [diatonicDegree, setDiatonicDegree] = useState('I')
+  const [chordDisplayMode, setChordDisplayMode] = useState("form");
+  const [chordType, setChordType] = useState("Major");
+  const [triadStringSet, setTriadStringSet] = useState("1-3");
+  const [triadInversion, setTriadInversion] = useState("root");
+  const [diatonicKeyType, setDiatonicKeyType] = useState("major");
+  const [diatonicChordSize, setDiatonicChordSize] = useState("triad");
+  const [diatonicDegree, setDiatonicDegree] = useState("I");
 
   // スケール設定
-  const [scaleType, setScaleType] = useState('major')
+  const [scaleType, setScaleType] = useState("major");
 
   // CAGED設定（複数選択可）
-  const [cagedForms, setCagedForms] = useState(new Set(['E']))
+  const [cagedForms, setCagedForms] = useState(new Set(["E"]));
 
   const toggleCagedForm = (key) => {
     setCagedForms((prev) => {
-      const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
-      return next
-    })
-  }
+      const next = new Set(prev);
+      if (next.has(key)) { next.delete(key) } else { next.add(key) }
+      return next;
+    });
+  };
 
   // 臨時記号モード切り替え時にルート音の表記を変換
   const handleAccidentalChange = (mode) => {
-    const idx = getRootIndex(rootNote)
-    const notes = mode === 'sharp' ? NOTES_SHARP : NOTES_FLAT
-    setRootNote(notes[idx])
-    setAccidental(mode)
-  }
+    const idx = getRootIndex(rootNote);
+    const notes = mode === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+    setRootNote(notes[idx]);
+    setAccidental(mode);
+  };
 
   // 指板の音をクリックしてルートを設定
   const handleNoteClick = (noteName) => {
-    setRootNote(noteName)
-  }
+    setRootNote(noteName);
+  };
 
   useEffect(() => {
-    const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`
-    const validDegrees = DIATONIC_CHORDS[diatonicScaleType].map((item) => item.value)
+    const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
+    const validDegrees = DIATONIC_CHORDS[diatonicScaleType].map((item) => item.value);
     if (!validDegrees.includes(diatonicDegree)) {
-      setDiatonicDegree(validDegrees[0])
+      setDiatonicDegree(validDegrees[0]);
     }
-  }, [diatonicKeyType, diatonicChordSize, diatonicDegree])
+  }, [diatonicKeyType, diatonicChordSize, diatonicDegree]);
 
-  const theme = 'dark'
-  const triadLayout = `${triadStringSet}-${triadInversion}`
-  const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`
+  const theme = "dark";
+  const triadLayout = `${triadStringSet}-${triadInversion}`;
+  const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
 
   return (
-    <div className={`min-h-screen p-4 flex flex-col gap-4 ${
-      theme === 'dark' ? 'bg-gray-950' : 'bg-stone-100'
-    }`}>
-      <div className={`rounded-xl p-4 space-y-4 ${
-        theme === 'dark' ? 'bg-gray-900' : 'bg-white border border-stone-300 shadow-sm'
-      }`}>
+    <div
+      className={`min-h-screen p-4 flex flex-col gap-4 ${
+        theme === "dark" ? "bg-gray-950" : "bg-stone-100"
+      }`}
+    >
+      <div
+        className={`rounded-xl p-4 space-y-4 ${
+          theme === "dark" ? "bg-gray-900" : "bg-white border border-stone-300 shadow-sm"
+        }`}
+      >
         <Controls
           theme={theme}
           rootNote={rootNote}
@@ -106,10 +110,15 @@ export default function App() {
         />
 
         <div className="mb-2 flex items-center justify-center gap-3 text-center">
-          <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>
-            Root: <span className={`font-bold text-base ${theme === 'dark' ? 'text-white' : 'text-stone-900'}`}>{rootNote}</span>
+          <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
+            Root:{" "}
+            <span
+              className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}
+            >
+              {rootNote}
+            </span>
           </span>
-          <span className={`text-xs ${theme === 'dark' ? 'text-gray-600' : 'text-stone-500'}`}>
+          <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-stone-500"}`}>
             （指板の音をクリックしてルートを変更）
           </span>
         </div>
@@ -132,30 +141,35 @@ export default function App() {
         />
 
         <div className="mt-4 min-h-[5.75rem]">
-          {baseLabelMode === 'degree' && (
+          {baseLabelMode === "degree" && (
             <>
-              <h3 className={`text-sm mb-3 text-center ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>度数の凡例</h3>
+              <h3
+                className={`text-sm mb-3 text-center ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}
+              >
+                度数の凡例
+              </h3>
               <div className="flex flex-wrap justify-center gap-2">
                 {[
-                  ['P1', '#ef4444'],
-                  ['m2', '#ec4899'],
-                  ['M2', '#84cc16'],
-                  ['m3', '#a855f7'],
-                  ['M3', '#22c55e'],
-                  ['P4', '#06b6d4'],
-                  ['b5', '#6b7280'],
-                  ['P5', '#3b82f6'],
-                  ['m6', '#8b5cf6'],
-                  ['M6', '#10b981'],
-                  ['m7', '#f97316'],
-                  ['M7', '#f59e0b'],
+                  ["P1", "#ef4444"],
+                  ["m2", "#ec4899"],
+                  ["M2", "#84cc16"],
+                  ["m3", "#a855f7"],
+                  ["M3", "#22c55e"],
+                  ["P4", "#06b6d4"],
+                  ["b5", "#6b7280"],
+                  ["P5", "#3b82f6"],
+                  ["m6", "#8b5cf6"],
+                  ["M6", "#10b981"],
+                  ["m7", "#f97316"],
+                  ["M7", "#f59e0b"],
                 ].map(([name, color]) => (
                   <div key={name} className="flex items-center gap-1">
-                    <div
-                      className="w-6 h-6 rounded-full"
-                      style={{ backgroundColor: color }}
-                    />
-                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-stone-700'}`}>{name}</span>
+                    <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
+                    <span
+                      className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
+                    >
+                      {name}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -163,7 +177,6 @@ export default function App() {
           )}
         </div>
       </div>
-
     </div>
-  )
+  );
 }
