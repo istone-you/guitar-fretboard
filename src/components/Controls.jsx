@@ -11,10 +11,6 @@ import {
 
 const CHORD_TYPES = ['Major', 'Minor', '7th', 'maj7', 'm7', 'm7(b5)', 'dim7', 'm(maj7)']
 const TRIAD_CHORD_TYPES = ['Major', 'Minor', 'Diminished', 'Augmented']
-const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
-  value: i,
-  label: i === 0 ? '0' : `${i}`,
-}))
 const CHORD_DISPLAY_OPTIONS = [
   { value: 'form', label: 'コードフォーム' },
   { value: 'power', label: 'パワーコード' },
@@ -40,8 +36,6 @@ export default function Controls({
   theme,
   rootNote,
   setRootNote,
-  capo,
-  setCapo,
   baseLabelMode,
   setBaseLabelMode,
   showChord,
@@ -89,7 +83,7 @@ export default function Controls({
 
   return (
     <div className={`space-y-4 pt-4 ${isDark ? 'text-white' : 'text-stone-900'}`}>
-      {/* ルート音 & カポ */}
+      {/* ルート音 */}
       <div className="flex flex-col items-center gap-4 lg:flex-row lg:flex-wrap lg:justify-center">
         <label className="flex items-center gap-2">
           <span className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>ルート</span>
@@ -98,17 +92,6 @@ export default function Controls({
             value={rootNote}
             onChange={setRootNote}
             options={NOTES.map((note) => ({ value: note, label: note }))}
-            widthClass="w-16"
-          />
-        </label>
-
-        <label className="flex items-center gap-2">
-          <span className={`text-sm font-semibold ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>カポ</span>
-          <DropdownSelect
-            theme={theme}
-            value={capo}
-            onChange={setCapo}
-            options={CAPO_OPTIONS}
             widthClass="w-16"
           />
         </label>

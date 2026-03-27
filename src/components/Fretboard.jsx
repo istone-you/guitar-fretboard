@@ -29,7 +29,6 @@ const STRING_ROW_GAP = 1
 export default function Fretboard({
   theme,
   rootNote,
-  capo,
   baseLabelMode,
   showChord,
   chordDisplayMode,
@@ -79,7 +78,7 @@ export default function Fretboard({
 
       let rootFret = -1
       for (let fret = 0; fret < FRET_COUNT; fret++) {
-        if (getNoteIndex(rootStringIdx, fret, capo) === effectiveRootIndex) {
+        if (getNoteIndex(rootStringIdx, fret) === effectiveRootIndex) {
           rootFret = fret
           break
         }
@@ -107,7 +106,7 @@ export default function Fretboard({
 
     if (effectiveDisplayMode !== 'form') return movableGroups
 
-    const openForm = getOpenChordForm(effectiveRootIndex, effectiveChordType, capo)
+    const openForm = getOpenChordForm(effectiveRootIndex, effectiveChordType)
     if (!openForm) return movableGroups
 
     const frets = openForm.map((cell) => cell.fret)
@@ -116,6 +115,7 @@ export default function Fretboard({
       ...movableGroups,
       {
         id: `open-${effectiveChordType}-${effectiveRootIndex}-${capo}`,
+        id: `open-${effectiveChordType}-${effectiveRootIndex}`,
         kind: 'open',
         cells: openForm,
         minFret: Math.min(...frets),
@@ -124,7 +124,7 @@ export default function Fretboard({
         maxString: Math.max(...strings),
       },
     ]
-  }, [showChord, chordDisplayMode, rootIndex, chordType, triadPosition, effectiveDisplayMode, effectiveChordType, effectiveRootIndex, capo])
+  }, [showChord, chordDisplayMode, rootIndex, chordType, triadPosition, effectiveDisplayMode, effectiveChordType, effectiveRootIndex])
 
   const chordPositions = useMemo(() => {
     const set = new Set()
@@ -141,14 +141,14 @@ export default function Fretboard({
     if (!showCaged || cagedForms.size === 0) return new Map()
     const merged = new Map()
     for (const key of cagedForms) {
-      for (const [cell, val] of calcCagedPositions(key, rootIndex, capo)) {
+      for (const [cell, val] of calcCagedPositions(key, rootIndex)) {
         if (!merged.has(cell) || val.degree === 'R') {
           merged.set(cell, val)
         }
       }
     }
     return merged
-  }, [showCaged, cagedForms, rootIndex, capo])
+  }, [showCaged, cagedForms, rootIndex])
 
   const opacity = 0.85
 
@@ -160,7 +160,7 @@ export default function Fretboard({
           <div className="flex mb-1">
             <div className="w-8 shrink-0" />
             {Array.from({ length: FRET_COUNT }, (_, fret) => (
-              <FretHeader key={fret} fret={fret} capo={capo} theme={theme} />
+              <FretHeader key={fret} fret={fret} theme={theme} />
             ))}
           </div>
 
@@ -194,7 +194,6 @@ export default function Fretboard({
                 key={stringIdx}
                 theme={theme}
                 stringIdx={stringIdx}
-                capo={capo}
                 rootIndex={rootIndex}
                 baseLabelMode={baseLabelMode}
                 showScale={showScale}
@@ -212,14 +211,13 @@ export default function Fretboard({
   )
 }
 
-function FretHeader({ fret, capo, theme }) {
+function FretHeader({ fret, theme }) {
   const isDark = theme === 'dark'
-  const isCapo = fret === capo && capo > 0
   return (
     <div className={`w-14 shrink-0 text-center text-sm font-mono
-      ${isCapo ? 'text-yellow-400 font-bold' : isDark ? 'text-gray-500' : 'text-stone-500'}
+      ${isDark ? 'text-gray-500' : 'text-stone-500'}
     `}>
-      {isCapo ? `♯${fret}` : fret}
+      {fret}
     </div>
   )
 }
@@ -245,7 +243,6 @@ function PositionMark({ fret, theme }) {
 function StringRow({
   theme,
   stringIdx,
-  capo,
   rootIndex,
   baseLabelMode,
   showScale,
@@ -266,7 +263,7 @@ function StringRow({
       </div>
 
       {Array.from({ length: FRET_COUNT }, (_, fret) => {
-        const noteIdx = getNoteIndex(stringIdx, fret, capo)
+        const noteIdx = getNoteIndex(stringIdx, fret)
         const noteName = NOTES[noteIdx]
         const semitone = calcDegree(noteIdx, rootIndex)
         const degreeName = getDegreeName(noteIdx, rootIndex)
@@ -313,8 +310,6 @@ function StringRow({
           overlayLabel = noteName
         }
 
-        const isCapoFret = fret === capo && capo > 0
-
         return (
           <FretCell
             key={fret}
@@ -326,7 +321,6 @@ function StringRow({
             overlayLabel={overlayLabel}
             inChord={inChord}
             isRoot={isRoot}
-            isCapoFret={isCapoFret}
             opacity={opacity}
             theme={theme}
             onClick={() => onNoteClick(noteName)}
@@ -346,7 +340,6 @@ function FretCell({
   overlayLabel,
   inChord,
   isRoot,
-  isCapoFret,
   opacity,
   theme,
   onClick,
@@ -360,7 +353,6 @@ function FretCell({
         cursor-pointer
         ${isDark ? 'border-l border-gray-600' : 'border-l border-stone-300'}
         ${fret === 0 ? (isDark ? 'border-r-4 border-r-gray-300' : 'border-r-4 border-r-stone-500') : ''}
-        ${isCapoFret ? 'border-l-4 border-l-yellow-400' : ''}
         ${isDark ? 'hover:bg-gray-700/30' : 'hover:bg-stone-200/70'} transition-colors
       `}
       onClick={onClick}

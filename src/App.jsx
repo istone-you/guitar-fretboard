@@ -6,8 +6,6 @@ import { DIATONIC_CHORDS } from './logic/fretboard'
 export default function App() {
   // ルート音
   const [rootNote, setRootNote] = useState('C')
-  // カポ（0=なし）
-  const [capo, setCapo] = useState(0)
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState('note')
 
@@ -67,8 +65,6 @@ export default function App() {
           theme={theme}
           rootNote={rootNote}
           setRootNote={setRootNote}
-          capo={capo}
-          setCapo={setCapo}
           baseLabelMode={baseLabelMode}
           setBaseLabelMode={setBaseLabelMode}
           showChord={showChord}
@@ -101,11 +97,6 @@ export default function App() {
           <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-stone-600'}`}>
             Root: <span className={`font-bold text-base ${theme === 'dark' ? 'text-white' : 'text-stone-900'}`}>{rootNote}</span>
           </span>
-          {capo > 0 && (
-            <span className="text-yellow-400 text-sm">
-              Capo {capo}フレット
-            </span>
-          )}
           <span className={`text-xs ${theme === 'dark' ? 'text-gray-600' : 'text-stone-500'}`}>
             （指板の音をクリックしてルートを変更）
           </span>
@@ -113,7 +104,6 @@ export default function App() {
         <Fretboard
           theme={theme}
           rootNote={rootNote}
-          capo={capo}
           baseLabelMode={baseLabelMode}
           showChord={showChord}
           chordDisplayMode={chordDisplayMode}
