@@ -1,4 +1,4 @@
-import type { ChordType, TriadChordType, DegreeName } from "../types";
+import type { ChordType, TriadChordType, DegreeName, ScaleType } from "../types";
 
 // 音名配列（半音12音）
 export const NOTES_SHARP = [
@@ -1017,6 +1017,13 @@ export function getDiatonicChordSemitones(
 export const MAJOR_SCALE_DEGREES = new Set([0, 2, 4, 5, 7, 9, 11]);
 // ナチュラルマイナー（エオリアン）の度数パターン: R, M2, m3, P4, P5, m6, m7
 export const NATURAL_MINOR_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 8, 10]);
+export const HARMONIC_MINOR_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 8, 11]);
+export const MELODIC_MINOR_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 9, 11]);
+export const DORIAN_SCALE_DEGREES = new Set([0, 2, 3, 5, 7, 9, 10]);
+export const PHRYGIAN_SCALE_DEGREES = new Set([0, 1, 3, 5, 7, 8, 10]);
+export const LYDIAN_SCALE_DEGREES = new Set([0, 2, 4, 6, 7, 9, 11]);
+export const MIXOLYDIAN_SCALE_DEGREES = new Set([0, 2, 4, 5, 7, 9, 10]);
+export const LOCRIAN_SCALE_DEGREES = new Set([0, 1, 3, 5, 6, 8, 10]);
 
 // スケールに含まれるか判定
 export function isInMajorScale(semitone: number): boolean {
@@ -1045,6 +1052,27 @@ export function isInPenta(semitone: number, type: "minor" | "major"): boolean {
 
 // ブルーノートスケール: R, m3, P4, b5, P5, m7 → 半音: 0, 3, 5, 6, 7, 10
 export const BLUES_SCALE_DEGREES = new Set([0, 3, 5, 6, 7, 10]);
+
+export const SCALE_DEGREES: Record<ScaleType, Set<number>> = {
+  major: MAJOR_SCALE_DEGREES,
+  "natural-minor": NATURAL_MINOR_SCALE_DEGREES,
+  "major-penta": MAJOR_PENTA_DEGREES,
+  "minor-penta": MINOR_PENTA_DEGREES,
+  blues: BLUES_SCALE_DEGREES,
+  "harmonic-minor": HARMONIC_MINOR_SCALE_DEGREES,
+  "melodic-minor": MELODIC_MINOR_SCALE_DEGREES,
+  ionian: MAJOR_SCALE_DEGREES,
+  dorian: DORIAN_SCALE_DEGREES,
+  phrygian: PHRYGIAN_SCALE_DEGREES,
+  lydian: LYDIAN_SCALE_DEGREES,
+  mixolydian: MIXOLYDIAN_SCALE_DEGREES,
+  aeolian: NATURAL_MINOR_SCALE_DEGREES,
+  locrian: LOCRIAN_SCALE_DEGREES,
+};
+
+export function isInScale(semitone: number, scaleType: ScaleType): boolean {
+  return SCALE_DEGREES[scaleType]?.has(semitone) ?? false;
+}
 
 // コード種別ごとの構成音（半音）
 export const CHORD_SEMITONES: Record<string, Set<number>> = {

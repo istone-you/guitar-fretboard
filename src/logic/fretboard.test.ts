@@ -3,6 +3,7 @@ import {
   NOTES_SHARP,
   NOTES_FLAT,
   OPEN_STRINGS,
+  SCALE_DEGREES,
   getNoteIndex,
   getNoteName,
   calcDegree,
@@ -11,6 +12,7 @@ import {
   isInMajorScale,
   isInNaturalMinorScale,
   isInPenta,
+  isInScale,
   getDiatonicChord,
   getDiatonicChordSemitones,
   getTriadLayout,
@@ -206,6 +208,37 @@ describe("isInPenta", () => {
 
   it("メジャーペンタのスケール外音", () => {
     [1, 3, 5, 6, 8, 10, 11].forEach((s) => expect(isInPenta(s, "major")).toBe(false));
+  });
+});
+
+describe("isInScale / SCALE_DEGREES", () => {
+  const cases = [
+    { scale: "major", inScale: [0, 2, 4, 5, 7, 9, 11], outOfScale: [1, 3, 6, 8, 10] },
+    { scale: "natural-minor", inScale: [0, 2, 3, 5, 7, 8, 10], outOfScale: [1, 4, 6, 9, 11] },
+    { scale: "major-penta", inScale: [0, 2, 4, 7, 9], outOfScale: [1, 3, 5, 6, 8, 10, 11] },
+    { scale: "minor-penta", inScale: [0, 3, 5, 7, 10], outOfScale: [1, 2, 4, 6, 8, 9, 11] },
+    { scale: "blues", inScale: [0, 3, 5, 6, 7, 10], outOfScale: [1, 2, 4, 8, 9, 11] },
+    { scale: "harmonic-minor", inScale: [0, 2, 3, 5, 7, 8, 11], outOfScale: [1, 4, 6, 9, 10] },
+    { scale: "melodic-minor", inScale: [0, 2, 3, 5, 7, 9, 11], outOfScale: [1, 4, 6, 8, 10] },
+    { scale: "ionian", inScale: [0, 2, 4, 5, 7, 9, 11], outOfScale: [1, 3, 6, 8, 10] },
+    { scale: "dorian", inScale: [0, 2, 3, 5, 7, 9, 10], outOfScale: [1, 4, 6, 8, 11] },
+    { scale: "phrygian", inScale: [0, 1, 3, 5, 7, 8, 10], outOfScale: [2, 4, 6, 9, 11] },
+    { scale: "lydian", inScale: [0, 2, 4, 6, 7, 9, 11], outOfScale: [1, 3, 5, 8, 10] },
+    { scale: "mixolydian", inScale: [0, 2, 4, 5, 7, 9, 10], outOfScale: [1, 3, 6, 8, 11] },
+    { scale: "aeolian", inScale: [0, 2, 3, 5, 7, 8, 10], outOfScale: [1, 4, 6, 9, 11] },
+    { scale: "locrian", inScale: [0, 1, 3, 5, 6, 8, 10], outOfScale: [2, 4, 7, 9, 11] },
+  ] as const;
+
+  cases.forEach(({ scale, inScale, outOfScale }) => {
+    it(`${scale} の構成音を正しく持つ`, () => {
+      inScale.forEach((s) => expect(SCALE_DEGREES[scale].has(s)).toBe(true));
+      outOfScale.forEach((s) => expect(SCALE_DEGREES[scale].has(s)).toBe(false));
+    });
+
+    it(`${scale} を共通判定で正しく判定する`, () => {
+      inScale.forEach((s) => expect(isInScale(s, scale)).toBe(true));
+      outOfScale.forEach((s) => expect(isInScale(s, scale)).toBe(false));
+    });
   });
 });
 

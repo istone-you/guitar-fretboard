@@ -2,7 +2,21 @@ export type Theme = "dark" | "light";
 export type Accidental = "sharp" | "flat";
 export type BaseLabelMode = "note" | "degree";
 export type ChordDisplayMode = "form" | "power" | "triad" | "diatonic";
-export type ScaleType = "major" | "natural-minor" | "major-penta" | "minor-penta" | "blues";
+export type ScaleType =
+  | "major"
+  | "natural-minor"
+  | "major-penta"
+  | "minor-penta"
+  | "blues"
+  | "harmonic-minor"
+  | "melodic-minor"
+  | "ionian"
+  | "dorian"
+  | "phrygian"
+  | "lydian"
+  | "mixolydian"
+  | "aeolian"
+  | "locrian";
 export type ChordType = "Major" | "Minor" | "7th" | "maj7" | "m7" | "m7(b5)" | "dim7" | "m(maj7)";
 export type TriadChordType = "Major" | "Minor" | "Diminished" | "Augmented";
 export type DegreeName =

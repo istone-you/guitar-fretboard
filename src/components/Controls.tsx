@@ -43,6 +43,40 @@ const SCALE_OPTIONS: { value: ScaleType; label: string }[] = [
   { value: "major-penta", label: "メジャーペンタ" },
   { value: "minor-penta", label: "マイナーペンタ" },
   { value: "blues", label: "ブルーノート" },
+  { value: "harmonic-minor", label: "ハーモニックマイナー" },
+  { value: "melodic-minor", label: "メロディックマイナー" },
+  { value: "ionian", label: "イオニアン" },
+  { value: "dorian", label: "ドリアン" },
+  { value: "phrygian", label: "フリジアン" },
+  { value: "lydian", label: "リディアン" },
+  { value: "mixolydian", label: "ミクソリディアン" },
+  { value: "aeolian", label: "エオリアン" },
+  { value: "locrian", label: "ロクリアン" },
+];
+const SCALE_GROUPS: {
+  title: string;
+  options: { value: ScaleType; label: string }[];
+}[] = [
+  {
+    title: "基本",
+    options: SCALE_OPTIONS.filter((option) =>
+      ["major", "natural-minor", "major-penta", "minor-penta", "blues"].includes(option.value),
+    ),
+  },
+  {
+    title: "マイナー派生",
+    options: SCALE_OPTIONS.filter((option) =>
+      ["harmonic-minor", "melodic-minor"].includes(option.value),
+    ),
+  },
+  {
+    title: "モード",
+    options: SCALE_OPTIONS.filter((option) =>
+      ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"].includes(
+        option.value,
+      ),
+    ),
+  },
 ];
 
 interface ControlsProps {
@@ -287,13 +321,7 @@ export default function Controls({
           onToggle={() => setShowScale(!showScale)}
         >
           <div className="flex flex-wrap gap-2 items-center">
-            <DropdownSelect
-              theme={theme}
-              value={scaleType}
-              onChange={setScaleType}
-              options={SCALE_OPTIONS}
-              widthClass="w-44"
-            />
+            <ScaleSelect theme={theme} value={scaleType} onChange={setScaleType} />
           </div>
         </LayerRow>
 
@@ -497,6 +525,102 @@ function LayerRow({ label, color, active, onToggle, theme, children }: LayerRowP
           {children}
         </div>
       </div>
+    </div>
+  );
+}
+
+interface ScaleSelectProps {
+  theme: Theme;
+  value: ScaleType;
+  onChange: (value: string) => void;
+}
+
+function ScaleSelect({ theme, value, onChange }: ScaleSelectProps) {
+  const [open, setOpen] = useState(false);
+  const isDark = theme === "dark";
+  const selected = SCALE_OPTIONS.find((option) => option.value === value) ?? SCALE_OPTIONS[0];
+
+  return (
+    <div className="relative w-44">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full items-center justify-between gap-2 rounded-xl border px-2.5 py-1.5 text-left text-sm font-medium shadow-sm transition-all ${
+          open
+            ? isDark
+              ? "border-gray-500 bg-gray-700 text-white"
+              : "border-stone-400 bg-white text-stone-900"
+            : isDark
+              ? "border-gray-500 bg-gray-700/90 text-white hover:border-gray-300"
+              : "border-stone-300 bg-white/95 text-stone-900 hover:border-stone-400"
+        }`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={selected.label}
+      >
+        <span className="truncate">{selected.label}</span>
+        <span
+          className={`text-xs transition-transform ${open ? "rotate-180" : ""} ${
+            isDark ? "text-gray-200" : "text-stone-600"
+          }`}
+          aria-hidden="true"
+        >
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
+          <div
+            role="dialog"
+            aria-label="スケール一覧"
+            className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
+              isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
+            }`}
+          >
+            <div className="space-y-2">
+              {SCALE_GROUPS.map((group) => (
+                <div key={group.title} className="space-y-1">
+                  <div
+                    className={`px-2 text-xs font-semibold tracking-wide ${
+                      isDark ? "text-gray-400" : "text-stone-500"
+                    }`}
+                  >
+                    {group.title}
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {group.options.map((option) => {
+                      const active = option.value === value;
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            onChange(option.value);
+                            setOpen(false);
+                          }}
+                          className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                            active
+                              ? isDark
+                                ? "border-transparent bg-emerald-600 text-white"
+                                : "border-transparent bg-emerald-600 text-white"
+                              : isDark
+                                ? "border-gray-600 bg-gray-800 text-gray-200 hover:border-gray-400"
+                                : "border-stone-300 bg-stone-50 text-stone-700 hover:border-stone-500"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

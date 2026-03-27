@@ -32,6 +32,23 @@ function makeProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("Fretboard", () => {
+  const scaleCases: ScaleType[] = [
+    "major",
+    "natural-minor",
+    "major-penta",
+    "minor-penta",
+    "blues",
+    "harmonic-minor",
+    "melodic-minor",
+    "ionian",
+    "dorian",
+    "phrygian",
+    "lydian",
+    "mixolydian",
+    "aeolian",
+    "locrian",
+  ];
+
   // ===== レンダリング =====
   it("6弦分の開放弦ラベルが表示される", () => {
     render(<Fretboard {...makeProps()} />);
@@ -111,35 +128,11 @@ describe("Fretboard", () => {
     expect(cells.length).toBeGreaterThan(0);
   });
 
-  it("メジャースケール表示でもレンダリングできる", () => {
-    render(<Fretboard {...makeProps({ showScale: true, scaleType: "major" as ScaleType })} />);
-    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
-  });
-
-  it("ナチュラルマイナー表示でもレンダリングできる", () => {
-    render(
-      <Fretboard {...makeProps({ showScale: true, scaleType: "natural-minor" as ScaleType })} />,
-    );
-    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
-  });
-
-  it("ブルース表示でもレンダリングできる", () => {
-    render(<Fretboard {...makeProps({ showScale: true, scaleType: "blues" as ScaleType })} />);
-    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
-  });
-
-  it("メジャーペンタ表示でもレンダリングできる", () => {
-    render(
-      <Fretboard {...makeProps({ showScale: true, scaleType: "major-penta" as ScaleType })} />,
-    );
-    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
-  });
-
-  it("マイナーペンタ表示でもレンダリングできる", () => {
-    render(
-      <Fretboard {...makeProps({ showScale: true, scaleType: "minor-penta" as ScaleType })} />,
-    );
-    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  scaleCases.forEach((scaleType) => {
+    it(`${scaleType} 表示でもレンダリングできる`, () => {
+      render(<Fretboard {...makeProps({ showScale: true, scaleType })} />);
+      expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+    });
   });
 
   it("CAGED表示でもレンダリングできる", () => {

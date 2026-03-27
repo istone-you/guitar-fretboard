@@ -67,6 +67,30 @@ describe("Controls", () => {
     expect(screen.getByText("スケール")).toBeTruthy();
   });
 
+  it("スケール選択を開くと一覧で候補が見える", () => {
+    render(<Controls {...makeProps()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "メジャースケール" }));
+
+    expect(screen.getByRole("dialog", { name: "スケール一覧" })).toBeTruthy();
+    expect(screen.getByText("基本")).toBeTruthy();
+    expect(screen.getByText("マイナー派生")).toBeTruthy();
+    expect(screen.getByText("モード")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "ハーモニックマイナー" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "ロクリアン" })).toBeTruthy();
+  });
+
+  it("スケール一覧から選ぶと setScaleType が呼ばれて閉じる", () => {
+    const props = makeProps();
+    render(<Controls {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "メジャースケール" }));
+    fireEvent.click(screen.getByRole("button", { name: "メロディックマイナー" }));
+
+    expect(props.setScaleType).toHaveBeenCalledWith("melodic-minor");
+    expect(screen.queryByRole("dialog", { name: "スケール一覧" })).toBeNull();
+  });
+
   // ===== ♯/♭切り替え =====
   it('♯ボタンをクリックすると onAccidentalChange("sharp") が呼ばれる', () => {
     const props = makeProps();

@@ -14,10 +14,7 @@ import {
   buildTriadVoicing,
   getDiatonicChord,
   getOpenChordForm,
-  isInMajorScale,
-  isInNaturalMinorScale,
-  isInPenta,
-  isInBluesScale,
+  isInScale,
   calcCagedPositions,
   getRootIndex,
   type FretCell,
@@ -362,10 +359,7 @@ function StringRow({
         const degreeName = getDegreeName(noteIdx, rootIndex);
 
         const isRoot = semitone === 0;
-        const inMajorScale = isInMajorScale(semitone);
-        const inNaturalMinorScale = isInNaturalMinorScale(semitone);
         const inChord = chordPositions.has(`${stringIdx}-${fret}`);
-        const inPenta = isInPenta(semitone, scaleType === "minor-penta" ? "minor" : "major");
         const cagedCell = cagedPositions.get(`${stringIdx}-${fret}`);
         const baseLabel =
           baseLabelMode === "degree"
@@ -388,15 +382,7 @@ function StringRow({
         let overlayLabel = noteName;
 
         if (showScale) {
-          const inSelectedScale =
-            scaleType === "major"
-              ? inMajorScale
-              : scaleType === "natural-minor"
-                ? inNaturalMinorScale
-                : scaleType === "blues"
-                  ? isInBluesScale(semitone)
-                  : inPenta;
-          if (inSelectedScale) {
+          if (isInScale(semitone, scaleType)) {
             overlayColor = { bg: "#22c55e", text: "#fff" };
             overlayLabel = noteName;
           }

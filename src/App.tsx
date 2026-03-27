@@ -7,11 +7,7 @@ import {
   NOTES_SHARP,
   NOTES_FLAT,
   getRootIndex,
-  MAJOR_SCALE_DEGREES,
-  NATURAL_MINOR_SCALE_DEGREES,
-  MINOR_PENTA_DEGREES,
-  MAJOR_PENTA_DEGREES,
-  BLUES_SCALE_DEGREES,
+  SCALE_DEGREES,
   CHORD_SEMITONES,
   getDiatonicChordSemitones,
 } from "./logic/fretboard";
@@ -125,19 +121,11 @@ export default function App() {
     "m7",
     "M7",
   ];
-  const SCALE_SEMITONES: Record<ScaleType, Set<number>> = {
-    major: MAJOR_SCALE_DEGREES,
-    "natural-minor": NATURAL_MINOR_SCALE_DEGREES,
-    "major-penta": MAJOR_PENTA_DEGREES,
-    "minor-penta": MINOR_PENTA_DEGREES,
-    blues: BLUES_SCALE_DEGREES,
-  };
-
   const handleAutoFilter = () => {
     const active = new Set<number>();
     const keyRootIndex = getRootIndex(rootNote);
     if (showScale) {
-      for (const s of SCALE_SEMITONES[scaleType] ?? []) active.add(s);
+      for (const s of SCALE_DEGREES[scaleType] ?? []) active.add(s);
     }
     if (showCaged) {
       for (const s of CHORD_SEMITONES.Major) active.add(s);
