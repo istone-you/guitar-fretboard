@@ -80,6 +80,7 @@ vi.mock("./components/Fretboard", () => ({
 
 describe("App", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     controlsState.latest = null;
     fretboardState.latest = null;
     headerState.latest = null;
@@ -96,6 +97,16 @@ describe("App", () => {
     expect(screen.getByText("fb-diatonic:major-triad:I")).toBeTruthy();
   });
 
+  it("theme と accidental を localStorage から復元する", () => {
+    window.localStorage.setItem("guiter:theme", "light");
+    window.localStorage.setItem("guiter:accidental", "sharp");
+
+    render(<App />);
+
+    expect(screen.getByText("fb-theme:light")).toBeTruthy();
+    expect(screen.getByText("fb-accidental:sharp")).toBeTruthy();
+  });
+
   it("指板クリックと臨時記号変更でルート表記を更新する", () => {
     render(<App />);
 
@@ -105,6 +116,7 @@ describe("App", () => {
     fireEvent.click(screen.getByText("acc-sharp"));
     expect(screen.getByText("header-root:C♯")).toBeTruthy();
     expect(screen.getByText("fb-accidental:sharp")).toBeTruthy();
+    expect(window.localStorage.getItem("guiter:accidental")).toBe("sharp");
   });
 
   it("テーマと各表示モードの状態を更新する", () => {
@@ -120,6 +132,7 @@ describe("App", () => {
     fireEvent.click(screen.getByText("chord-minor"));
 
     expect(screen.getByText("fb-theme:light")).toBeTruthy();
+    expect(window.localStorage.getItem("guiter:theme")).toBe("light");
     expect(screen.getByText("fb-scale:blues")).toBeTruthy();
     expect(screen.getByText("fb-mode:power")).toBeTruthy();
     expect(fretboardState.latest).toBeTruthy();

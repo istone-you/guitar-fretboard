@@ -25,11 +25,28 @@ import type {
   DegreeName,
 } from "./types";
 
+const STORAGE_KEYS = {
+  theme: "guiter:theme",
+  accidental: "guiter:accidental",
+} as const;
+
+function readStoredTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  const stored = window.localStorage.getItem(STORAGE_KEYS.theme);
+  return stored === "light" || stored === "dark" ? stored : "dark";
+}
+
+function readStoredAccidental(): Accidental {
+  if (typeof window === "undefined") return "flat";
+  const stored = window.localStorage.getItem(STORAGE_KEYS.accidental);
+  return stored === "sharp" || stored === "flat" ? stored : "flat";
+}
+
 export default function App() {
   // ルート音
   const [rootNote, setRootNote] = useState("C");
   // 臨時記号表示（sharp / flat）
-  const [accidental, setAccidental] = useState<Accidental>("flat");
+  const [accidental, setAccidental] = useState<Accidental>(readStoredAccidental);
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState<BaseLabelMode>("note");
 
@@ -71,6 +88,7 @@ export default function App() {
     const notes = mode === "sharp" ? NOTES_SHARP : NOTES_FLAT;
     setRootNote(notes[idx]);
     setAccidental(mode);
+    window.localStorage.setItem(STORAGE_KEYS.accidental, mode);
   };
 
   // 指板の音をクリックしてルートを設定
@@ -90,7 +108,7 @@ export default function App() {
     if (!validDegrees.includes(diatonicDegree)) setDiatonicDegree(validDegrees[0]);
   };
 
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
 
   const DEGREE_BY_SEMITONE: DegreeName[] = [
@@ -169,7 +187,13 @@ export default function App() {
       >
         <Controls
           theme={theme}
-          onThemeChange={() => setTheme((t) => (t === "dark" ? "light" : "dark"))}
+          onThemeChange={() =>
+            setTheme((currentTheme) => {
+              const nextTheme = currentTheme === "dark" ? "light" : "dark";
+              window.localStorage.setItem(STORAGE_KEYS.theme, nextTheme);
+              return nextTheme;
+            })
+          }
           rootNote={rootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
