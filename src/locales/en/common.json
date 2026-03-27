@@ -1,0 +1,90 @@
+{
+  "settings": "Settings",
+  "howToUse": "How to Use",
+  "howToUseItems": {
+    "changeRoot": "Click a fretboard note to change the root",
+    "togglePanel": "Click each panel to toggle it on or off",
+    "switchMode": "Use panel controls to switch modes",
+    "toggleDegree": "In degree mode, click degrees to hide or show them on the fretboard",
+    "filterOverlay": "Use \"Filter\" to show only notes included in the active overlays"
+  },
+  "theme": "Theme",
+  "language": "Language",
+  "accidental": "♯/♭",
+  "layers": {
+    "scale": "Scale",
+    "caged": "CAGED",
+    "chord": "Chord"
+  },
+  "controls": {
+    "displayMode": "Display",
+    "degree": "Degree",
+    "chord": "Chord",
+    "strings": "Strings",
+    "key": "Key",
+    "inversion": "Inversion",
+    "chordType": "Chord"
+  },
+  "header": {
+    "root": "Root",
+    "display": "Labels",
+    "note": "Notes",
+    "degree": "Degrees"
+  },
+  "degreeFilter": {
+    "title": "Degrees",
+    "filter": "Filter",
+    "filterTitle": "Filter by the currently visible overlays",
+    "reset": "Reset",
+    "hideAll": "Hide all"
+  },
+  "scaleGroups": {
+    "basics": "Basics",
+    "minorDerived": "Minor Derived",
+    "modes": "Modes"
+  },
+  "scaleDialog": "Scale list",
+  "options": {
+    "chordDisplayMode": {
+      "form": "Chord Forms",
+      "power": "Power Chords",
+      "triad": "Triads",
+      "diatonic": "Diatonic"
+    },
+    "diatonicKey": {
+      "major": "Major",
+      "naturalMinor": "Minor"
+    },
+    "diatonicChordSize": {
+      "triad": "Triad",
+      "seventh": "7th"
+    },
+    "triadStrings": {
+      "1-3": "1-3",
+      "2-4": "2-4",
+      "3-5": "3-5",
+      "4-6": "4-6"
+    },
+    "triadInversions": {
+      "root": "Root",
+      "first": "1st",
+      "second": "2nd"
+    },
+    "scale": {
+      "major": "Major Scale",
+      "naturalMinor": "Natural Minor",
+      "majorPenta": "Major Pentatonic",
+      "minorPenta": "Minor Pentatonic",
+      "blues": "Blues",
+      "harmonicMinor": "Harmonic Minor",
+      "melodicMinor": "Melodic Minor",
+      "ionian": "Ionian",
+      "dorian": "Dorian",
+      "phrygian": "Phrygian",
+      "lydian": "Lydian",
+      "mixolydian": "Mixolydian",
+      "aeolian": "Aeolian",
+      "locrian": "Locrian"
+    }
+  }
+}

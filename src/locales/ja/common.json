@@ -1,0 +1,90 @@
+{
+  "settings": "設定",
+  "howToUse": "使い方",
+  "howToUseItems": {
+    "changeRoot": "指板の音をクリックしてルートを変更",
+    "togglePanel": "各パネルをクリックしてオン/オフ",
+    "switchMode": "パネル内のコントロールでモードを切り替え",
+    "toggleDegree": "度数モード時、各度数をクリックして指板上の表示をオン/オフ",
+    "filterOverlay": "「絞り込む」で有効なオーバーレイの構成音のみ表示"
+  },
+  "theme": "テーマ",
+  "language": "言語",
+  "accidental": "♯/♭",
+  "layers": {
+    "scale": "スケール",
+    "caged": "CAGED",
+    "chord": "コード"
+  },
+  "controls": {
+    "displayMode": "表示形式",
+    "degree": "度数",
+    "chord": "コード",
+    "strings": "弦",
+    "key": "キー",
+    "inversion": "転回",
+    "chordType": "和音"
+  },
+  "header": {
+    "root": "ルート",
+    "display": "表示",
+    "note": "音名",
+    "degree": "度数"
+  },
+  "degreeFilter": {
+    "title": "度数",
+    "filter": "絞り込む",
+    "filterTitle": "表示中のオーバーレイに合わせて絞り込む",
+    "reset": "リセット",
+    "hideAll": "全非表示"
+  },
+  "scaleGroups": {
+    "basics": "基本",
+    "minorDerived": "マイナー派生",
+    "modes": "モード"
+  },
+  "scaleDialog": "スケール一覧",
+  "options": {
+    "chordDisplayMode": {
+      "form": "コードフォーム",
+      "power": "パワーコード",
+      "triad": "トライアド",
+      "diatonic": "ダイアトニック"
+    },
+    "diatonicKey": {
+      "major": "メジャー",
+      "naturalMinor": "マイナー"
+    },
+    "diatonicChordSize": {
+      "triad": "3和音",
+      "seventh": "4和音"
+    },
+    "triadStrings": {
+      "1-3": "1~3弦",
+      "2-4": "2~4弦",
+      "3-5": "3~5弦",
+      "4-6": "4~6弦"
+    },
+    "triadInversions": {
+      "root": "基本",
+      "first": "第一転回",
+      "second": "第二転回"
+    },
+    "scale": {
+      "major": "メジャースケール",
+      "naturalMinor": "ナチュラルマイナー",
+      "majorPenta": "メジャーペンタ",
+      "minorPenta": "マイナーペンタ",
+      "blues": "ブルーノート",
+      "harmonicMinor": "ハーモニックマイナー",
+      "melodicMinor": "メロディックマイナー",
+      "ionian": "イオニアン",
+      "dorian": "ドリアン",
+      "phrygian": "フリジアン",
+      "lydian": "リディアン",
+      "mixolydian": "ミクソリディアン",
+      "aeolian": "エオリアン",
+      "locrian": "ロクリアン"
+    }
+  }
+}

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import "./i18n";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
 import FretboardHeader from "./components/FretboardHeader";
@@ -39,6 +41,7 @@ function readStoredAccidental(): Accidental {
 }
 
 export default function App() {
+  const { t } = useTranslation();
   // ルート音
   const [rootNote, setRootNote] = useState("C");
   // 臨時記号表示（sharp / flat）
@@ -241,18 +244,18 @@ export default function App() {
             <>
               <div className="flex items-center justify-center gap-2 mb-3">
                 <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-                  度数
+                  {t("degreeFilter.title")}
                 </h3>
                 <button
                   onClick={handleAutoFilter}
-                  title="表示中のオーバーレイに合わせて絞り込む"
+                  title={t("degreeFilter.filterTitle")}
                   className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
                     theme === "dark"
                       ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
                       : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
                   }`}
                 >
-                  絞り込む
+                  {t("degreeFilter.filter")}
                 </button>
                 <button
                   onClick={() =>
@@ -266,7 +269,7 @@ export default function App() {
                       : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
                   }`}
                 >
-                  {hiddenDegrees.size > 0 ? "リセット" : "全非表示"}
+                  {hiddenDegrees.size > 0 ? t("degreeFilter.reset") : t("degreeFilter.hideAll")}
                 </button>
               </div>
               <div className="flex flex-wrap justify-center gap-2">

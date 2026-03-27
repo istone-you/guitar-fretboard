@@ -1,4 +1,6 @@
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+import "../i18n";
 import {
   NOTES_SHARP,
   NOTES_FLAT,
@@ -10,6 +12,7 @@ import {
   getDiatonicChord,
   getRootIndex,
 } from "../logic/fretboard";
+import { changeLocale } from "../i18n";
 import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
 
 const CHORD_TYPES: ChordType[] = [
@@ -23,61 +26,6 @@ const CHORD_TYPES: ChordType[] = [
   "m(maj7)",
 ];
 const TRIAD_CHORD_TYPES = ["Major", "Minor", "Diminished", "Augmented"];
-const CHORD_DISPLAY_OPTIONS: { value: ChordDisplayMode; label: string }[] = [
-  { value: "form", label: "コードフォーム" },
-  { value: "power", label: "パワーコード" },
-  { value: "triad", label: "トライアド" },
-  { value: "diatonic", label: "ダイアトニック" },
-];
-const DIATONIC_KEY_OPTIONS = [
-  { value: "major", label: "メジャー" },
-  { value: "natural-minor", label: "マイナー" },
-];
-const DIATONIC_CHORD_SIZE_OPTIONS = [
-  { value: "triad", label: "3和音" },
-  { value: "seventh", label: "4和音" },
-];
-const SCALE_OPTIONS: { value: ScaleType; label: string }[] = [
-  { value: "major", label: "メジャースケール" },
-  { value: "natural-minor", label: "ナチュラルマイナー" },
-  { value: "major-penta", label: "メジャーペンタ" },
-  { value: "minor-penta", label: "マイナーペンタ" },
-  { value: "blues", label: "ブルーノート" },
-  { value: "harmonic-minor", label: "ハーモニックマイナー" },
-  { value: "melodic-minor", label: "メロディックマイナー" },
-  { value: "ionian", label: "イオニアン" },
-  { value: "dorian", label: "ドリアン" },
-  { value: "phrygian", label: "フリジアン" },
-  { value: "lydian", label: "リディアン" },
-  { value: "mixolydian", label: "ミクソリディアン" },
-  { value: "aeolian", label: "エオリアン" },
-  { value: "locrian", label: "ロクリアン" },
-];
-const SCALE_GROUPS: {
-  title: string;
-  options: { value: ScaleType; label: string }[];
-}[] = [
-  {
-    title: "基本",
-    options: SCALE_OPTIONS.filter((option) =>
-      ["major", "natural-minor", "major-penta", "minor-penta", "blues"].includes(option.value),
-    ),
-  },
-  {
-    title: "マイナー派生",
-    options: SCALE_OPTIONS.filter((option) =>
-      ["harmonic-minor", "melodic-minor"].includes(option.value),
-    ),
-  },
-  {
-    title: "モード",
-    options: SCALE_OPTIONS.filter((option) =>
-      ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"].includes(
-        option.value,
-      ),
-    ),
-  },
-];
 
 interface ControlsProps {
   theme: Theme;
@@ -143,9 +91,70 @@ export default function Controls({
   setDiatonicDegree,
 }: ControlsProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+  const chordDisplayOptions: { value: ChordDisplayMode; label: string }[] = [
+    { value: "form", label: t("options.chordDisplayMode.form") },
+    { value: "power", label: t("options.chordDisplayMode.power") },
+    { value: "triad", label: t("options.chordDisplayMode.triad") },
+    { value: "diatonic", label: t("options.chordDisplayMode.diatonic") },
+  ];
+  const diatonicKeyOptions = [
+    { value: "major", label: t("options.diatonicKey.major") },
+    { value: "natural-minor", label: t("options.diatonicKey.naturalMinor") },
+  ];
+  const diatonicChordSizeOptions = [
+    { value: "triad", label: t("options.diatonicChordSize.triad") },
+    { value: "seventh", label: t("options.diatonicChordSize.seventh") },
+  ];
+  const scaleOptions: { value: ScaleType; label: string }[] = [
+    { value: "major", label: t("options.scale.major") },
+    { value: "natural-minor", label: t("options.scale.naturalMinor") },
+    { value: "major-penta", label: t("options.scale.majorPenta") },
+    { value: "minor-penta", label: t("options.scale.minorPenta") },
+    { value: "blues", label: t("options.scale.blues") },
+    { value: "harmonic-minor", label: t("options.scale.harmonicMinor") },
+    { value: "melodic-minor", label: t("options.scale.melodicMinor") },
+    { value: "ionian", label: t("options.scale.ionian") },
+    { value: "dorian", label: t("options.scale.dorian") },
+    { value: "phrygian", label: t("options.scale.phrygian") },
+    { value: "lydian", label: t("options.scale.lydian") },
+    { value: "mixolydian", label: t("options.scale.mixolydian") },
+    { value: "aeolian", label: t("options.scale.aeolian") },
+    { value: "locrian", label: t("options.scale.locrian") },
+  ];
+  const triadStringOptions = TRIAD_STRING_SET_OPTIONS.map(({ value }) => ({
+    value,
+    label: t(`options.triadStrings.${value}`),
+  }));
+  const triadInversionOptions = TRIAD_INVERSION_OPTIONS.map(({ value }) => ({
+    value,
+    label: t(`options.triadInversions.${value}`),
+  }));
+  const scaleGroups = [
+    {
+      title: t("scaleGroups.basics"),
+      options: scaleOptions.filter((option) =>
+        ["major", "natural-minor", "major-penta", "minor-penta", "blues"].includes(option.value),
+      ),
+    },
+    {
+      title: t("scaleGroups.minorDerived"),
+      options: scaleOptions.filter((option) =>
+        ["harmonic-minor", "melodic-minor"].includes(option.value),
+      ),
+    },
+    {
+      title: t("scaleGroups.modes"),
+      options: scaleOptions.filter((option) =>
+        ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"].includes(
+          option.value,
+        ),
+      ),
+    },
+  ];
   const rootIndex = getRootIndex(rootNote);
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
   const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {
@@ -178,7 +187,7 @@ export default function Controls({
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
               isDark ? "text-gray-200 hover:text-white" : "text-stone-600 hover:text-stone-900"
             }`}
-            title="設定"
+            title={t("settings")}
           >
             <svg
               viewBox="0 0 24 24"
@@ -207,16 +216,20 @@ export default function Controls({
                   <span
                     className={`text-xs font-bold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-stone-600"}`}
                   >
-                    使い方
+                    {t("howToUse")}
                   </span>
                   <ul
                     className={`text-xs space-y-1.5 ${isDark ? "text-gray-200" : "text-stone-700"}`}
                   >
-                    <li>・指板の音をクリックしてルートを変更</li>
-                    <li>・各パネルをクリックしてオン/オフ</li>
-                    <li>・パネル内のコントロールでモードを切り替え</li>
-                    <li>・度数モード時、各度数をクリックして指板上の表示をオン/オフ</li>
-                    <li>・「絞り込む」で有効なオーバーレイの構成音のみ表示</li>
+                    {[
+                      t("howToUseItems.changeRoot"),
+                      t("howToUseItems.togglePanel"),
+                      t("howToUseItems.switchMode"),
+                      t("howToUseItems.toggleDegree"),
+                      t("howToUseItems.filterOverlay"),
+                    ].map((item) => (
+                      <li key={item}>・{item}</li>
+                    ))}
                   </ul>
                 </div>
 
@@ -227,7 +240,7 @@ export default function Controls({
                   <span
                     className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
                   >
-                    テーマ
+                    {t("theme")}
                   </span>
                   <div
                     className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
@@ -276,12 +289,39 @@ export default function Controls({
                   </div>
                 </div>
 
+                <div className="flex items-center justify-between gap-3">
+                  <span
+                    className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
+                  >
+                    {t("language")}
+                  </span>
+                  <div
+                    className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
+                  >
+                    {(["ja", "en"] as const).map((value) => (
+                      <button
+                        key={value}
+                        onClick={() => changeLocale(value)}
+                        className={`w-10 px-2 py-1 rounded text-sm font-semibold transition-all ${
+                          i18n.language === value
+                            ? "bg-indigo-600 text-white"
+                            : isDark
+                              ? "bg-gray-700 text-gray-100 hover:bg-gray-600"
+                              : "bg-white text-stone-600 hover:bg-stone-200"
+                        }`}
+                      >
+                        {value.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* ♯/♭ */}
                 <div className="flex items-center justify-between gap-3">
                   <span
                     className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
                   >
-                    ♯/♭
+                    {t("accidental")}
                   </span>
                   <div
                     className={`inline-flex items-center gap-1 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
@@ -314,19 +354,25 @@ export default function Controls({
 
       <div className="space-y-3">
         <LayerRow
-          label="スケール"
+          label={t("layers.scale")}
           color="bg-emerald-600"
           active={showScale}
           theme={theme}
           onToggle={() => setShowScale(!showScale)}
         >
           <div className="flex flex-wrap gap-2 items-center">
-            <ScaleSelect theme={theme} value={scaleType} onChange={setScaleType} />
+            <ScaleSelect
+              theme={theme}
+              value={scaleType}
+              onChange={setScaleType}
+              options={scaleOptions}
+              groups={scaleGroups}
+            />
           </div>
         </LayerRow>
 
         <LayerRow
-          label="CAGED"
+          label={t("layers.caged")}
           color="bg-indigo-500"
           active={showCaged}
           theme={theme}
@@ -359,7 +405,7 @@ export default function Controls({
         </LayerRow>
 
         <LayerRow
-          label="コード"
+          label={t("layers.chord")}
           color="bg-amber-500"
           active={showChord}
           theme={theme}
@@ -370,13 +416,13 @@ export default function Controls({
               <span
                 className={`text-center sm:text-left text-xs ${isDark ? "text-gray-200" : "text-stone-600"}`}
               >
-                表示形式
+                {t("controls.displayMode")}
               </span>
               <DropdownSelect
                 theme={theme}
                 value={chordDisplayMode}
                 onChange={setChordDisplayMode}
-                options={CHORD_DISPLAY_OPTIONS}
+                options={chordDisplayOptions}
                 widthClass="w-36"
               />
             </div>
@@ -385,7 +431,7 @@ export default function Controls({
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "power" ? "invisible" : ""}`}
               >
-                {chordDisplayMode === "diatonic" ? "度数" : "コード"}
+                {chordDisplayMode === "diatonic" ? t("controls.degree") : t("controls.chord")}
               </span>
               <DropdownSelect
                 theme={theme}
@@ -423,7 +469,7 @@ export default function Controls({
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
-                {chordDisplayMode === "triad" ? "弦" : "キー"}
+                {chordDisplayMode === "triad" ? t("controls.strings") : t("controls.key")}
               </span>
               <DropdownSelect
                 theme={theme}
@@ -437,12 +483,9 @@ export default function Controls({
                 onChange={chordDisplayMode === "triad" ? setTriadStringSet : setDiatonicKeyType}
                 options={
                   chordDisplayMode === "diatonic"
-                    ? DIATONIC_KEY_OPTIONS
+                    ? diatonicKeyOptions
                     : chordDisplayMode === "triad"
-                      ? TRIAD_STRING_SET_OPTIONS.map(({ value, label }) => ({
-                          value,
-                          label,
-                        }))
+                      ? triadStringOptions
                       : [{ value: "", label: "--" }]
                 }
                 disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
@@ -454,7 +497,7 @@ export default function Controls({
               <span
                 className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
               >
-                {chordDisplayMode === "triad" ? "転回" : "和音"}
+                {chordDisplayMode === "triad" ? t("controls.inversion") : t("controls.chordType")}
               </span>
               <DropdownSelect
                 theme={theme}
@@ -468,12 +511,9 @@ export default function Controls({
                 onChange={chordDisplayMode === "triad" ? setTriadInversion : setDiatonicChordSize}
                 options={
                   chordDisplayMode === "diatonic"
-                    ? DIATONIC_CHORD_SIZE_OPTIONS
+                    ? diatonicChordSizeOptions
                     : chordDisplayMode === "triad"
-                      ? TRIAD_INVERSION_OPTIONS.map(({ value, label }) => ({
-                          value,
-                          label,
-                        }))
+                      ? triadInversionOptions
                       : [{ value: "", label: "--" }]
                 }
                 disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
@@ -533,12 +573,15 @@ interface ScaleSelectProps {
   theme: Theme;
   value: ScaleType;
   onChange: (value: string) => void;
+  options: { value: ScaleType; label: string }[];
+  groups: { title: string; options: { value: ScaleType; label: string }[] }[];
 }
 
-function ScaleSelect({ theme, value, onChange }: ScaleSelectProps) {
+function ScaleSelect({ theme, value, onChange, options, groups }: ScaleSelectProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const isDark = theme === "dark";
-  const selected = SCALE_OPTIONS.find((option) => option.value === value) ?? SCALE_OPTIONS[0];
+  const selected = options.find((option) => option.value === value) ?? options[0];
 
   return (
     <div className="relative w-44">
@@ -574,13 +617,13 @@ function ScaleSelect({ theme, value, onChange }: ScaleSelectProps) {
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
           <div
             role="dialog"
-            aria-label="スケール一覧"
+            aria-label={t("scaleDialog")}
             className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-64 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             }`}
           >
             <div className="space-y-2">
-              {SCALE_GROUPS.map((group) => (
+              {groups.map((group) => (
                 <div key={group.title} className="space-y-1">
                   <div
                     className={`px-2 text-xs font-semibold tracking-wide ${

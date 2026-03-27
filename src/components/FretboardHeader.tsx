@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+import "../i18n";
 import type { BaseLabelMode, Theme } from "../types";
 
 interface FretboardHeaderProps {
@@ -13,10 +15,13 @@ export default function FretboardHeader({
   baseLabelMode,
   onBaseLabelModeChange,
 }: FretboardHeaderProps) {
+  const { t, i18n } = useTranslation();
+  const isEnglish = i18n.language === "en";
+
   return (
     <div className="mb-2 flex flex-wrap items-center justify-center gap-3">
       <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-        ルート:{" "}
+        {t("header.root")}:{" "}
         <span
           className={`text-base font-bold ${theme === "dark" ? "text-white" : "text-stone-900"}`}
         >
@@ -29,20 +34,20 @@ export default function FretboardHeader({
         }`}
       >
         <span
-          className={`w-12 px-2 text-sm font-semibold ${
+          className={`${isEnglish ? "whitespace-nowrap px-2" : "w-12 px-2"} text-center text-sm font-semibold ${
             theme === "dark" ? "text-gray-300" : "text-stone-700"
           }`}
         >
-          表示
+          {t("header.display")}
         </span>
         {[
-          { value: "note" as BaseLabelMode, label: "音名" },
-          { value: "degree" as BaseLabelMode, label: "度数" },
+          { value: "note" as BaseLabelMode, label: t("header.note") },
+          { value: "degree" as BaseLabelMode, label: t("header.degree") },
         ].map(({ value, label }) => (
           <button
             key={value}
             onClick={() => onBaseLabelModeChange(value)}
-            className={`w-[4rem] whitespace-nowrap rounded px-2.5 py-1 text-sm font-semibold transition-all ${
+            className={`${isEnglish ? "min-w-[4rem]" : "w-[4rem]"} whitespace-nowrap rounded px-2.5 py-1 text-sm font-semibold transition-all ${
               baseLabelMode === value
                 ? "bg-indigo-600 text-white"
                 : theme === "dark"
