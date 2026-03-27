@@ -109,10 +109,7 @@ export default function App() {
 
         <div className="mb-2 flex items-center justify-center gap-3 flex-wrap">
           <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-            Root: <span className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}>{rootNote}</span>
-          </span>
-          <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-stone-500"}`}>
-            （指板の音をクリックしてルートを変更）
+            ルート: <span className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}>{rootNote}</span>
           </span>
           <div className={`inline-flex items-center gap-2 rounded-lg p-1 ${theme === "dark" ? "bg-gray-800" : "bg-stone-100"}`}>
             <span className={`w-12 px-2 text-sm font-semibold ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}>

@@ -118,9 +118,21 @@ export default function Controls({
           </button>
 
           {settingsOpen && (
-            <div className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-56 space-y-4 ${
+            <div className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-64 space-y-4 ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             }`}>
+              {/* 使い方 */}
+              <div className="space-y-2">
+                <span className={`text-xs font-bold uppercase tracking-wide ${isDark ? "text-gray-500" : "text-stone-400"}`}>使い方</span>
+                <ul className={`text-xs space-y-1.5 ${isDark ? "text-gray-400" : "text-stone-600"}`}>
+                  <li>・指板の音をクリックしてルートを変更</li>
+                  <li>・各パネルをクリックしてオン/オフ</li>
+                  <li>・パネル内のコントロールでモードを切り替え</li>
+                </ul>
+              </div>
+
+              <div className={`border-t ${isDark ? "border-gray-700" : "border-stone-200"}`} />
+
               {/* テーマ */}
               <div className="flex items-center justify-between gap-3">
                 <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>テーマ</span>
