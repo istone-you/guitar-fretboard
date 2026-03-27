@@ -197,6 +197,54 @@ export const CHORD_FORMS_6TH: Partial<Record<ChordType, FretPosition[]>> = {
     { string: 4, fretOffset: 0 },
     { string: 5, fretOffset: 0 },
   ],
+  sus2: [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 4 },
+    { string: 4, fretOffset: 0 },
+    { string: 5, fretOffset: 0 },
+  ],
+  sus4: [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 0 },
+    { string: 5, fretOffset: 0 },
+  ],
+  "6": [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 1 },
+    { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 0 },
+  ],
+  m6: [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 2 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 0 },
+    { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 0 },
+  ],
+  dim: [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 1 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 0 },
+    { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: -1 },
+  ],
+  aug: [
+    { string: 0, fretOffset: 0 },
+    { string: 1, fretOffset: 3 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 1 },
+    { string: 4, fretOffset: 1 },
+    { string: 5, fretOffset: 0 },
+  ],
 };
 
 // 5弦ルートのバレーコードフォーム
@@ -255,6 +303,47 @@ export const CHORD_FORMS_5TH: Partial<Record<ChordType, FretPosition[]>> = {
     { string: 3, fretOffset: 1 },
     { string: 4, fretOffset: 1 },
     { string: 5, fretOffset: 0 },
+  ],
+  sus2: [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 0 },
+    { string: 5, fretOffset: 0 },
+  ],
+  sus4: [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 3 },
+    { string: 5, fretOffset: 0 },
+  ],
+  "6": [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 2 },
+  ],
+  m6: [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 2 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 1 },
+    { string: 5, fretOffset: 2 },
+  ],
+  dim: [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 1 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 1 },
+  ],
+  aug: [
+    { string: 1, fretOffset: 0 },
+    { string: 2, fretOffset: 3 },
+    { string: 3, fretOffset: 2 },
+    { string: 4, fretOffset: 2 },
+    { string: 5, fretOffset: 1 },
   ],
 };
 
@@ -932,6 +1021,107 @@ export const OPEN_CHORD_FORMS: Partial<Record<ChordType, Record<string, FretCell
       { string: 5, fret: 0 },
     ],
   },
+  sus2: {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 3 },
+      { string: 5, fret: 0 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 4 },
+      { string: 3, fret: 4 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+  },
+  sus4: {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 3 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 3 },
+      { string: 5, fret: 3 },
+    ],
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 2 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 0 },
+    ],
+  },
+  "6": {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 2 },
+      { string: 5, fret: 2 },
+    ],
+    C: [
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 2 },
+    ],
+  },
+  m6: {
+    A: [
+      { string: 1, fret: 0 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 2 },
+    ],
+    D: [
+      { string: 2, fret: 0 },
+      { string: 3, fret: 2 },
+      { string: 4, fret: 0 },
+      { string: 5, fret: 1 },
+    ],
+  },
+  dim: {
+    B: [
+      { string: 1, fret: 2 },
+      { string: 2, fret: 3 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 3 },
+    ],
+  },
+  aug: {
+    E: [
+      { string: 0, fret: 0 },
+      { string: 1, fret: 3 },
+      { string: 2, fret: 2 },
+      { string: 3, fret: 1 },
+      { string: 4, fret: 1 },
+      { string: 5, fret: 0 },
+    ],
+  },
 };
 
 export function getOpenChordForm(rootIndex: number, chordType: ChordType): FretCell[] | null {
@@ -1086,6 +1276,12 @@ export const CHORD_SEMITONES: Record<string, Set<number>> = {
   "m(maj7)": new Set([0, 3, 7, 11]),
   Diminished: new Set([0, 3, 6]),
   Augmented: new Set([0, 4, 8]),
+  sus2: new Set([0, 2, 7]),
+  sus4: new Set([0, 5, 7]),
+  "6": new Set([0, 4, 7, 9]),
+  m6: new Set([0, 3, 7, 9]),
+  dim: new Set([0, 3, 6]),
+  aug: new Set([0, 4, 8]),
   power: new Set([0, 7]),
 };
 

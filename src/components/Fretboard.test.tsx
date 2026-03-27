@@ -186,6 +186,22 @@ describe("Fretboard", () => {
     expect(screen.getAllByText("C").length).toBeGreaterThan(0);
   });
 
+  it("追加したコードフォームでもレンダリングできる", () => {
+    (["sus2", "sus4", "6", "m6", "dim", "aug"] as ChordType[]).forEach((chordType) => {
+      const { unmount } = render(
+        <Fretboard
+          {...makeProps({
+            showChord: true,
+            chordDisplayMode: "form" as ChordDisplayMode,
+            chordType,
+          })}
+        />,
+      );
+      expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+      unmount();
+    });
+  });
+
   it("hiddenDegrees に含まれる度数は非表示になる", () => {
     render(
       <Fretboard

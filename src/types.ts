@@ -17,7 +17,21 @@ export type ScaleType =
   | "mixolydian"
   | "aeolian"
   | "locrian";
-export type ChordType = "Major" | "Minor" | "7th" | "maj7" | "m7" | "m7(b5)" | "dim7" | "m(maj7)";
+export type ChordType =
+  | "Major"
+  | "Minor"
+  | "7th"
+  | "maj7"
+  | "m7"
+  | "m7(b5)"
+  | "dim7"
+  | "m(maj7)"
+  | "sus2"
+  | "sus4"
+  | "6"
+  | "m6"
+  | "dim"
+  | "aug";
 export type TriadChordType = "Major" | "Minor" | "Diminished" | "Augmented";
 export type DegreeName =
   | "P1"

@@ -206,8 +206,8 @@ describe("Controls", () => {
     const props = makeProps({ showChord: true, chordDisplayMode: "triad" as ChordDisplayMode });
     render(<Controls {...props} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "1~3弦" }));
-    fireEvent.click(screen.getByRole("button", { name: "2~4弦" }));
+    fireEvent.click(screen.getByRole("button", { name: "1~3" }));
+    fireEvent.click(screen.getByRole("button", { name: "2~4" }));
     expect(props.setTriadStringSet).toHaveBeenCalledWith("2-4");
 
     fireEvent.click(screen.getByRole("button", { name: "基本" }));

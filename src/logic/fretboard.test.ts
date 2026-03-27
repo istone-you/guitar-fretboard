@@ -312,6 +312,17 @@ describe("getDiatonicChordSemitones", () => {
   });
 });
 
+describe("CHORD_SEMITONES", () => {
+  it("追加したコード種別の構成音が正しい", () => {
+    expect([...CHORD_SEMITONES.sus2].sort((a, b) => a - b)).toEqual([0, 2, 7]);
+    expect([...CHORD_SEMITONES.sus4].sort((a, b) => a - b)).toEqual([0, 5, 7]);
+    expect([...CHORD_SEMITONES["6"]].sort((a, b) => a - b)).toEqual([0, 4, 7, 9]);
+    expect([...CHORD_SEMITONES.m6].sort((a, b) => a - b)).toEqual([0, 3, 7, 9]);
+    expect([...CHORD_SEMITONES.dim].sort((a, b) => a - b)).toEqual([0, 3, 6]);
+    expect([...CHORD_SEMITONES.aug].sort((a, b) => a - b)).toEqual([0, 4, 8]);
+  });
+});
+
 describe("getTriadLayout", () => {
   it("不明なレイアウト値では先頭レイアウトを返す", () => {
     expect(getTriadLayout("unknown-layout").value).toBe("1-3-root");
@@ -345,6 +356,22 @@ describe("getOpenChordForm", () => {
   it("Cのdim7オープンフォームは存在しない", () => {
     const form = getOpenChordForm(0, "dim7");
     expect(form).toBeNull();
+  });
+
+  it("A sus4 のオープンフォームが存在する", () => {
+    const form = getOpenChordForm(9, "sus4");
+    expect(form).not.toBeNull();
+    expect(form!.length).toBeGreaterThan(0);
+  });
+
+  it("A 6 のオープンフォームが存在する", () => {
+    const form = getOpenChordForm(9, "6");
+    expect(form).not.toBeNull();
+  });
+
+  it("E aug のオープンフォームが存在する", () => {
+    const form = getOpenChordForm(4, "aug");
+    expect(form).not.toBeNull();
   });
 });
 

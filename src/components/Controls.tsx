@@ -24,6 +24,12 @@ const CHORD_TYPES: ChordType[] = [
   "m7(b5)",
   "dim7",
   "m(maj7)",
+  "sus2",
+  "sus4",
+  "6",
+  "m6",
+  "dim",
+  "aug",
 ];
 const TRIAD_CHORD_TYPES = ["Major", "Minor", "Diminished", "Augmented"];
 
@@ -434,25 +440,29 @@ export default function Controls({
               >
                 {chordDisplayMode === "diatonic" ? t("controls.degree") : t("controls.chord")}
               </span>
-              <DropdownSelect
-                theme={theme}
-                value={
-                  chordDisplayMode === "form"
-                    ? chordType
-                    : chordDisplayMode === "triad"
+              {chordDisplayMode === "form" ? (
+                <ChordTypeSelect
+                  theme={theme}
+                  value={chordType}
+                  onChange={setChordType}
+                  options={CHORD_TYPES.map((chord) => ({
+                    value: chord,
+                    label: chord,
+                  }))}
+                />
+              ) : (
+                <DropdownSelect
+                  theme={theme}
+                  value={
+                    chordDisplayMode === "triad"
                       ? chordType
                       : chordDisplayMode === "diatonic"
                         ? diatonicDegree
                         : ""
-                }
-                onChange={chordDisplayMode === "diatonic" ? setDiatonicDegree : setChordType}
-                options={
-                  chordDisplayMode === "form"
-                    ? CHORD_TYPES.map((chord) => ({
-                        value: chord,
-                        label: chord,
-                      }))
-                    : chordDisplayMode === "triad"
+                  }
+                  onChange={chordDisplayMode === "diatonic" ? setDiatonicDegree : setChordType}
+                  options={
+                    chordDisplayMode === "triad"
                       ? TRIAD_CHORD_TYPES.map((chord) => ({
                           value: chord,
                           label: chord,
@@ -460,11 +470,12 @@ export default function Controls({
                       : chordDisplayMode === "diatonic"
                         ? diatonicCodeOptions
                         : [{ value: "", label: "--" }]
-                }
-                disabled={chordDisplayMode === "power"}
-                accent="amber"
-                widthClass="w-36"
-              />
+                  }
+                  disabled={chordDisplayMode === "power"}
+                  accent="amber"
+                  widthClass="w-36"
+                />
+              )}
             </div>
 
             <div className="flex flex-col gap-1 items-center sm:items-start">
@@ -671,6 +682,96 @@ function ScaleSelect({ theme, value, onChange, options, groups }: ScaleSelectPro
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+interface ChordTypeSelectProps {
+  theme: Theme;
+  value: ChordType;
+  onChange: (value: string) => void;
+  options: { value: ChordType; label: string }[];
+}
+
+function ChordTypeSelect({ theme, value, onChange, options }: ChordTypeSelectProps) {
+  const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
+  const isDark = theme === "dark";
+  const selected = options.find((option) => option.value === value) ?? options[0];
+
+  return (
+    <div className="relative w-36">
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className={`flex w-full items-center justify-between gap-2 rounded-xl border px-2.5 py-1.5 text-left text-sm font-medium shadow-sm transition-all ${
+          open
+            ? isDark
+              ? "border-gray-500 bg-gray-700 text-white"
+              : "border-stone-400 bg-white text-stone-900"
+            : isDark
+              ? "border-gray-500 bg-gray-700/90 text-white hover:border-gray-300"
+              : "border-stone-300 bg-white/95 text-stone-900 hover:border-stone-400"
+        }`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        aria-label={selected.label}
+      >
+        <span className="truncate">{selected.label}</span>
+        <span
+          className={`text-xs transition-transform ${open ? "rotate-180" : ""} ${
+            isDark ? "text-gray-200" : "text-stone-600"
+          }`}
+          aria-hidden="true"
+        >
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-20"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(false);
+            }}
+          />
+          <div
+            role="dialog"
+            aria-label={t("controls.chordType")}
+            onClick={(e) => e.stopPropagation()}
+            className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-48 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
+              isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
+            }`}
+          >
+            <div className="flex flex-wrap gap-1">
+              {options.map((option) => {
+                const active = option.value === value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => {
+                      onChange(option.value);
+                      setOpen(false);
+                    }}
+                    className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                      active
+                        ? "border-transparent bg-amber-500 text-white"
+                        : isDark
+                          ? "border-gray-600 bg-gray-800 text-gray-200 hover:border-gray-400"
+                          : "border-stone-300 bg-stone-50 text-stone-700 hover:border-stone-500"
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </>
