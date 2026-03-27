@@ -9,12 +9,16 @@
 - ルート音クリックによるリアルタイム切り替え
 - 音名表示 / 度数表示の切り替え
 - 度数ごとの表示オン / オフ
+- 表示中オーバーレイに応じた度数フィルター
 - スケール表示
   - メジャー
   - ナチュラルマイナー
   - メジャーペンタ
   - マイナーペンタ
   - ブルース
+  - ハーモニックマイナー
+  - メロディックマイナー
+  - Ionian / Dorian / Phrygian / Lydian / Mixolydian / Aeolian / Locrian
 - コード表示
   - コードフォーム
   - パワーコード
@@ -23,17 +27,25 @@
 - CAGED フォーム表示
 - シャープ / フラット表記切り替え
 - ライト / ダークテーマ切り替え
+- 日本語 / 英語の多言語対応
+- 設定の localStorage 永続化
+  - テーマ
+  - 臨時記号
+  - 言語
 
 ## Tech Stack
 
 - Bun
 - React
 - TypeScript
-- Vite + Vite Plus
+- Vite 8 + Vite Plus
 - Tailwind CSS
 - Vitest
 - Testing Library
 - Cloudflare Pages
+- Wrangler
+- i18next
+- react-i18next
 
 ## Setup
 

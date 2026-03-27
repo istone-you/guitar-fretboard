@@ -31,6 +31,10 @@
    - マイナーペンタトニック（R, m3, P4, P5, m7）を指板上にハイライト。
    - メジャーペンタトニック（R, M2, M3, P5, M6）を指板上にハイライト。
    - ブルーノートスケール（R, m3, P4, b5, P5, m7）を指板上にハイライト。
+   - ハーモニックマイナー（R, M2, m3, P4, P5, m6, M7）を指板上にハイライト。
+   - メロディックマイナー（R, M2, m3, P4, P5, M6, M7）を指板上にハイライト。
+   - モード群として Ionian / Dorian / Phrygian / Lydian / Mixolydian / Aeolian / Locrian を指板上にハイライト。
+   - スケール選択UIは単純なプルダウンではなく、選択中ラベルを押すと一覧パネルが開く形式とし、候補全体を見渡せること。
 2. **CAGEDシステムモード**:
    - C・A・G・E・Dの5つのコードフォームを指板上に表示（複数選択可）。
    - ルート音に応じて各フォームの位置が平行移動すること。
@@ -49,6 +53,11 @@
 - **ルート選択**: 指板上の任意の音をクリックしてルート音を変更。
 - **臨時記号**: ♯/♭ の表記を設定から切り替えられること。
 - **トランスポーズ**: ルートを変更すると、コードやスケールの「形」がそのまま平行移動（CSS Gridや座標計算で制御）すること。
+- **多言語対応**: UI文言は日本語 / 英語を切り替えられること。
+  - 実装は `i18next` / `react-i18next` を使用すること。
+  - 翻訳辞書は JSON で管理すること。
+- **設定永続化**: 設定は localStorage に保持すること。
+  - 対象には少なくともテーマ、臨時記号、言語設定を含めること。
 
 ## 4. 技術スタック
 
@@ -57,9 +66,10 @@
 - **Language**: TypeScript
 - **Build Tool**: Vite 8 + Vite Plus
 - **Lint / Format**: Vite Plus
-- **Styling**: Tailwind CSS 3 + PostCSS + Autoprefixer
+- **Styling**: Tailwind CSS 3
 - **Testing**: Vitest + Testing Library
 - **Deployment**: Cloudflare Pages + Wrangler
+- **i18n**: i18next + react-i18next
 - **Logic**:
   - 音名配列: `['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']`
   - 度数計算: `(TargetNoteIndex - RootNoteIndex + 12) % 12`
