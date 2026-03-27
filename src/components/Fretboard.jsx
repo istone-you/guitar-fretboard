@@ -165,11 +165,7 @@ export default function Fretboard({
               return (
                 <div
                   key={group.id}
-                  className={`pointer-events-none absolute rounded-2xl border-2 z-[6] ${
-                    group.kind === 'open'
-                      ? 'border-emerald-300/60 bg-emerald-300/8'
-                      : 'border-amber-300/60 bg-amber-300/8'
-                  }`}
+                  className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
                   style={{ top, left, width, height }}
                 />
               )

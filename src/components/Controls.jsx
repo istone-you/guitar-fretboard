@@ -4,7 +4,7 @@ import { NOTES, CAGED_FORMS, CAGED_ORDER, DIATONIC_CHORDS, getDiatonicChord } fr
 const CHORD_TYPES = ['Major', 'Minor', '7th', 'maj7', 'm7', 'm7(b5)', 'dim7', 'm(maj7)']
 const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   value: i,
-  label: i === 0 ? 'なし' : `${i}フレット`,
+  label: i === 0 ? '0' : `${i}`,
 }))
 const CHORD_DISPLAY_OPTIONS = [
   { value: 'form', label: 'コードフォーム' },
@@ -20,8 +20,8 @@ const DIATONIC_KEY_OPTIONS = [
 const SCALE_OPTIONS = [
   { value: 'major', label: 'メジャースケール' },
   { value: 'natural-minor', label: 'ナチュラルマイナー' },
-  { value: 'minor-penta', label: 'マイナーペンタ' },
   { value: 'major-penta', label: 'メジャーペンタ' },
+  { value: 'minor-penta', label: 'マイナーペンタ' },
 ]
 
 export default function Controls({
@@ -81,7 +81,7 @@ export default function Controls({
             value={rootNote}
             onChange={setRootNote}
             options={NOTES.map((note) => ({ value: note, label: note }))}
-            widthClass="w-24"
+            widthClass="w-20"
           />
         </label>
 
@@ -92,7 +92,7 @@ export default function Controls({
             value={capo}
             onChange={setCapo}
             options={CAPO_OPTIONS}
-            widthClass="w-28"
+            widthClass="w-20"
           />
         </label>
 
