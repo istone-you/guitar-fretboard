@@ -170,8 +170,7 @@ export default function Fretboard({
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex justify-center">
-        <div className="min-w-max">
+      <div className="w-fit mx-auto">
           {/* フレット番号ヘッダー */}
           <div className="flex mb-1">
             <div className="w-8 shrink-0" />
@@ -227,7 +226,6 @@ export default function Fretboard({
               ),
             )}
           </div>
-        </div>
       </div>
     </div>
   );
