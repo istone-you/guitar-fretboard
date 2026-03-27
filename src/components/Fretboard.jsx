@@ -10,6 +10,7 @@ import {
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
   POWER_CHORD_FORMS,
+  buildTriadVoicing,
   getDiatonicChord,
   getOpenChordForm,
   isInMajorScale,
@@ -37,6 +38,7 @@ export default function Fretboard({
   showCaged,
   cagedForms,
   chordType,
+  triadPosition,
   diatonicScaleType,
   diatonicDegree,
   layerOpacity,
@@ -53,11 +55,28 @@ export default function Fretboard({
   const chordGroups = useMemo(() => {
     if (!showChord) return []
 
+    if (chordDisplayMode === 'triad') {
+      const cells = buildTriadVoicing(rootIndex, chordType, triadPosition)
+      if (cells.length === 0) return []
+
+      const frets = cells.map((cell) => cell.fret)
+      const strings = cells.map((cell) => cell.string)
+      return [{
+        id: `triad-${rootIndex}-${chordType}-${triadPosition}`,
+        kind: 'triad',
+        cells,
+        minFret: Math.min(...frets),
+        maxFret: Math.max(...frets),
+        minString: Math.min(...strings),
+        maxString: Math.max(...strings),
+      }]
+    }
+
     const movableGroups = [0, 1].flatMap((rootStringIdx) => {
-      const form = effectiveDisplayMode === 'power'
+      const fullForm = effectiveDisplayMode === 'power'
         ? POWER_CHORD_FORMS[rootStringIdx]
         : (rootStringIdx === 0 ? CHORD_FORMS_6TH : CHORD_FORMS_5TH)[effectiveChordType]
-      if (!form) return []
+      if (!fullForm) return []
 
       let rootFret = -1
       for (let fret = 0; fret < FRET_COUNT; fret++) {
@@ -68,7 +87,7 @@ export default function Fretboard({
       }
       if (rootFret === -1) return []
 
-      const cells = form
+      const cells = fullForm
         .map(({ string, fretOffset }) => ({ string, fret: rootFret + fretOffset }))
         .filter(({ fret }) => fret >= 0 && fret < FRET_COUNT)
       if (cells.length === 0) return []
@@ -106,7 +125,7 @@ export default function Fretboard({
         maxString: Math.max(...strings),
       },
     ]
-  }, [showChord, effectiveDisplayMode, effectiveChordType, effectiveRootIndex, capo])
+  }, [showChord, chordDisplayMode, rootIndex, chordType, triadPosition, effectiveDisplayMode, effectiveChordType, effectiveRootIndex, capo])
 
   const chordPositions = useMemo(() => {
     const set = new Set()

@@ -230,6 +230,461 @@ export const POWER_CHORD_FORMS = {
   ],
 }
 
+export const TRIAD_LAYOUT_OPTIONS = [
+  { value: '1-3-root', label: '1~3弦（基本）', strings: [3, 4, 5], inversion: 'root' },
+  { value: '1-3-first', label: '1~3弦（第一転回）', strings: [3, 4, 5], inversion: 'first' },
+  { value: '1-3-second', label: '1~3弦（第二転回）', strings: [3, 4, 5], inversion: 'second' },
+  { value: '2-4-root', label: '2~4弦（基本）', strings: [2, 3, 4], inversion: 'root' },
+  { value: '2-4-first', label: '2~4弦（第一転回）', strings: [2, 3, 4], inversion: 'first' },
+  { value: '2-4-second', label: '2~4弦（第二転回）', strings: [2, 3, 4], inversion: 'second' },
+  { value: '3-5-root', label: '3~5弦（基本）', strings: [1, 2, 3], inversion: 'root' },
+  { value: '3-5-first', label: '3~5弦（第一転回）', strings: [1, 2, 3], inversion: 'first' },
+  { value: '3-5-second', label: '3~5弦（第二転回）', strings: [1, 2, 3], inversion: 'second' },
+  { value: '4-6-root', label: '4~6弦（基本）', strings: [0, 1, 2], inversion: 'root' },
+  { value: '4-6-first', label: '4~6弦（第一転回）', strings: [0, 1, 2], inversion: 'first' },
+  { value: '4-6-second', label: '4~6弦（第二転回）', strings: [0, 1, 2], inversion: 'second' },
+]
+
+export function getTriadLayout(layoutValue) {
+  return TRIAD_LAYOUT_OPTIONS.find((option) => option.value === layoutValue) ?? TRIAD_LAYOUT_OPTIONS[0]
+}
+
+const TRIAD_SHAPES = {
+  '1-3-root': {
+    Major: {
+      anchorString: 3,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -2 },
+      ],
+    },
+    Minor: {
+      anchorString: 3,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: -1 },
+        { string: 5, fretOffset: -2 },
+      ],
+    },
+    Diminished: {
+      anchorString: 3,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: -1 },
+        { string: 5, fretOffset: -3 },
+      ],
+    },
+    Augmented: {
+      anchorString: 3,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -1 },
+      ],
+    },
+  },
+  '1-3-first': {
+    Major: {
+      anchorString: 5,
+      positions: [
+        { string: 3, fretOffset: 1 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: 0 },
+      ],
+    },
+    Minor: {
+      anchorString: 5,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: 0 },
+      ],
+    },
+    Diminished: {
+      anchorString: 5,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: -1 },
+        { string: 5, fretOffset: 0 },
+      ],
+    },
+    Augmented: {
+      anchorString: 5,
+      positions: [
+        { string: 3, fretOffset: 1 },
+        { string: 4, fretOffset: 1 },
+        { string: 5, fretOffset: 0 },
+      ],
+    },
+  },
+  '1-3-second': {
+    Major: {
+      anchorString: 4,
+      positions: [
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -1 },
+      ],
+    },
+    Minor: {
+      anchorString: 4,
+      positions: [
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -2 },
+      ],
+    },
+    Diminished: {
+      anchorString: 4,
+      positions: [
+        { string: 3, fretOffset: -2 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -2 },
+      ],
+    },
+    Augmented: {
+      anchorString: 4,
+      positions: [
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+        { string: 5, fretOffset: -1 },
+      ],
+    },
+  },
+  '2-4-root': {
+    Major: {
+      anchorString: 2,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: -2 },
+      ],
+    },
+    Minor: {
+      anchorString: 2,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -2 },
+        { string: 4, fretOffset: -2 },
+      ],
+    },
+    Diminished: {
+      anchorString: 2,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -2 },
+        { string: 4, fretOffset: -3 },
+      ],
+    },
+    Augmented: {
+      anchorString: 2,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: -1 },
+      ],
+    },
+  },
+  '2-4-first': {
+    Major: {
+      anchorString: 4,
+      positions: [
+        { string: 2, fretOffset: 1 },
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+    Minor: {
+      anchorString: 4,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -1 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+    Diminished: {
+      anchorString: 4,
+      positions: [
+        { string: 2, fretOffset: -2 },
+        { string: 3, fretOffset: -2 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+    Augmented: {
+      anchorString: 4,
+      positions: [
+        { string: 2, fretOffset: 1 },
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+  },
+  '2-4-second': {
+    Major: {
+      anchorString: 3,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+    Minor: {
+      anchorString: 3,
+      positions: [
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: -1 },
+      ],
+    },
+    Diminished: {
+      anchorString: 3,
+      positions: [
+        { string: 2, fretOffset: -1 },
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: -1 },
+      ],
+    },
+    Augmented: {
+      anchorString: 3,
+      positions: [
+        { string: 2, fretOffset: 1 },
+        { string: 3, fretOffset: 0 },
+        { string: 4, fretOffset: 0 },
+      ],
+    },
+  },
+  '3-5-root': {
+    Major: {
+      anchorString: 1,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -1 },
+        { string: 3, fretOffset: -3 },
+      ],
+    },
+    Minor: {
+      anchorString: 1,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -2 },
+        { string: 3, fretOffset: -3 },
+      ],
+    },
+    Diminished: {
+      anchorString: 1,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: 1 },
+        { string: 3, fretOffset: 0 },
+      ],
+    },
+    Augmented: {
+      anchorString: 1,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -1 },
+        { string: 3, fretOffset: -2 },
+      ],
+    },
+  },
+  '3-5-first': {
+    Major: {
+      anchorString: 3,
+      positions: [
+        { string: 1, fretOffset: 2 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: 0 },
+      ],
+    },
+    Minor: {
+      anchorString: 3,
+      positions: [
+        { string: 1, fretOffset: 1 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: 0 },
+      ],
+    },
+    Diminished: {
+      anchorString: 3,
+      positions: [
+        { string: 1, fretOffset: 1 },
+        { string: 2, fretOffset: -1 },
+        { string: 3, fretOffset: 0 },
+      ],
+    },
+    Augmented: {
+      anchorString: 3,
+      positions: [
+        { string: 1, fretOffset: 2 },
+        { string: 2, fretOffset: 1 },
+        { string: 3, fretOffset: 0 },
+      ],
+    },
+  },
+  '3-5-second': {
+    Major: {
+      anchorString: 2,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -1 },
+      ],
+    },
+    Minor: {
+      anchorString: 2,
+      positions: [
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -2 },
+      ],
+    },
+    Diminished: {
+      anchorString: 2,
+      positions: [
+        { string: 1, fretOffset: -1 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -2 },
+      ],
+    },
+    Augmented: {
+      anchorString: 2,
+      positions: [
+        { string: 1, fretOffset: 1 },
+        { string: 2, fretOffset: 0 },
+        { string: 3, fretOffset: -1 },
+      ],
+    },
+  },
+  '4-6-root': {
+    Major: {
+      anchorString: 0,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: -1 },
+        { string: 2, fretOffset: -3 },
+      ],
+    },
+    Minor: {
+      anchorString: 0,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: -2 },
+        { string: 2, fretOffset: -3 },
+      ],
+    },
+    Diminished: {
+      anchorString: 0,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: -2 },
+        { string: 2, fretOffset: -4 },
+      ],
+    },
+    Augmented: {
+      anchorString: 0,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: -1 },
+        { string: 2, fretOffset: -2 },
+      ],
+    },
+  },
+  '4-6-first': {
+    Major: {
+      anchorString: 2,
+      positions: [
+        { string: 0, fretOffset: 2 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: 0 },
+      ],
+    },
+    Minor: {
+      anchorString: 2,
+      positions: [
+        { string: 0, fretOffset: 1 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: 0 },
+      ],
+    },
+    Diminished: {
+      anchorString: 2,
+      positions: [
+        { string: 0, fretOffset: 1 },
+        { string: 1, fretOffset: -1 },
+        { string: 2, fretOffset: 0 },
+      ],
+    },
+    Augmented: {
+      anchorString: 2,
+      positions: [
+        { string: 0, fretOffset: 2 },
+        { string: 1, fretOffset: 1 },
+        { string: 2, fretOffset: 0 },
+      ],
+    },
+  },
+  '4-6-second': {
+    Major: {
+      anchorString: 1,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -1 },
+      ],
+    },
+    Minor: {
+      anchorString: 1,
+      positions: [
+        { string: 0, fretOffset: 0 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -2 },
+      ],
+    },
+    Diminished: {
+      anchorString: 1,
+      positions: [
+        { string: 0, fretOffset: -1 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -2 },
+      ],
+    },
+    Augmented: {
+      anchorString: 1,
+      positions: [
+        { string: 0, fretOffset: 1 },
+        { string: 1, fretOffset: 0 },
+        { string: 2, fretOffset: -1 },
+      ],
+    },
+  },
+}
+
+export function buildTriadVoicing(rootIndex, chordType, layoutValue) {
+  const shape = TRIAD_SHAPES[layoutValue]?.[chordType]
+  if (!shape) return []
+
+  let best = null
+  for (let anchorFret = 0; anchorFret < FRET_COUNT; anchorFret++) {
+    if (getNoteIndex(shape.anchorString, anchorFret, 0) !== rootIndex) continue
+
+    const cells = shape.positions.map(({ string, fretOffset }) => ({
+      string,
+      fret: anchorFret + fretOffset,
+    }))
+
+    if (cells.some(({ fret }) => fret < 0 || fret >= FRET_COUNT)) continue
+
+    const frets = cells.map((cell) => cell.fret)
+    const score = Math.max(...frets) * 10 + (Math.max(...frets) - Math.min(...frets))
+    if (!best || score < best.score) {
+      best = { cells, score }
+    }
+  }
+
+  return best?.cells ?? []
+}
+
 export const OPEN_CHORD_FORMS = {
   Major: {
     C: [

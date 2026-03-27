@@ -19,6 +19,7 @@ export default function App() {
   // コードフォーム設定
   const [chordDisplayMode, setChordDisplayMode] = useState('form')
   const [chordType, setChordType] = useState('Major')
+  const [triadLayout, setTriadLayout] = useState('1-3-root')
   const [diatonicScaleType, setDiatonicScaleType] = useState('major-triad')
   const [diatonicDegree, setDiatonicDegree] = useState('I')
 
@@ -82,6 +83,8 @@ export default function App() {
           toggleCagedForm={toggleCagedForm}
           chordType={chordType}
           setChordType={setChordType}
+          triadPosition={triadLayout}
+          setTriadPosition={setTriadLayout}
           diatonicScaleType={diatonicScaleType}
           setDiatonicScaleType={setDiatonicScaleType}
           diatonicDegree={diatonicDegree}
@@ -115,6 +118,7 @@ export default function App() {
           showCaged={showCaged}
           cagedForms={cagedForms}
           chordType={chordType}
+          triadPosition={triadLayout}
           diatonicScaleType={diatonicScaleType}
           diatonicDegree={diatonicDegree}
           layerOpacity={layerOpacity}

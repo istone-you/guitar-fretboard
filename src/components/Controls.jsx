@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { NOTES, CAGED_FORMS, CAGED_ORDER, DIATONIC_CHORDS, getDiatonicChord } from '../logic/fretboard'
+import { NOTES, CAGED_FORMS, CAGED_ORDER, DIATONIC_CHORDS, TRIAD_LAYOUT_OPTIONS, getDiatonicChord } from '../logic/fretboard'
 
 const CHORD_TYPES = ['Major', 'Minor', '7th', 'maj7', 'm7', 'm7(b5)', 'dim7', 'm(maj7)']
+const TRIAD_CHORD_TYPES = ['Major', 'Minor', 'Diminished', 'Augmented']
 const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
   value: i,
   label: i === 0 ? '0' : `${i}`,
@@ -10,6 +11,7 @@ const CHORD_DISPLAY_OPTIONS = [
   { value: 'form', label: 'コードフォーム' },
   { value: 'power', label: 'パワーコード' },
   { value: 'diatonic', label: 'ダイアトニック' },
+  { value: 'triad', label: 'トライアド' },
 ]
 const DIATONIC_KEY_OPTIONS = [
   { value: 'major-triad', label: 'メジャー（3和音）' },
@@ -46,6 +48,8 @@ export default function Controls({
   toggleCagedForm,
   chordType,
   setChordType,
+  triadPosition,
+  setTriadPosition,
   diatonicScaleType,
   setDiatonicScaleType,
   diatonicDegree,
@@ -193,6 +197,8 @@ export default function Controls({
                 value={
                   chordDisplayMode === 'form'
                     ? chordType
+                    : chordDisplayMode === 'triad'
+                      ? chordType
                     : chordDisplayMode === 'diatonic'
                       ? diatonicDegree
                       : ''
@@ -201,6 +207,8 @@ export default function Controls({
                 options={
                   chordDisplayMode === 'form'
                     ? CHORD_TYPES.map((chord) => ({ value: chord, label: chord }))
+                    : chordDisplayMode === 'triad'
+                      ? TRIAD_CHORD_TYPES.map((chord) => ({ value: chord, label: chord }))
                     : chordDisplayMode === 'diatonic'
                       ? diatonicCodeOptions
                     : [{ value: '', label: '--' }]
@@ -211,13 +219,27 @@ export default function Controls({
             </div>
 
             <div className="flex flex-col gap-1">
-              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${chordDisplayMode === 'diatonic' ? '' : 'invisible'}`}>キー</span>
+              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${(chordDisplayMode === 'diatonic' || chordDisplayMode === 'triad') ? '' : 'invisible'}`}>
+                {chordDisplayMode === 'triad' ? '配置' : 'キー'}
+              </span>
               <DropdownSelect
                 theme={theme}
-                value={chordDisplayMode === 'diatonic' ? diatonicScaleType : ''}
-                onChange={setDiatonicScaleType}
-                options={chordDisplayMode === 'diatonic' ? DIATONIC_KEY_OPTIONS : [{ value: '', label: '--' }]}
-                disabled={chordDisplayMode !== 'diatonic'}
+                value={
+                  chordDisplayMode === 'diatonic'
+                    ? diatonicScaleType
+                    : chordDisplayMode === 'triad'
+                      ? triadPosition
+                      : ''
+                }
+                onChange={chordDisplayMode === 'triad' ? setTriadPosition : setDiatonicScaleType}
+                options={
+                  chordDisplayMode === 'diatonic'
+                    ? DIATONIC_KEY_OPTIONS
+                    : chordDisplayMode === 'triad'
+                      ? TRIAD_LAYOUT_OPTIONS.map(({ value, label }) => ({ value, label }))
+                      : [{ value: '', label: '--' }]
+                }
+                disabled={chordDisplayMode !== 'diatonic' && chordDisplayMode !== 'triad'}
                 widthClass="w-44"
               />
             </div>
