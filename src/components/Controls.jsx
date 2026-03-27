@@ -1,5 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { NOTES, CAGED_FORMS, CAGED_ORDER, DIATONIC_CHORDS, TRIAD_LAYOUT_OPTIONS, getDiatonicChord } from '../logic/fretboard'
+import {
+  NOTES,
+  CAGED_FORMS,
+  CAGED_ORDER,
+  DIATONIC_CHORDS,
+  TRIAD_STRING_SET_OPTIONS,
+  TRIAD_INVERSION_OPTIONS,
+  getDiatonicChord,
+} from '../logic/fretboard'
 
 const CHORD_TYPES = ['Major', 'Minor', '7th', 'maj7', 'm7', 'm7(b5)', 'dim7', 'm(maj7)']
 const TRIAD_CHORD_TYPES = ['Major', 'Minor', 'Diminished', 'Augmented']
@@ -10,14 +18,16 @@ const CAPO_OPTIONS = Array.from({ length: 12 }, (_, i) => ({
 const CHORD_DISPLAY_OPTIONS = [
   { value: 'form', label: 'コードフォーム' },
   { value: 'power', label: 'パワーコード' },
-  { value: 'diatonic', label: 'ダイアトニック' },
   { value: 'triad', label: 'トライアド' },
+  { value: 'diatonic', label: 'ダイアトニック' },
 ]
 const DIATONIC_KEY_OPTIONS = [
-  { value: 'major-triad', label: 'メジャー（3和音）' },
-  { value: 'major-seventh', label: 'メジャー（4和音）' },
-  { value: 'natural-minor-triad', label: 'マイナー（3和音）' },
-  { value: 'natural-minor-seventh', label: 'マイナー（4和音）' },
+  { value: 'major', label: 'メジャー' },
+  { value: 'natural-minor', label: 'マイナー' },
+]
+const DIATONIC_CHORD_SIZE_OPTIONS = [
+  { value: 'triad', label: '3和音' },
+  { value: 'seventh', label: '4和音' },
 ]
 const SCALE_OPTIONS = [
   { value: 'major', label: 'メジャースケール' },
@@ -48,17 +58,20 @@ export default function Controls({
   toggleCagedForm,
   chordType,
   setChordType,
-  triadPosition,
-  setTriadPosition,
-  diatonicScaleType,
-  setDiatonicScaleType,
+  triadStringSet,
+  setTriadStringSet,
+  triadInversion,
+  setTriadInversion,
+  diatonicKeyType,
+  setDiatonicKeyType,
+  diatonicChordSize,
+  setDiatonicChordSize,
   diatonicDegree,
   setDiatonicDegree,
-  layerOpacity,
-  setLayerOpacity,
 }) {
   const isDark = theme === 'dark'
   const rootIndex = NOTES.indexOf(rootNote)
+  const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`
   const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {
     const chord = getDiatonicChord(rootIndex, diatonicScaleType, value)
     const suffixMap = {
@@ -85,7 +98,7 @@ export default function Controls({
             value={rootNote}
             onChange={setRootNote}
             options={NOTES.map((note) => ({ value: note, label: note }))}
-            widthClass="w-20"
+            widthClass="w-16"
           />
         </label>
 
@@ -96,7 +109,7 @@ export default function Controls({
             value={capo}
             onChange={setCapo}
             options={CAPO_OPTIONS}
-            widthClass="w-20"
+            widthClass="w-16"
           />
         </label>
 
@@ -109,7 +122,7 @@ export default function Controls({
             <button
               key={value}
               onClick={() => setBaseLabelMode(value)}
-              className={`w-[4.5rem] whitespace-nowrap px-3 py-1 rounded text-sm font-semibold transition-all
+              className={`w-[4rem] whitespace-nowrap px-2.5 py-1 rounded text-sm font-semibold transition-all
                 ${baseLabelMode === value
                   ? 'bg-indigo-600 text-white'
                   : isDark ? 'bg-gray-700 text-gray-400 hover:bg-gray-600' : 'bg-white text-stone-600 hover:bg-stone-200'
@@ -149,23 +162,25 @@ export default function Controls({
           onToggle={() => setShowCaged(!showCaged)}
         >
           <div className="flex flex-wrap gap-2 items-center">
-            {CAGED_ORDER.map((key) => {
-              const active = cagedForms.has(key)
-              return (
-                <button
-                  key={key}
-                  onClick={() => toggleCagedForm(key)}
-                  className={`w-9 h-9 rounded-full text-sm font-bold transition-all border-2
-                    ${active
-                      ? 'text-white border-transparent scale-110 shadow-lg'
-                      : isDark ? 'bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-400' : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500'
-                    }`}
-                  style={active ? { backgroundColor: CAGED_FORMS[key].color } : {}}
-                >
-                  {key}
-                </button>
-              )
-            })}
+            <div className="flex flex-wrap gap-2 items-center">
+              {CAGED_ORDER.map((key) => {
+                const active = cagedForms.has(key)
+                return (
+                  <button
+                    key={key}
+                    onClick={() => toggleCagedForm(key)}
+                    className={`w-9 h-9 rounded-full text-sm font-bold transition-all border-2
+                      ${active
+                        ? 'text-white border-transparent scale-110 shadow-lg'
+                        : isDark ? 'bg-gray-700 text-gray-400 border-gray-600 hover:border-gray-400' : 'bg-white text-stone-600 border-stone-300 hover:border-stone-500'
+                      }`}
+                    style={active ? { backgroundColor: CAGED_FORMS[key].color } : {}}
+                  >
+                    {key}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </LayerRow>
 
@@ -184,7 +199,7 @@ export default function Controls({
                 value={chordDisplayMode}
                 onChange={setChordDisplayMode}
                 options={CHORD_DISPLAY_OPTIONS}
-                widthClass="w-44"
+                widthClass="w-36"
               />
             </div>
 
@@ -214,51 +229,63 @@ export default function Controls({
                     : [{ value: '', label: '--' }]
                 }
                 disabled={chordDisplayMode === 'power'}
-                widthClass="w-44"
+                widthClass="w-36"
               />
             </div>
 
             <div className="flex flex-col gap-1">
               <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${(chordDisplayMode === 'diatonic' || chordDisplayMode === 'triad') ? '' : 'invisible'}`}>
-                {chordDisplayMode === 'triad' ? '配置' : 'キー'}
+                {chordDisplayMode === 'triad' ? '弦' : 'キー'}
               </span>
               <DropdownSelect
                 theme={theme}
                 value={
                   chordDisplayMode === 'diatonic'
-                    ? diatonicScaleType
+                    ? diatonicKeyType
                     : chordDisplayMode === 'triad'
-                      ? triadPosition
+                      ? triadStringSet
                       : ''
                 }
-                onChange={chordDisplayMode === 'triad' ? setTriadPosition : setDiatonicScaleType}
+                onChange={chordDisplayMode === 'triad' ? setTriadStringSet : setDiatonicKeyType}
                 options={
                   chordDisplayMode === 'diatonic'
                     ? DIATONIC_KEY_OPTIONS
                     : chordDisplayMode === 'triad'
-                      ? TRIAD_LAYOUT_OPTIONS.map(({ value, label }) => ({ value, label }))
+                      ? TRIAD_STRING_SET_OPTIONS.map(({ value, label }) => ({ value, label }))
                       : [{ value: '', label: '--' }]
                 }
                 disabled={chordDisplayMode !== 'diatonic' && chordDisplayMode !== 'triad'}
-                widthClass="w-44"
+                widthClass="w-36"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className={`pl-1 text-xs ${isDark ? 'text-gray-500' : 'text-stone-500'} ${(chordDisplayMode === 'diatonic' || chordDisplayMode === 'triad') ? '' : 'invisible'}`}>
+                {chordDisplayMode === 'triad' ? '転回' : '和音'}
+              </span>
+              <DropdownSelect
+                theme={theme}
+                value={
+                  chordDisplayMode === 'diatonic'
+                    ? diatonicChordSize
+                    : chordDisplayMode === 'triad'
+                      ? triadInversion
+                      : ''
+                }
+                onChange={chordDisplayMode === 'triad' ? setTriadInversion : setDiatonicChordSize}
+                options={
+                  chordDisplayMode === 'diatonic'
+                    ? DIATONIC_CHORD_SIZE_OPTIONS
+                    : chordDisplayMode === 'triad'
+                      ? TRIAD_INVERSION_OPTIONS.map(({ value, label }) => ({ value, label }))
+                      : [{ value: '', label: '--' }]
+                }
+                disabled={chordDisplayMode !== 'diatonic' && chordDisplayMode !== 'triad'}
+                widthClass="w-36"
               />
             </div>
           </div>
         </LayerRow>
-      </div>
-
-      {/* Opacity スライダー */}
-      <div className="flex items-center gap-3 justify-center">
-        <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-stone-700'}`}>レイヤー透過</span>
-        <input
-          type="range"
-          min={20}
-          max={100}
-          value={layerOpacity}
-          onChange={(e) => setLayerOpacity(Number(e.target.value))}
-          className="w-32 accent-indigo-400"
-        />
-        <span className={`text-sm w-10 text-right ${isDark ? 'text-gray-400' : 'text-stone-500'}`}>{layerOpacity}%</span>
       </div>
 
     </div>
@@ -391,7 +418,7 @@ function DropdownSelect({ theme, value, onChange, options, disabled = false, wid
                     onChange(option.value)
                     setOpen(false)
                   }}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm transition-colors ${
+                  className={`flex w-full items-center rounded-xl px-3 py-2 text-sm transition-colors ${
                     active
                       ? isDark
                         ? 'bg-gray-800 text-white'
@@ -402,16 +429,6 @@ function DropdownSelect({ theme, value, onChange, options, disabled = false, wid
                   }`}
                 >
                   <span>{option.label}</span>
-                  <span
-                    className={`text-xs ${
-                      active
-                        ? isDark ? 'text-sky-300' : 'text-sky-600'
-                        : 'opacity-0'
-                    }`}
-                    aria-hidden="true"
-                  >
-                    ●
-                  </span>
                 </button>
               )
             })}

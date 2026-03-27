@@ -19,8 +19,10 @@ export default function App() {
   // コードフォーム設定
   const [chordDisplayMode, setChordDisplayMode] = useState('form')
   const [chordType, setChordType] = useState('Major')
-  const [triadLayout, setTriadLayout] = useState('1-3-root')
-  const [diatonicScaleType, setDiatonicScaleType] = useState('major-triad')
+  const [triadStringSet, setTriadStringSet] = useState('1-3')
+  const [triadInversion, setTriadInversion] = useState('root')
+  const [diatonicKeyType, setDiatonicKeyType] = useState('major')
+  const [diatonicChordSize, setDiatonicChordSize] = useState('triad')
   const [diatonicDegree, setDiatonicDegree] = useState('I')
 
   // スケール設定
@@ -37,22 +39,22 @@ export default function App() {
     })
   }
 
-  // レイヤー透過度（%）
-  const [layerOpacity, setLayerOpacity] = useState(85)
-
   // 指板の音をクリックしてルートを設定
   const handleNoteClick = (noteName) => {
     setRootNote(noteName)
   }
 
   useEffect(() => {
+    const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`
     const validDegrees = DIATONIC_CHORDS[diatonicScaleType].map((item) => item.value)
     if (!validDegrees.includes(diatonicDegree)) {
       setDiatonicDegree(validDegrees[0])
     }
-  }, [diatonicScaleType, diatonicDegree])
+  }, [diatonicKeyType, diatonicChordSize, diatonicDegree])
 
   const theme = 'dark'
+  const triadLayout = `${triadStringSet}-${triadInversion}`
+  const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`
 
   return (
     <div className={`min-h-screen p-4 flex flex-col gap-4 ${
@@ -83,14 +85,16 @@ export default function App() {
           toggleCagedForm={toggleCagedForm}
           chordType={chordType}
           setChordType={setChordType}
-          triadPosition={triadLayout}
-          setTriadPosition={setTriadLayout}
-          diatonicScaleType={diatonicScaleType}
-          setDiatonicScaleType={setDiatonicScaleType}
+          triadStringSet={triadStringSet}
+          setTriadStringSet={setTriadStringSet}
+          triadInversion={triadInversion}
+          setTriadInversion={setTriadInversion}
+          diatonicKeyType={diatonicKeyType}
+          setDiatonicKeyType={setDiatonicKeyType}
+          diatonicChordSize={diatonicChordSize}
+          setDiatonicChordSize={setDiatonicChordSize}
           diatonicDegree={diatonicDegree}
           setDiatonicDegree={setDiatonicDegree}
-          layerOpacity={layerOpacity}
-          setLayerOpacity={setLayerOpacity}
         />
 
         <div className="mb-2 flex items-center justify-center gap-3 text-center">
@@ -121,7 +125,6 @@ export default function App() {
           triadPosition={triadLayout}
           diatonicScaleType={diatonicScaleType}
           diatonicDegree={diatonicDegree}
-          layerOpacity={layerOpacity}
           onNoteClick={handleNoteClick}
         />
 

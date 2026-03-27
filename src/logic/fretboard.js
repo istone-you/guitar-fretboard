@@ -230,20 +230,27 @@ export const POWER_CHORD_FORMS = {
   ],
 }
 
-export const TRIAD_LAYOUT_OPTIONS = [
-  { value: '1-3-root', label: '1~3弦（基本）', strings: [3, 4, 5], inversion: 'root' },
-  { value: '1-3-first', label: '1~3弦（第一転回）', strings: [3, 4, 5], inversion: 'first' },
-  { value: '1-3-second', label: '1~3弦（第二転回）', strings: [3, 4, 5], inversion: 'second' },
-  { value: '2-4-root', label: '2~4弦（基本）', strings: [2, 3, 4], inversion: 'root' },
-  { value: '2-4-first', label: '2~4弦（第一転回）', strings: [2, 3, 4], inversion: 'first' },
-  { value: '2-4-second', label: '2~4弦（第二転回）', strings: [2, 3, 4], inversion: 'second' },
-  { value: '3-5-root', label: '3~5弦（基本）', strings: [1, 2, 3], inversion: 'root' },
-  { value: '3-5-first', label: '3~5弦（第一転回）', strings: [1, 2, 3], inversion: 'first' },
-  { value: '3-5-second', label: '3~5弦（第二転回）', strings: [1, 2, 3], inversion: 'second' },
-  { value: '4-6-root', label: '4~6弦（基本）', strings: [0, 1, 2], inversion: 'root' },
-  { value: '4-6-first', label: '4~6弦（第一転回）', strings: [0, 1, 2], inversion: 'first' },
-  { value: '4-6-second', label: '4~6弦（第二転回）', strings: [0, 1, 2], inversion: 'second' },
+export const TRIAD_STRING_SET_OPTIONS = [
+  { value: '1-3', label: '1~3弦', strings: [3, 4, 5] },
+  { value: '2-4', label: '2~4弦', strings: [2, 3, 4] },
+  { value: '3-5', label: '3~5弦', strings: [1, 2, 3] },
+  { value: '4-6', label: '4~6弦', strings: [0, 1, 2] },
 ]
+
+export const TRIAD_INVERSION_OPTIONS = [
+  { value: 'root', label: '基本' },
+  { value: 'first', label: '第一転回' },
+  { value: 'second', label: '第二転回' },
+]
+
+export const TRIAD_LAYOUT_OPTIONS = TRIAD_STRING_SET_OPTIONS.flatMap((stringSet) =>
+  TRIAD_INVERSION_OPTIONS.map((inversion) => ({
+    value: `${stringSet.value}-${inversion.value}`,
+    label: `${stringSet.label}（${inversion.label}）`,
+    strings: stringSet.strings,
+    inversion: inversion.value,
+  }))
+)
 
 export function getTriadLayout(layoutValue) {
   return TRIAD_LAYOUT_OPTIONS.find((option) => option.value === layoutValue) ?? TRIAD_LAYOUT_OPTIONS[0]

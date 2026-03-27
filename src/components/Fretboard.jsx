@@ -41,7 +41,6 @@ export default function Fretboard({
   triadPosition,
   diatonicScaleType,
   diatonicDegree,
-  layerOpacity,
   onNoteClick,
 }) {
   const rootIndex = getRootIndex(rootNote)
@@ -151,7 +150,7 @@ export default function Fretboard({
     return merged
   }, [showCaged, cagedForms, rootIndex, capo])
 
-  const opacity = layerOpacity / 100
+  const opacity = 0.85
 
   return (
     <div className="overflow-x-auto">
