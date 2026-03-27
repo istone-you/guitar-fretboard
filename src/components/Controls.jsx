@@ -38,7 +38,6 @@ export default function Controls({
   theme,
   onThemeChange,
   rootNote,
-  setRootNote,
   accidental,
   onAccidentalChange,
   baseLabelMode,
@@ -112,19 +111,6 @@ export default function Controls({
             </svg>
           )}
         </button>
-
-        <label className="flex items-center gap-2">
-          <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>
-            ルート
-          </span>
-          <DropdownSelect
-            theme={theme}
-            value={rootNote}
-            onChange={setRootNote}
-            options={NOTES.map((note) => ({ value: note, label: note }))}
-            widthClass="w-16"
-          />
-        </label>
 
         <div
           className={`inline-flex items-center justify-between gap-2 rounded-lg p-1 ${isDark ? "bg-gray-800" : "bg-stone-100"}`}
@@ -412,13 +398,14 @@ function LayerRow({ label, color, active, onToggle, theme, children }) {
   );
 }
 
-function DropdownSelect({
+export function DropdownSelect({
   theme,
   value,
   onChange,
   options,
   disabled = false,
   widthClass = "w-32",
+  keepOpen = false,
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
@@ -496,7 +483,7 @@ function DropdownSelect({
                   type="button"
                   onClick={() => {
                     onChange(option.value);
-                    setOpen(false);
+                    if (!keepOpen) setOpen(false);
                   }}
                   className={`flex w-full items-center rounded-xl px-3 py-2 text-sm transition-colors ${
                     active

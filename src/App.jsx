@@ -79,7 +79,6 @@ export default function App() {
           theme={theme}
           onThemeChange={() => setTheme((t) => t === "dark" ? "light" : "dark")}
           rootNote={rootNote}
-          setRootNote={setRootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
           baseLabelMode={baseLabelMode}
@@ -110,14 +109,9 @@ export default function App() {
           setDiatonicDegree={setDiatonicDegree}
         />
 
-        <div className="mb-2 flex items-center justify-center gap-3 text-center">
+        <div className="mb-2 flex items-center justify-center gap-3">
           <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-            Root:{" "}
-            <span
-              className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}
-            >
-              {rootNote}
-            </span>
+            Root: <span className={`font-bold text-base ${theme === "dark" ? "text-white" : "text-stone-900"}`}>{rootNote}</span>
           </span>
           <span className={`text-xs ${theme === "dark" ? "text-gray-600" : "text-stone-500"}`}>
             （指板の音をクリックしてルートを変更）

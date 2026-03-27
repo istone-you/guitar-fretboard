@@ -41,11 +41,6 @@ function makeProps(overrides = {}) {
 
 describe('Controls', () => {
   // ===== レンダリング =====
-  it('ルートラベルが表示される', () => {
-    render(<Controls {...makeProps()} />)
-    expect(screen.getByText('ルート')).toBeTruthy()
-  })
-
   it('♯/♭トグルが表示される', () => {
     render(<Controls {...makeProps()} />)
     expect(screen.getByText('♯')).toBeTruthy()
@@ -141,16 +136,4 @@ describe('Controls', () => {
     expect(props.toggleCagedForm).toHaveBeenCalledWith('C')
   })
 
-  // ===== ♯モードでの音名表示 =====
-  it('♯モードのとき♯表記の音名がドロップダウンに表示される', () => {
-    const props = makeProps({ accidental: 'sharp', rootNote: 'C♯' })
-    render(<Controls {...props} />)
-    expect(screen.getByText('C♯')).toBeTruthy()
-  })
-
-  it('♭モードのとき♭表記の音名がドロップダウンに表示される', () => {
-    const props = makeProps({ accidental: 'flat', rootNote: 'D♭' })
-    render(<Controls {...props} />)
-    expect(screen.getByText('D♭')).toBeTruthy()
-  })
 })
