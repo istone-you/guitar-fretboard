@@ -1001,6 +1001,17 @@ export function getDiatonicChord(
   };
 }
 
+export function getDiatonicChordSemitones(
+  rootIndex: number,
+  scaleType: string,
+  degreeValue: string,
+): Set<number> {
+  const chord = getDiatonicChord(rootIndex, scaleType, degreeValue);
+  const rootOffset = (chord.rootIndex - rootIndex + 12) % 12;
+  const chordSemitones = CHORD_SEMITONES[chord.chordType] ?? new Set<number>();
+  return new Set([...chordSemitones].map((semitone) => (semitone + rootOffset) % 12));
+}
+
 // ===== スケールフォーム定義 =====
 // メジャースケール（イオニアン）の度数パターン: R, M2, M3, P4, P5, M6, M7
 export const MAJOR_SCALE_DEGREES = new Set([0, 2, 4, 5, 7, 9, 11]);

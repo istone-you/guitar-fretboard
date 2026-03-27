@@ -12,7 +12,7 @@ import {
   MAJOR_PENTA_DEGREES,
   BLUES_SCALE_DEGREES,
   CHORD_SEMITONES,
-  getDiatonicChord,
+  getDiatonicChordSemitones,
 } from "./logic/fretboard";
 import type {
   Theme,
@@ -116,6 +116,7 @@ export default function App() {
 
   const handleAutoFilter = () => {
     const active = new Set<number>();
+    const keyRootIndex = getRootIndex(rootNote);
     if (showScale) {
       for (const s of SCALE_SEMITONES[scaleType] ?? []) active.add(s);
     }
@@ -127,8 +128,7 @@ export default function App() {
       if (chordDisplayMode === "power") {
         semitones = CHORD_SEMITONES.power;
       } else if (chordDisplayMode === "diatonic") {
-        const chord = getDiatonicChord(getRootIndex(rootNote), diatonicScaleType, diatonicDegree);
-        semitones = CHORD_SEMITONES[chord.chordType];
+        semitones = getDiatonicChordSemitones(keyRootIndex, diatonicScaleType, diatonicDegree);
       } else {
         semitones = CHORD_SEMITONES[chordType];
       }

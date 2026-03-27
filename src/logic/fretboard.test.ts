@@ -12,6 +12,7 @@ import {
   isInNaturalMinorScale,
   isInPenta,
   getDiatonicChord,
+  getDiatonicChordSemitones,
   getOpenChordForm,
   buildTriadVoicing,
 } from "./fretboard";
@@ -241,6 +242,26 @@ describe("getDiatonicChord", () => {
     // B (rootIndex=11) のメジャー V = F♯ (index=6)
     const chord = getDiatonicChord(11, "major-triad", "V");
     expect(chord.rootIndex).toBe(6);
+  });
+});
+
+describe("getDiatonicChordSemitones", () => {
+  it("Cメジャー I はキー基準で Cメジャーの構成音になる", () => {
+    expect([...getDiatonicChordSemitones(0, "major-triad", "I")].sort((a, b) => a - b)).toEqual([
+      0, 4, 7,
+    ]);
+  });
+
+  it("Cメジャー ii はキー基準で Dm の度数になる", () => {
+    expect([...getDiatonicChordSemitones(0, "major-triad", "ii")].sort((a, b) => a - b)).toEqual([
+      2, 5, 9,
+    ]);
+  });
+
+  it("Aナチュラルマイナー III7 はキー基準で Cmaj7 の度数になる", () => {
+    expect(
+      [...getDiatonicChordSemitones(9, "natural-minor-seventh", "III")].sort((a, b) => a - b),
+    ).toEqual([3, 7, 10, 2].sort((a, b) => a - b));
   });
 });
 
