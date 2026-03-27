@@ -17,6 +17,7 @@ import {
   isInMajorScale,
   isInNaturalMinorScale,
   isInPenta,
+  isInBluesScale,
   calcCagedPositions,
   getRootIndex,
 } from "../logic/fretboard";
@@ -326,7 +327,9 @@ function StringRow({
               ? inMajorScale
               : scaleType === "natural-minor"
                 ? inNaturalMinorScale
-                : inPenta;
+                : scaleType === "blues"
+                  ? isInBluesScale(semitone)
+                  : inPenta;
           if (inSelectedScale) {
             overlayColor = { bg: "#22c55e", text: "#fff" };
             overlayLabel = noteName;

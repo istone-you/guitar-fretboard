@@ -32,6 +32,7 @@ const SCALE_OPTIONS = [
   { value: "natural-minor", label: "ナチュラルマイナー" },
   { value: "major-penta", label: "メジャーペンタ" },
   { value: "minor-penta", label: "マイナーペンタ" },
+  { value: "blues", label: "ブルーノート" },
 ];
 
 export default function Controls({

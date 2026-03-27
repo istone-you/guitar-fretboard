@@ -952,6 +952,13 @@ export function isInPenta(semitone, type) {
   return type === "minor" ? MINOR_PENTA_DEGREES.has(semitone) : MAJOR_PENTA_DEGREES.has(semitone);
 }
 
+// ブルーノートスケール: R, m3, P4, b5, P5, m7 → 半音: 0, 3, 5, 6, 7, 10
+export const BLUES_SCALE_DEGREES = new Set([0, 3, 5, 6, 7, 10]);
+
+export function isInBluesScale(semitone) {
+  return BLUES_SCALE_DEGREES.has(semitone);
+}
+
 // ===== CAGEDシステム =====
 // 各フォームをオープンコードの形から定義
 // anchorString: ルート音を探す基準弦（0=6弦, 1=5弦, 2=4弦）
