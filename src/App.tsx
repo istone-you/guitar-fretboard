@@ -54,6 +54,8 @@ export default function App() {
   const { t } = useTranslation();
   // ルート音
   const [rootNote, setRootNote] = useState("C");
+  // フレット範囲
+  const [fretRange, setFretRange] = useState<[number, number]>([0, 14]);
   // 臨時記号表示（sharp / flat）
   const [accidental, setAccidental] = useState<Accidental>(readStoredAccidental);
   // ベースレイヤー表示
@@ -239,8 +241,10 @@ export default function App() {
           rootNote={rootNote}
           accidental={accidental}
           baseLabelMode={baseLabelMode}
+          fretRange={fretRange}
           onBaseLabelModeChange={setBaseLabelMode}
           onRootNoteChange={handleNoteClick}
+          onFretRangeChange={setFretRange}
         />
         <Fretboard
           theme={theme}
@@ -248,6 +252,7 @@ export default function App() {
           accidental={accidental}
           baseLabelMode={baseLabelMode}
           displaySize={fretboardDisplaySize}
+          fretRange={fretRange}
           showChord={showChord}
           chordDisplayMode={chordDisplayMode}
           showScale={showScale}

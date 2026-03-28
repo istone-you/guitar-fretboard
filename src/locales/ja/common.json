@@ -29,6 +29,7 @@
   },
   "header": {
     "root": "ルート",
+    "fret": "フレット",
     "display": "表示",
     "note": "音名",
     "degree": "度数"

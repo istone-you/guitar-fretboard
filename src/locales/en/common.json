@@ -29,6 +29,7 @@
   },
   "header": {
     "root": "Root",
+    "fret": "Fret",
     "display": "Labels",
     "note": "Notes",
     "degree": "Degrees"

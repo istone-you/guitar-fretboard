@@ -122,6 +122,7 @@ interface FretboardProps {
   accidental: Accidental;
   baseLabelMode: BaseLabelMode;
   displaySize: FretboardDisplaySize;
+  fretRange: [number, number];
   showChord: boolean;
   chordDisplayMode: ChordDisplayMode;
   showScale: boolean;
@@ -142,6 +143,7 @@ export default function Fretboard({
   accidental,
   baseLabelMode,
   displaySize,
+  fretRange,
   showChord,
   chordDisplayMode,
   showScale,
@@ -155,6 +157,7 @@ export default function Fretboard({
   onNoteClick,
   hiddenDegrees = new Set(),
 }: FretboardProps) {
+  const [fretMin, fretMax] = fretRange;
   const size = FRETBOARD_SIZE_CONFIG[displaySize];
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
@@ -280,13 +283,15 @@ export default function Fretboard({
 
   const opacity = 0.85;
 
+  const visibleFrets = Array.from({ length: fretMax - fretMin + 1 }, (_, i) => fretMin + i);
+
   return (
     <div className="overflow-x-auto">
       <div className="w-fit mx-auto">
         {/* フレット番号ヘッダー */}
         <div className="flex mb-1">
           <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
-          {Array.from({ length: FRET_COUNT }, (_, fret) => (
+          {visibleFrets.map((fret) => (
             <FretHeader key={fret} fret={fret} theme={theme} size={size} />
           ))}
         </div>
@@ -294,29 +299,33 @@ export default function Fretboard({
         {/* ポジションマーク行 */}
         <div className="flex mb-2">
           <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
-          {Array.from({ length: FRET_COUNT }, (_, fret) => (
+          {visibleFrets.map((fret) => (
             <PositionMark key={fret} fret={fret} theme={theme} size={size} />
           ))}
         </div>
 
         {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
         <div className="relative">
-          {chordGroups.map((group) => {
-            const top = (STRING_COUNT - 1 - group.maxString) * (size.rowHeight + size.rowGap);
-            const left = size.stringLabelWidth + group.minFret * size.cellWidth;
-            const width = (group.maxFret - group.minFret + 1) * size.cellWidth;
-            const height =
-              (group.maxString - group.minString + 1) * size.rowHeight +
-              (group.maxString - group.minString) * size.rowGap;
+          {chordGroups
+            .filter((group) => group.maxFret >= fretMin && group.minFret <= fretMax)
+            .map((group) => {
+              const clampedMin = Math.max(group.minFret, fretMin);
+              const clampedMax = Math.min(group.maxFret, fretMax);
+              const top = (STRING_COUNT - 1 - group.maxString) * (size.rowHeight + size.rowGap);
+              const left = size.stringLabelWidth + (clampedMin - fretMin) * size.cellWidth;
+              const width = (clampedMax - clampedMin + 1) * size.cellWidth;
+              const height =
+                (group.maxString - group.minString + 1) * size.rowHeight +
+                (group.maxString - group.minString) * size.rowGap;
 
-            return (
-              <div
-                key={group.id}
-                className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
-                style={{ top, left, width, height }}
-              />
-            );
-          })}
+              return (
+                <div
+                  key={group.id}
+                  className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
+                  style={{ top, left, width, height }}
+                />
+              );
+            })}
 
           {Array.from({ length: STRING_COUNT }, (_, i) => STRING_COUNT - 1 - i).map((stringIdx) => (
             <StringRow
@@ -332,6 +341,7 @@ export default function Fretboard({
               chordPositions={chordPositions}
               opacity={opacity}
               size={size}
+              visibleFrets={visibleFrets}
               onNoteClick={onNoteClick}
               hiddenDegrees={hiddenDegrees}
             />
@@ -411,6 +421,7 @@ interface StringRowProps {
   chordPositions: Set<string>;
   opacity: number;
   size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
+  visibleFrets: number[];
   onNoteClick: (noteName: string) => void;
   hiddenDegrees: Set<string>;
 }
@@ -427,6 +438,7 @@ function StringRow({
   chordPositions,
   opacity,
   size,
+  visibleFrets,
   onNoteClick,
   hiddenDegrees,
 }: StringRowProps) {
@@ -448,7 +460,7 @@ function StringRow({
         {openStringNotes[stringIdx]}
       </div>
 
-      {Array.from({ length: FRET_COUNT }, (_, fret) => {
+      {visibleFrets.map((fret) => {
         const noteIdx = getNoteIndex(stringIdx, fret);
         const noteName = NOTES[noteIdx];
         const semitone = calcDegree(noteIdx, rootIndex);

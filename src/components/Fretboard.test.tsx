@@ -18,6 +18,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     accidental: "flat" as Accidental,
     baseLabelMode: "note" as BaseLabelMode,
     displaySize: "standard" as FretboardDisplaySize,
+    fretRange: [0, 14] as [number, number],
     showChord: false,
     chordDisplayMode: "form" as ChordDisplayMode,
     showScale: false,
