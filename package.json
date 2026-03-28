@@ -15,7 +15,8 @@
     "coverage": "vp test run --coverage",
     "test:watch": "vp test",
     "test:ui": "vp test --ui",
-    "deploy": "bun run build && wrangler pages deploy dist --project-name=guitar-fretboard"
+    "deploy": "bun run build && wrangler pages deploy dist --project-name=guitar-fretboard",
+    "deploy:preview": "bun run build && wrangler pages deploy dist --project-name=guitar-fretboard --branch preview"
   },
   "dependencies": {
     "i18next": "^25.10.10",

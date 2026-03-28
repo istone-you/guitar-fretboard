@@ -89,6 +89,7 @@ bun run coverage
 
 ```bash
 bun run deploy
+bun run deploy:preview
 ```
 
-`dist/` を Cloudflare Pages にデプロイします。
+`bun run deploy` は本番向け、`bun run deploy:preview` は `preview` ブランチ向けに `dist/` を Cloudflare Pages へデプロイします。
