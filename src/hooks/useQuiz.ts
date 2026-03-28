@@ -3,13 +3,19 @@ import {
   NOTES_SHARP,
   NOTES_FLAT,
   CHORD_SEMITONES,
+  DIATONIC_CHORDS,
   isInScale,
   getDegreeName,
   getNoteIndex,
   getRootIndex,
 } from "../logic/fretboard";
 import type { Accidental, ChordType, ScaleType } from "../types";
-import type { QuizMode, QuizQuestion, QuizType } from "../components/QuizPanel/index";
+import type {
+  DiatonicAnswerEntry,
+  QuizMode,
+  QuizQuestion,
+  QuizType,
+} from "../components/QuizPanel/index";
 
 const DEGREE_NAMES = ["P1", "m2", "M2", "m3", "M3", "P4", "b5", "P5", "m6", "M6", "m7", "M7"];
 
@@ -58,6 +64,10 @@ interface UseQuizParams {
   chordQuizTypes: ChordType[];
 }
 
+function chordSuffix(chordType: ChordType): string {
+  return CHORD_SUFFIX_MAP[chordType] ?? chordType;
+}
+
 export function useQuiz({
   accidental,
   fretRange,
@@ -85,12 +95,25 @@ export function useQuiz({
   const [quizSelectedChoices, setQuizSelectedChoices] = useState<string[]>([]);
   const [quizSelectedChordRoot, setQuizSelectedChordRoot] = useState<string | null>(null);
   const [quizSelectedChordType, setQuizSelectedChordType] = useState<ChordType | null>(null);
+  const [diatonicQuizKeyType, setDiatonicQuizKeyType] = useState<"major" | "natural-minor">(
+    "major",
+  );
+  const [diatonicQuizChordSize, setDiatonicQuizChordSize] = useState<"triad" | "seventh">("triad");
+  const [diatonicSelectedRoot, setDiatonicSelectedRoot] = useState<string | null>(null);
+  const [diatonicSelectedChordType, setDiatonicSelectedChordType] = useState<ChordType | null>(
+    null,
+  );
+  const [diatonicAllAnswers, setDiatonicAllAnswers] = useState<
+    Record<string, { root: string; chordType: ChordType }>
+  >({});
   const [quizRevealNoteNames, setQuizRevealNoteNames] = useState<string[] | null>(null);
   const chordQuizTypesKey = chordQuizTypes.join("|");
   const previousChordQuizTypesKeyRef = useRef(chordQuizTypesKey);
   const previousRootNoteRef = useRef(rootNote);
   const scaleQuizKey = `${rootNote}|${scaleType}`;
   const previousScaleQuizKeyRef = useRef(scaleQuizKey);
+  const diatonicQuizKey = `${diatonicQuizKeyType}|${diatonicQuizChordSize}`;
+  const previousDiatonicQuizKeyRef = useRef(diatonicQuizKey);
 
   const generateQuizQuestion = useCallback(
     (mode: QuizMode, type: QuizType = "choice"): QuizQuestion => {
@@ -179,6 +202,50 @@ export function useQuiz({
         };
       }
 
+      if (mode === "diatonic") {
+        const progressionKey = `${diatonicQuizKeyType}-${diatonicQuizChordSize}`;
+        const progression = DIATONIC_CHORDS[progressionKey] ?? DIATONIC_CHORDS["major-triad"];
+        const uniqueChordTypes = Array.from(new Set(progression.map((entry) => entry.chordType)));
+        const answers: DiatonicAnswerEntry[] = progression.map((entry) => {
+          const answerRoot = notes[(rootIdx + entry.offset) % 12];
+          return {
+            degree: entry.value,
+            root: answerRoot,
+            chordType: entry.chordType,
+            label: `${answerRoot}${chordSuffix(entry.chordType)}`,
+          };
+        });
+
+        if (type === "all") {
+          return {
+            stringIdx,
+            fret,
+            correct: answers.map((entry) => entry.label).join(" / "),
+            choices: [],
+            answerLabel: answers.map((entry) => `${entry.degree}: ${entry.label}`).join(", "),
+            promptDiatonicKeyType: diatonicQuizKeyType,
+            promptDiatonicChordSize: diatonicQuizChordSize,
+            diatonicChordTypeOptions: uniqueChordTypes,
+            diatonicAnswers: answers,
+          };
+        }
+
+        const selected = answers[Math.floor(Math.random() * answers.length)];
+        return {
+          stringIdx,
+          fret,
+          correct: `${selected.degree}|${selected.root}|${selected.chordType}`,
+          choices: [],
+          answerLabel: selected.label,
+          promptRoot: selected.root,
+          promptChordType: selected.chordType,
+          promptDiatonicDegree: selected.degree,
+          promptDiatonicKeyType: diatonicQuizKeyType,
+          promptDiatonicChordSize: diatonicQuizChordSize,
+          diatonicChordTypeOptions: uniqueChordTypes,
+        };
+      }
+
       if (type === "fretboard") {
         const correct = mode === "note" ? notes[noteIdx] : getDegreeName(noteIdx, rootIdx);
         return { stringIdx, fret, correct, choices: [] };
@@ -194,7 +261,15 @@ export function useQuiz({
       const choices = DEGREE_NAMES;
       return { stringIdx, fret, correct, choices };
     },
-    [accidental, chordQuizTypes, fretRange, rootNote, scaleType],
+    [
+      accidental,
+      chordQuizTypes,
+      diatonicQuizChordSize,
+      diatonicQuizKeyType,
+      fretRange,
+      rootNote,
+      scaleType,
+    ],
   );
 
   const resetQuizProgress = useCallback(() => {
@@ -205,6 +280,9 @@ export function useQuiz({
     setQuizSelectedChoices([]);
     setQuizSelectedChordRoot(null);
     setQuizSelectedChordType(null);
+    setDiatonicSelectedRoot(null);
+    setDiatonicSelectedChordType(null);
+    setDiatonicAllAnswers({});
     setQuizRevealNoteNames(null);
     setQuizScore({ correct: 0, total: 0 });
   }, []);
@@ -217,6 +295,9 @@ export function useQuiz({
     setQuizSelectedChoices([]);
     setQuizSelectedChordRoot(null);
     setQuizSelectedChordType(null);
+    setDiatonicSelectedRoot(null);
+    setDiatonicSelectedChordType(null);
+    setDiatonicAllAnswers({});
     setQuizRevealNoteNames(null);
   }, []);
 
@@ -428,6 +509,68 @@ export function useQuiz({
     clearCurrentQuizState();
   }, [clearCurrentQuizState, quizQuestion]);
 
+  const handleDiatonicAnswerRootSelect = useCallback(
+    (root: string) => {
+      if (quizMode !== "diatonic" || selectedAnswer !== null) return;
+      setDiatonicSelectedRoot(root);
+    },
+    [quizMode, selectedAnswer],
+  );
+
+  const handleDiatonicAnswerTypeSelect = useCallback(
+    (chordType: ChordType) => {
+      if (quizMode !== "diatonic" || selectedAnswer !== null || quizQuestion == null) return;
+      if (diatonicSelectedRoot == null) return;
+
+      setDiatonicSelectedChordType(chordType);
+
+      if (quizType === "identify") {
+        const isCorrect =
+          diatonicSelectedRoot === quizQuestion.promptRoot &&
+          chordType === quizQuestion.promptChordType;
+        setSelectedAnswer(
+          `${quizQuestion.promptDiatonicDegree}|${diatonicSelectedRoot}|${chordType}`,
+        );
+        setQuizScore((prev) => ({
+          correct: prev.correct + (isCorrect ? 1 : 0),
+          total: prev.total + 1,
+        }));
+        return;
+      }
+
+      const nextDegree =
+        quizQuestion.diatonicAnswers?.find((entry) => diatonicAllAnswers[entry.degree] == null)
+          ?.degree ?? null;
+      if (nextDegree == null) return;
+
+      const nextAnswers = {
+        ...diatonicAllAnswers,
+        [nextDegree]: { root: diatonicSelectedRoot, chordType },
+      };
+      setDiatonicAllAnswers(nextAnswers);
+      setDiatonicSelectedRoot(null);
+      setDiatonicSelectedChordType(null);
+
+      const completed = quizQuestion.diatonicAnswers?.every(
+        (entry) => nextAnswers[entry.degree] != null,
+      );
+      if (!completed) return;
+
+      const isCorrect =
+        quizQuestion.diatonicAnswers?.every(
+          (entry) =>
+            nextAnswers[entry.degree]?.root === entry.root &&
+            nextAnswers[entry.degree]?.chordType === entry.chordType,
+        ) ?? false;
+      setSelectedAnswer(isCorrect ? quizQuestion.correct : "diatonic-all");
+      setQuizScore((prev) => ({
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        total: prev.total + 1,
+      }));
+    },
+    [diatonicAllAnswers, diatonicSelectedRoot, quizMode, quizQuestion, quizType, selectedAnswer],
+  );
+
   useEffect(() => {
     if (previousRootNoteRef.current === rootNote) return;
     previousRootNoteRef.current = rootNote;
@@ -456,6 +599,24 @@ export function useQuiz({
   }, [
     chordQuizTypesKey,
     clearCurrentQuizState,
+    generateQuizQuestion,
+    quizMode,
+    quizQuestion,
+    quizType,
+    showQuiz,
+  ]);
+
+  useEffect(() => {
+    if (previousDiatonicQuizKeyRef.current === diatonicQuizKey) return;
+    previousDiatonicQuizKeyRef.current = diatonicQuizKey;
+    if (!showQuiz || quizQuestion == null) return;
+    if (quizMode !== "diatonic") return;
+
+    clearCurrentQuizState();
+    setQuizQuestion(generateQuizQuestion(quizMode, quizType));
+  }, [
+    clearCurrentQuizState,
+    diatonicQuizKey,
     generateQuizQuestion,
     quizMode,
     quizQuestion,
@@ -503,8 +664,13 @@ export function useQuiz({
     quizCorrectCell,
     quizSelectedCells,
     quizSelectedChoices,
+    diatonicQuizKeyType,
+    diatonicQuizChordSize,
     quizSelectedChordRoot,
     quizSelectedChordType,
+    diatonicSelectedRoot,
+    diatonicSelectedChordType,
+    diatonicAllAnswers,
     quizRevealNoteNames,
     setQuizMode,
     setQuizType,
@@ -515,8 +681,12 @@ export function useQuiz({
     handleQuizAnswer,
     handleChordQuizRootSelect,
     handleChordQuizTypeSelect,
+    handleDiatonicAnswerRootSelect,
+    handleDiatonicAnswerTypeSelect,
     handleFretboardQuizAnswer,
     handleNextQuestion,
     handleRetryQuestion,
+    setDiatonicQuizKeyType,
+    setDiatonicQuizChordSize,
   };
 }

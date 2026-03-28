@@ -3,6 +3,68 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { useQuiz } from "./useQuiz";
 
 describe("useQuiz", () => {
+  it("ダイアトニック識別クイズは設定変更時に問題を再生成する", async () => {
+    const { result } = renderHook(() =>
+      useQuiz({
+        accidental: "flat",
+        fretRange: [0, 14],
+        rootNote: "C",
+        scaleType: "major",
+        showQuiz: true,
+        chordQuizTypes: ["Major"],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.quizQuestion).not.toBeNull());
+
+    act(() => {
+      result.current.handleQuizKindChange("diatonic", "identify");
+    });
+
+    const firstQuestion = result.current.quizQuestion?.promptDiatonicChordSize;
+
+    act(() => {
+      result.current.setDiatonicQuizChordSize("seventh");
+    });
+
+    await waitFor(() =>
+      expect(result.current.quizQuestion?.promptDiatonicChordSize).toBe("seventh"),
+    );
+    expect(firstQuestion).toBe("triad");
+  });
+
+  it("ダイアトニック全答クイズは7枠埋めると採点される", async () => {
+    const { result } = renderHook(() =>
+      useQuiz({
+        accidental: "flat",
+        fretRange: [0, 14],
+        rootNote: "C",
+        scaleType: "major",
+        showQuiz: true,
+        chordQuizTypes: ["Major"],
+      }),
+    );
+
+    await waitFor(() => expect(result.current.quizQuestion).not.toBeNull());
+
+    act(() => {
+      result.current.handleQuizKindChange("diatonic", "all");
+    });
+
+    const answers = result.current.quizQuestion?.diatonicAnswers ?? [];
+    for (const answer of answers) {
+      act(() => {
+        result.current.handleDiatonicAnswerRootSelect(answer.root);
+      });
+      act(() => {
+        result.current.handleDiatonicAnswerTypeSelect(answer.chordType);
+      });
+    }
+
+    expect(result.current.selectedAnswer).toBe(result.current.quizQuestion?.correct);
+    expect(result.current.quizScore).toEqual({ correct: 1, total: 1 });
+  });
+
   it("コード識別クイズはルートと種別の2段階で判定する", async () => {
     const { result } = renderHook(() =>
       useQuiz({

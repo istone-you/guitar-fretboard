@@ -1142,7 +1142,7 @@ export const DIATONIC_CHORDS: Record<string, DiatonicChordEntry[]> = {
     { value: "IV", offset: 5, chordType: "Major" },
     { value: "V", offset: 7, chordType: "Major" },
     { value: "vi", offset: 9, chordType: "Minor" },
-    { value: "vii", offset: 11, chordType: "dim7" },
+    { value: "vii", offset: 11, chordType: "dim" },
   ],
   "major-seventh": [
     { value: "I", offset: 0, chordType: "maj7" },
@@ -1155,7 +1155,7 @@ export const DIATONIC_CHORDS: Record<string, DiatonicChordEntry[]> = {
   ],
   "natural-minor-triad": [
     { value: "i", offset: 0, chordType: "Minor" },
-    { value: "ii", offset: 2, chordType: "dim7" },
+    { value: "ii", offset: 2, chordType: "dim" },
     { value: "III", offset: 3, chordType: "Major" },
     { value: "iv", offset: 5, chordType: "Minor" },
     { value: "v", offset: 7, chordType: "Minor" },

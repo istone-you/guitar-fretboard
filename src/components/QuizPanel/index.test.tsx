@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import QuizPanel from ".";
@@ -14,7 +15,9 @@ function makeQuestion(overrides: Partial<QuizQuestion> = {}): QuizQuestion {
   };
 }
 
-function makeProps(overrides: Record<string, unknown> = {}) {
+function makeProps(
+  overrides: Partial<ComponentProps<typeof QuizPanel>> = {},
+): ComponentProps<typeof QuizPanel> {
   return {
     theme: "dark" as Theme,
     mode: "note" as QuizMode,
@@ -24,17 +27,27 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     selectedAnswer: null,
     rootNote: "C",
     quizSelectedChoices: [],
+    noteOptions: ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"],
     quizSelectedChordRoot: null,
     quizSelectedChordType: null,
+    diatonicSelectedRoot: null,
+    diatonicSelectedChordType: null,
+    diatonicAllAnswers: {},
+    diatonicQuizKeyType: "major",
+    diatonicQuizChordSize: "triad",
     chordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7"] as ChordType[],
     availableChordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7", "sus2"] as ChordType[],
     scaleType: "major" as ScaleType,
     onKindChange: vi.fn(),
     onChordQuizTypesChange: vi.fn(),
     onScaleTypeChange: vi.fn(),
+    onDiatonicQuizKeyTypeChange: vi.fn(),
+    onDiatonicQuizChordSizeChange: vi.fn(),
     onAnswer: vi.fn(),
     onChordQuizRootSelect: vi.fn(),
     onChordQuizTypeSelect: vi.fn(),
+    onDiatonicAnswerRootSelect: vi.fn(),
+    onDiatonicAnswerTypeSelect: vi.fn(),
     onNextQuestion: vi.fn(),
     onRetryQuestion: vi.fn(),
     ...overrides,
@@ -263,6 +276,62 @@ describe("QuizPanel", () => {
     expect(screen.getByRole("dialog", { name: "スケール一覧" }).className).toContain(
       "bottom-[calc(100%+0.5rem)]",
     );
+  });
+
+  it("ダイアトニック識別では設定と2段階回答UIが表示される", () => {
+    const props = makeProps();
+    render(
+      <QuizPanel
+        {...props}
+        mode={"diatonic" as QuizMode}
+        quizType={"identify" as QuizType}
+        question={makeQuestion({
+          choices: [],
+          promptRoot: "D",
+          promptChordType: "Minor" as ChordType,
+          promptDiatonicDegree: "ii",
+          promptDiatonicKeyType: "major",
+          promptDiatonicChordSize: "triad",
+          diatonicChordTypeOptions: ["Major", "Minor", "dim7"] as ChordType[],
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Cメジャー \/ 3和音 \/ ii/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "D" }));
+    expect(props.onDiatonicAnswerRootSelect).toHaveBeenCalledWith("D");
+  });
+
+  it("ダイアトニック全答では7枠が表示される", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "diatonic" as QuizMode,
+          quizType: "all" as QuizType,
+          question: makeQuestion({
+            choices: [],
+            promptDiatonicKeyType: "major",
+            promptDiatonicChordSize: "triad",
+            diatonicChordTypeOptions: ["Major", "Minor", "dim7"] as ChordType[],
+            diatonicAnswers: [
+              { degree: "I", root: "C", chordType: "Major", label: "C" },
+              { degree: "ii", root: "D", chordType: "Minor", label: "Dm" },
+              { degree: "iii", root: "E", chordType: "Minor", label: "Em" },
+              { degree: "IV", root: "F", chordType: "Major", label: "F" },
+              { degree: "V", root: "G", chordType: "Major", label: "G" },
+              { degree: "vi", root: "A", chordType: "Minor", label: "Am" },
+              { degree: "vii", root: "B", chordType: "dim7", label: "Bdim7" },
+            ],
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Cメジャー \/ 3和音 のダイアトニックコード/)).toBeTruthy();
+    expect(screen.getAllByText("--").length).toBeGreaterThan(0);
+    expect(screen.getByText("I")).toBeTruthy();
+    expect(screen.getByText("ii")).toBeTruthy();
+    expect(screen.getByText("vii")).toBeTruthy();
   });
 
   it("回答済みのとき種別ドロップダウンは disabled", () => {

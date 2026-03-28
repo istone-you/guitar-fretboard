@@ -139,16 +139,25 @@ export default function App() {
     quizCorrectCell,
     quizSelectedCells,
     quizSelectedChoices,
+    diatonicQuizKeyType,
+    diatonicQuizChordSize,
     quizSelectedChordRoot,
     quizSelectedChordType,
+    diatonicSelectedRoot,
+    diatonicSelectedChordType,
+    diatonicAllAnswers,
     quizRevealNoteNames,
     handleQuizKindChange,
     handleQuizAnswer,
     handleChordQuizRootSelect,
     handleChordQuizTypeSelect,
+    handleDiatonicAnswerRootSelect,
+    handleDiatonicAnswerTypeSelect,
     handleFretboardQuizAnswer,
     handleNextQuestion,
     handleRetryQuestion,
+    setDiatonicQuizKeyType,
+    setDiatonicQuizChordSize,
   } = useQuiz({
     accidental,
     chordQuizTypes,
@@ -191,7 +200,9 @@ export default function App() {
       .sort((left, right) => left - right)
       .map((semitone) => notes[(rootIndex + semitone) % 12]);
   }, [accidental, overlaySemitones, rootNote]);
-  const quizRootChangeEnabled = !showQuiz || quizMode === "degree" || quizMode === "scale";
+  const quizRootChangeEnabled =
+    !showQuiz || quizMode === "degree" || quizMode === "scale" || quizMode === "diatonic";
+  const quizNoteOptions = accidental === "sharp" ? [...NOTES_SHARP] : [...NOTES_FLAT];
 
   return (
     <div
@@ -339,17 +350,27 @@ export default function App() {
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
               quizSelectedChoices={quizSelectedChoices}
+              noteOptions={quizNoteOptions}
               quizSelectedChordRoot={quizSelectedChordRoot}
               quizSelectedChordType={quizSelectedChordType}
+              diatonicSelectedRoot={diatonicSelectedRoot}
+              diatonicSelectedChordType={diatonicSelectedChordType}
+              diatonicAllAnswers={diatonicAllAnswers}
+              diatonicQuizKeyType={diatonicQuizKeyType}
+              diatonicQuizChordSize={diatonicQuizChordSize}
               chordQuizTypes={chordQuizTypes}
               availableChordQuizTypes={CHORD_QUIZ_TYPES_ALL}
               scaleType={scaleType}
               onKindChange={handleQuizKindChange}
               onChordQuizTypesChange={setChordQuizTypes}
               onScaleTypeChange={(value) => setScaleType(value as ScaleType)}
+              onDiatonicQuizKeyTypeChange={setDiatonicQuizKeyType}
+              onDiatonicQuizChordSizeChange={setDiatonicQuizChordSize}
               onAnswer={handleQuizAnswer}
               onChordQuizRootSelect={handleChordQuizRootSelect}
               onChordQuizTypeSelect={handleChordQuizTypeSelect}
+              onDiatonicAnswerRootSelect={handleDiatonicAnswerRootSelect}
+              onDiatonicAnswerTypeSelect={handleDiatonicAnswerTypeSelect}
               onNextQuestion={handleNextQuestion}
               onRetryQuestion={handleRetryQuestion}
             />
