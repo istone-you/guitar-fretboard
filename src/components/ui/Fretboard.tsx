@@ -116,6 +116,13 @@ interface ChordGroup {
   rootStringIdx?: number;
 }
 
+function buildCellKey(cells: FretCell[]): string {
+  return cells
+    .map((cell) => `${cell.string}-${cell.fret}`)
+    .sort()
+    .join("|");
+}
+
 export interface FretboardProps {
   theme: Theme;
   rootNote: string;
@@ -145,6 +152,8 @@ export interface FretboardProps {
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
   quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
+  hideChordNoteLabels?: boolean;
+  chordOverlayTone?: "amber" | "indigo";
 }
 
 export default function Fretboard({
@@ -176,6 +185,8 @@ export default function Fretboard({
   onQuizCellClick,
   quizRevealNoteNames = null,
   suppressRegularDisplay = false,
+  hideChordNoteLabels = false,
+  chordOverlayTone = "amber",
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
   const quizActive = quizModeActive && quizCell !== undefined;
@@ -252,6 +263,11 @@ export default function Fretboard({
 
     const openForm = getOpenChordForm(effectiveRootIndex, effectiveChordType);
     if (!openForm) return movableGroups;
+    const openFormKey = buildCellKey(openForm);
+    const overlapsMovableGroup = movableGroups.some(
+      (group) => buildCellKey(group.cells) === openFormKey,
+    );
+    if (overlapsMovableGroup) return movableGroups;
 
     const frets = openForm.map((cell) => cell.fret);
     const strings = openForm.map((cell) => cell.string);
@@ -337,7 +353,11 @@ export default function Fretboard({
               return (
                 <div
                   key={group.id}
-                  className="pointer-events-none absolute rounded-2xl border-2 border-amber-300/60 bg-amber-300/8 z-[6]"
+                  className={`pointer-events-none absolute rounded-2xl border-2 z-[6] ${
+                    hideChordNoteLabels
+                      ? "animate-pulse border-indigo-500/70 bg-indigo-500/10"
+                      : "border-amber-300/60 bg-amber-300/8"
+                  }`}
                   style={{ top, left, width, height }}
                 />
               );
@@ -370,6 +390,8 @@ export default function Fretboard({
               onQuizCellClick={onQuizCellClick}
               quizRevealNoteNames={quizRevealNoteNames}
               suppressRegularDisplay={suppressRegularDisplay}
+              hideChordNoteLabels={hideChordNoteLabels}
+              chordOverlayTone={chordOverlayTone}
             />
           ))}
         </div>
@@ -459,6 +481,8 @@ interface StringRowProps {
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
   quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
+  hideChordNoteLabels?: boolean;
+  chordOverlayTone?: "amber" | "indigo";
 }
 
 function StringRow({
@@ -486,6 +510,8 @@ function StringRow({
   onQuizCellClick,
   quizRevealNoteNames,
   suppressRegularDisplay = false,
+  hideChordNoteLabels = false,
+  chordOverlayTone = "amber",
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -598,6 +624,8 @@ function StringRow({
             onClick={handleClick}
             isQuizTarget={fret === quizTargetFret}
             suppressRegularDisplay={shouldSuppressRegularDisplay}
+            hideChordNoteLabels={hideChordNoteLabels}
+            chordOverlayTone={chordOverlayTone}
             quizAnswerMode={quizAnswerMode}
             isTargetStringCell={isTargetString}
             isAnswered={isAnswered}
@@ -638,6 +666,8 @@ interface FretCellComponentProps {
   onClick: () => void;
   isQuizTarget: boolean;
   suppressRegularDisplay: boolean;
+  hideChordNoteLabels?: boolean;
+  chordOverlayTone?: "amber" | "indigo";
   quizAnswerMode?: boolean;
   isTargetStringCell?: boolean;
   isAnswered?: boolean;
@@ -662,6 +692,8 @@ function FretCellComponent({
   onClick,
   isQuizTarget,
   suppressRegularDisplay,
+  hideChordNoteLabels = false,
+  chordOverlayTone = "amber",
   quizAnswerMode = false,
   isTargetStringCell = false,
   isAnswered = false,
@@ -671,6 +703,10 @@ function FretCellComponent({
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
   const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !suppressRegularDisplay;
+  const chordOverlayClass =
+    chordOverlayTone === "indigo"
+      ? "border-indigo-500 bg-indigo-500"
+      : "border-amber-500 bg-amber-500";
 
   return (
     <div
@@ -735,16 +771,33 @@ function FretCellComponent({
 
       {inChord && (
         <div
-          className="absolute rounded-full border-amber-500 z-20"
-          style={{ inset: size.overlayInset, borderWidth: size.chordBorderWidth, opacity }}
+          className={`absolute rounded-full z-20 ${hideChordNoteLabels ? "" : chordOverlayClass.split(" ")[0]}`}
+          style={{
+            inset: size.overlayInset,
+            borderWidth: hideChordNoteLabels ? 0 : size.chordBorderWidth,
+            opacity,
+          }}
         >
-          <div className="w-full h-full rounded-full bg-amber-500 flex items-center justify-center">
-            <span
-              className="font-bold text-white leading-none"
-              style={{ fontSize: size.overlayFontSize }}
-            >
-              {noteName}
-            </span>
+          <div
+            className={`w-full h-full rounded-full flex items-center justify-center ${
+              chordOverlayClass.split(" ")[1]
+            } ${hideChordNoteLabels ? "animate-pulse" : ""}`}
+          >
+            {hideChordNoteLabels ? (
+              <span
+                className="font-bold text-white leading-none"
+                style={{ fontSize: size.overlayFontSize }}
+              >
+                ?
+              </span>
+            ) : (
+              <span
+                className="font-bold text-white leading-none"
+                style={{ fontSize: size.overlayFontSize }}
+              >
+                {noteName}
+              </span>
+            )}
           </div>
         </div>
       )}

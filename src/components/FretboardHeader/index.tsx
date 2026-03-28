@@ -12,6 +12,7 @@ interface FretboardHeaderProps {
   baseLabelMode: BaseLabelMode;
   fretRange: [number, number];
   showQuiz: boolean;
+  rootChangeDisabled?: boolean;
   onBaseLabelModeChange: (mode: BaseLabelMode) => void;
   onRootNoteChange: (note: string) => void;
   onFretRangeChange: (range: [number, number]) => void;
@@ -24,6 +25,7 @@ export default function FretboardHeader({
   baseLabelMode,
   fretRange,
   showQuiz,
+  rootChangeDisabled = false,
   onBaseLabelModeChange,
   onRootNoteChange,
   onFretRangeChange,
@@ -60,23 +62,53 @@ export default function FretboardHeader({
     value,
     onPrev,
     onNext,
+    disabled = false,
     width = "w-6",
   }: {
     value: number | string;
     onPrev: () => void;
     onNext: () => void;
+    disabled?: boolean;
     width?: string;
   }) => (
     <span className="inline-flex items-center">
-      <button className={btnBase} onClick={onPrev}>
+      <button
+        className={`${btnBase} ${
+          disabled
+            ? theme === "dark"
+              ? "cursor-not-allowed text-gray-700 hover:text-gray-700 active:bg-transparent"
+              : "cursor-not-allowed text-stone-300 hover:text-stone-300 active:bg-transparent"
+            : ""
+        }`}
+        onClick={onPrev}
+        disabled={disabled}
+      >
         ‹
       </button>
       <span
-        className={`text-base font-bold ${width} text-center ${theme === "dark" ? "text-white" : "text-stone-900"}`}
+        className={`text-base font-bold ${width} text-center ${
+          disabled
+            ? theme === "dark"
+              ? "text-gray-700"
+              : "text-stone-300"
+            : theme === "dark"
+              ? "text-white"
+              : "text-stone-900"
+        }`}
       >
         {value}
       </span>
-      <button className={btnBase} onClick={onNext}>
+      <button
+        className={`${btnBase} ${
+          disabled
+            ? theme === "dark"
+              ? "cursor-not-allowed text-gray-700 hover:text-gray-700 active:bg-transparent"
+              : "cursor-not-allowed text-stone-300 hover:text-stone-300 active:bg-transparent"
+            : ""
+        }`}
+        onClick={onNext}
+        disabled={disabled}
+      >
         ›
       </button>
     </span>
@@ -89,6 +121,7 @@ export default function FretboardHeader({
         <Stepper
           value={rootNote}
           width="w-8"
+          disabled={rootChangeDisabled}
           onPrev={() => stepNote(-1)}
           onNext={() => stepNote(1)}
         />

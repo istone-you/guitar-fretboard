@@ -138,6 +138,92 @@ describe("ui/Fretboard", () => {
     expect(screen.getAllByText("C").length).toBeGreaterThan(0);
   });
 
+  it("hideChordNoteLabels のときコードフォーム内の音名は表示しない", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          hideChordNoteLabels: true,
+          suppressRegularDisplay: true,
+        })}
+      />,
+    );
+
+    expect(screen.queryAllByText("C")).toHaveLength(0);
+  });
+
+  it("hideChordNoteLabels のときコードフォーム上に ? を表示して点滅する", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          hideChordNoteLabels: true,
+          suppressRegularDisplay: true,
+        })}
+      />,
+    );
+
+    expect(screen.getAllByText("?").length).toBeGreaterThan(0);
+    expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(1);
+    expect(container.querySelector(".border-indigo-500\\/70")).toBeTruthy();
+  });
+
+  it("indigo のコードフォーム色を指定できる", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          suppressRegularDisplay: true,
+          chordOverlayTone: "indigo",
+        })}
+      />,
+    );
+
+    expect(container.querySelector(".border-indigo-500")).toBeTruthy();
+    expect(container.querySelector(".bg-indigo-500")).toBeTruthy();
+  });
+
+  it("E メジャーではオープンコードとバレーコードの枠が重複しない", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          rootNote: "E",
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          chordType: "Major" as ChordType,
+          suppressRegularDisplay: true,
+        })}
+      />,
+    );
+
+    const frames = Array.from(container.querySelectorAll(".border-amber-300\\/60")).map((element) =>
+      element.getAttribute("style"),
+    );
+    expect(new Set(frames).size).toBe(frames.length);
+  });
+
+  it("A メジャーではオープンコードとバレーコードの枠が重複しない", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          rootNote: "A",
+          showChord: true,
+          chordDisplayMode: "form" as ChordDisplayMode,
+          chordType: "Major" as ChordType,
+          suppressRegularDisplay: true,
+        })}
+      />,
+    );
+
+    const frames = Array.from(container.querySelectorAll(".border-amber-300\\/60")).map((element) =>
+      element.getAttribute("style"),
+    );
+    expect(new Set(frames).size).toBe(frames.length);
+  });
+
   it("パワーコード表示でもレンダリングできる", () => {
     render(
       <Fretboard
@@ -262,37 +348,6 @@ describe("ui/Fretboard", () => {
       />,
     );
     expect(screen.getAllByText("D♭").length).toBeGreaterThan(0);
-  });
-
-  it("relative 4択の回答後は正解音を複数箇所に表示できる", () => {
-    render(
-      <Fretboard
-        {...makeProps({
-          quizModeActive: true,
-          quizCell: undefined,
-          quizRevealNoteNames: ["F"],
-        })}
-      />,
-    );
-
-    expect(screen.queryByText("?")).toBeNull();
-    expect(screen.getAllByText("F").length).toBeGreaterThan(1);
-  });
-
-  it("relative 指板クイズの回答後も正解音を複数箇所に表示できる", () => {
-    render(
-      <Fretboard
-        {...makeProps({
-          quizModeActive: true,
-          quizAnswerMode: true,
-          quizAnsweredCell: { stringIdx: 0, fret: 1 },
-          quizCorrectCell: { stringIdx: 1, fret: 6 },
-          quizRevealNoteNames: ["F"],
-        })}
-      />,
-    );
-
-    expect(screen.getAllByText("F").length).toBeGreaterThan(1);
   });
 
   it("コード構成音クイズの途中選択を保持できる", () => {

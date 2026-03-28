@@ -6,11 +6,12 @@ export default function QuizFretboard(props: FretboardProps) {
   return (
     <Fretboard
       {...props}
-      showChord={false}
       showScale={false}
       showCaged={false}
       hiddenDegrees={new Set()}
       suppressRegularDisplay
+      hideChordNoteLabels={props.showChord && !props.quizAnswerMode}
+      chordOverlayTone={props.showChord && !props.quizAnswerMode ? "indigo" : "amber"}
     />
   );
 }

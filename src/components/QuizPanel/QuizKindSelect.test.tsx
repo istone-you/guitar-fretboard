@@ -8,10 +8,10 @@ const options = [
   { value: "note-fretboard", label: "音名・指板" },
   { value: "degree-choice", label: "度数・12択" },
   { value: "degree-fretboard", label: "度数・指板" },
-  { value: "relative-choice", label: "ルート度数・12択" },
-  { value: "relative-fretboard", label: "ルート度数・指板" },
-  { value: "chord-choice", label: "コード構成音・12択" },
-  { value: "chord-fretboard", label: "コード構成音・指板" },
+  { value: "chord-choice", label: "コード・識別" },
+  { value: "chord-fretboard", label: "コード・指板" },
+  { value: "scale-choice", label: "スケール・音名選択" },
+  { value: "scale-fretboard", label: "スケール・指板" },
 ];
 
 function makeProps(overrides: Record<string, unknown> = {}) {
@@ -32,7 +32,7 @@ describe("QuizKindSelect", () => {
     fireEvent.click(screen.getByText("音名・12択"));
 
     expect(screen.getByRole("dialog", { name: "quiz-kind-select" })).toBeTruthy();
-    expect(screen.getByText("コード構成音・指板")).toBeTruthy();
+    expect(screen.getByText("コード・指板")).toBeTruthy();
   });
 
   it("選択すると onChange が呼ばれる", () => {
@@ -67,10 +67,10 @@ describe("QuizKindSelect", () => {
       "音名・指板",
       "度数・12択",
       "度数・指板",
-      "ルート度数・12択",
-      "ルート度数・指板",
-      "コード構成音・12択",
-      "コード構成音・指板",
+      "コード・識別",
+      "コード・指板",
+      "スケール・音名選択",
+      "スケール・指板",
     ]);
   });
 });

@@ -71,6 +71,7 @@ vi.mock("./components/FretboardHeader/index", () => ({
         <span>header-mode:{String(props.baseLabelMode)}</span>
         <button onClick={() => props.onBaseLabelModeChange?.("degree")}>header-degree</button>
         <button onClick={() => props.onBaseLabelModeChange?.("note")}>header-note</button>
+        <button onClick={() => props.onRootNoteChange?.("D♭")}>header-root-db</button>
       </div>
     );
   },
@@ -301,5 +302,19 @@ describe("App", () => {
 
     expect(normalFretboardState.latest).toBeTruthy();
     expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+  });
+
+  it("クイズ中にルートを変えると問題も更新される", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByText("quiz-toggle"));
+    fireEvent.click(screen.getByText("音名・12択"));
+    fireEvent.click(screen.getByText("度数・指板"));
+
+    expect(screen.getByText(/ルート: C/)).toBeTruthy();
+
+    fireEvent.click(screen.getByText("header-root-db"));
+
+    expect(screen.getByText(/ルート: D♭/)).toBeTruthy();
   });
 });

@@ -15,6 +15,7 @@ import { DropdownSelect } from "../ui/DropdownSelect";
 import { LayerRow } from "./LayerRow";
 import { ScaleSelect } from "./ScaleSelect";
 import { ChordTypeSelect } from "./ChordTypeSelect";
+import { buildScaleOptions } from "./scaleOptions";
 import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../../types";
 
 const CHORD_TYPES: ChordType[] = [
@@ -114,22 +115,7 @@ export default function Controls({
     { value: "triad", label: t("options.diatonicChordSize.triad") },
     { value: "seventh", label: t("options.diatonicChordSize.seventh") },
   ];
-  const scaleOptions: { value: ScaleType; label: string }[] = [
-    { value: "major", label: t("options.scale.major") },
-    { value: "natural-minor", label: t("options.scale.naturalMinor") },
-    { value: "major-penta", label: t("options.scale.majorPenta") },
-    { value: "minor-penta", label: t("options.scale.minorPenta") },
-    { value: "blues", label: t("options.scale.blues") },
-    { value: "harmonic-minor", label: t("options.scale.harmonicMinor") },
-    { value: "melodic-minor", label: t("options.scale.melodicMinor") },
-    { value: "ionian", label: t("options.scale.ionian") },
-    { value: "dorian", label: t("options.scale.dorian") },
-    { value: "phrygian", label: t("options.scale.phrygian") },
-    { value: "lydian", label: t("options.scale.lydian") },
-    { value: "mixolydian", label: t("options.scale.mixolydian") },
-    { value: "aeolian", label: t("options.scale.aeolian") },
-    { value: "locrian", label: t("options.scale.locrian") },
-  ];
+  const { options: scaleOptions, groups: scaleGroups } = buildScaleOptions(t);
   const triadStringOptions = TRIAD_STRING_SET_OPTIONS.map(({ value }) => ({
     value,
     label: t(`options.triadStrings.${value}`),
@@ -138,28 +124,6 @@ export default function Controls({
     value,
     label: t(`options.triadInversions.${value}`),
   }));
-  const scaleGroups = [
-    {
-      title: t("scaleGroups.basics"),
-      options: scaleOptions.filter((option) =>
-        ["major", "natural-minor", "major-penta", "minor-penta", "blues"].includes(option.value),
-      ),
-    },
-    {
-      title: t("scaleGroups.minorDerived"),
-      options: scaleOptions.filter((option) =>
-        ["harmonic-minor", "melodic-minor"].includes(option.value),
-      ),
-    },
-    {
-      title: t("scaleGroups.modes"),
-      options: scaleOptions.filter((option) =>
-        ["ionian", "dorian", "phrygian", "lydian", "mixolydian", "aeolian", "locrian"].includes(
-          option.value,
-        ),
-      ),
-    },
-  ];
   const rootIndex = getRootIndex(rootNote);
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
   const diatonicCodeOptions = DIATONIC_CHORDS[diatonicScaleType].map(({ value }) => {

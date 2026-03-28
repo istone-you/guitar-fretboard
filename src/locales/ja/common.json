@@ -107,14 +107,17 @@
   "quiz": {
     "questionNote": "{{string}}弦 {{fret}}フレットの音は？",
     "questionDegree": "{{string}}弦 {{fret}}フレットの度数は？（ルート: {{root}}）",
-    "questionRelative": "{{root}}の{{degree}}は？",
+    "questionDegreeFretboard": "{{string}}弦の {{degree}} はどこ？（ルート: {{root}}）",
+    "questionScale": "{{root}}{{scale}}の音は？",
     "questionFretboard": "{{string}}弦の {{note}} はどこ？",
-    "questionRelativeFretboard": "{{root}}の{{degree}}はどこ？",
+    "questionScaleFretboard": "{{root}}{{scale}}の音はどこ？",
     "questionChordFretboard": "{{chord}} の構成音は？",
+    "questionChordIdentify": "このコードは？",
     "tapInstruction": "指板をタップして答えてね",
     "correct": "正解！",
     "incorrect": "不正解… 正解は {{answer}}",
     "next": "次へ",
+    "retry": "もう一度",
     "mode": {
       "note": "音名",
       "degree": "度数"
@@ -126,12 +129,12 @@
     "kind": {
       "noteChoice": "音名・12択",
       "degreeChoice": "度数・12択",
-      "relativeChoice": "ルート度数・12択",
       "noteFretboard": "音名・指板",
       "degreeFretboard": "度数・指板",
-      "relativeFretboard": "ルート度数・指板",
-      "chordChoice": "コード構成音・12択",
-      "chordFretboard": "コード構成音・指板"
+      "scaleChoice": "スケール・音名選択",
+      "scaleFretboard": "スケール・指板",
+      "chordChoice": "コード・識別",
+      "chordFretboard": "コード・指板"
     },
     "chordTypes": {
       "label": "出題コード",

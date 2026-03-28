@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import QuizPanel from ".";
-import type { Theme, ChordType } from "../../types";
+import type { Theme, ChordType, ScaleType } from "../../types";
 import type { QuizMode, QuizType, QuizQuestion } from ".";
 
 function makeQuestion(overrides: Partial<QuizQuestion> = {}): QuizQuestion {
@@ -24,12 +24,19 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     selectedAnswer: null,
     rootNote: "C",
     quizSelectedChoices: [],
+    quizSelectedChordRoot: null,
+    quizSelectedChordType: null,
     chordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7"] as ChordType[],
     availableChordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7", "sus2"] as ChordType[],
+    scaleType: "major" as ScaleType,
     onKindChange: vi.fn(),
     onChordQuizTypesChange: vi.fn(),
+    onScaleTypeChange: vi.fn(),
     onAnswer: vi.fn(),
+    onChordQuizRootSelect: vi.fn(),
+    onChordQuizTypeSelect: vi.fn(),
     onNextQuestion: vi.fn(),
+    onRetryQuestion: vi.fn(),
     ...overrides,
   };
 }
@@ -76,21 +83,22 @@ describe("QuizPanel", () => {
     expect(props.onKindChange).toHaveBeenCalledWith("degree", "fretboard");
   });
 
-  it("relative モードではルート基準の問題文が表示される", () => {
+  it("scale モードではスケール構成音の問題文が表示される", () => {
     render(
       <QuizPanel
         {...makeProps({
-          mode: "relative" as QuizMode,
+          mode: "scale" as QuizMode,
           question: makeQuestion({
-            correct: "F",
-            promptRoot: "C",
-            promptDegree: "P4",
+            promptScaleRoot: "C",
+            promptScaleType: "major" as ScaleType,
+            correctNoteNames: ["C", "D", "E", "F", "G", "A", "B"],
+            answerLabel: "C / D / E / F / G / A / B",
           }),
         })}
       />,
     );
 
-    expect(screen.getByText(/CのP4は/)).toBeTruthy();
+    expect(screen.getByText(/Cメジャースケールの音は/)).toBeTruthy();
   });
 
   it("chord モードではコード構成音の問題文が表示される", () => {
@@ -98,9 +106,9 @@ describe("QuizPanel", () => {
       <QuizPanel
         {...makeProps({
           mode: "chord" as QuizMode,
-          quizType: "choice" as QuizType,
+          quizType: "fretboard" as QuizType,
           question: makeQuestion({
-            choices: ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"],
+            choices: [],
             promptChordLabel: "Cm7",
             correctNoteNames: ["C", "E♭", "G", "B♭"],
             answerLabel: "C / E♭ / G / B♭",
@@ -110,6 +118,43 @@ describe("QuizPanel", () => {
     );
 
     expect(screen.getByText(/Cm7 の構成音/)).toBeTruthy();
+  });
+
+  it("コード識別ではルートとコード種別を順に選べる", () => {
+    const props = makeProps();
+    const { rerender } = render(
+      <QuizPanel
+        {...props}
+        mode={"chord" as QuizMode}
+        quizType={"choice" as QuizType}
+        question={makeQuestion({
+          promptChordLabel: "Cmaj7",
+          promptChordRoot: "C",
+          promptChordType: "maj7" as ChordType,
+        })}
+      />,
+    );
+
+    expect(screen.getByText("このコードは？")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "C" }));
+    expect(props.onChordQuizRootSelect).toHaveBeenCalledWith("C");
+
+    rerender(
+      <QuizPanel
+        {...props}
+        mode={"chord" as QuizMode}
+        quizType={"choice" as QuizType}
+        quizSelectedChordRoot={"C"}
+        question={makeQuestion({
+          promptChordLabel: "Cmaj7",
+          promptChordRoot: "C",
+          promptChordType: "maj7" as ChordType,
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "maj7" }));
+    expect(props.onChordQuizTypeSelect).toHaveBeenCalledWith("maj7");
   });
 
   it("chord モードでは出題コード選択が表示される", () => {
@@ -158,6 +203,68 @@ describe("QuizPanel", () => {
     ]);
   });
 
+  it("scale モードではスケール選択が表示される", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "scale" as QuizMode,
+          question: makeQuestion({
+            promptScaleRoot: "C",
+            promptScaleType: "major" as ScaleType,
+            correctNoteNames: ["C", "D", "E", "F", "G", "A", "B"],
+            answerLabel: "C / D / E / F / G / A / B",
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText("スケール")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "メジャースケール" })).toBeTruthy();
+  });
+
+  it("scale モードのスケールを切り替えるとハンドラが呼ばれる", () => {
+    const props = makeProps();
+    render(
+      <QuizPanel
+        {...props}
+        mode={"scale" as QuizMode}
+        question={makeQuestion({
+          promptScaleRoot: "C",
+          promptScaleType: "major" as ScaleType,
+          correctNoteNames: ["C", "D", "E", "F", "G", "A", "B"],
+          answerLabel: "C / D / E / F / G / A / B",
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "メジャースケール" }));
+    fireEvent.click(screen.getByRole("button", { name: "ハーモニックマイナー" }));
+
+    expect(props.onScaleTypeChange).toHaveBeenCalledWith("harmonic-minor");
+  });
+
+  it("scale モードのスケール選択は上に開く", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "scale" as QuizMode,
+          question: makeQuestion({
+            promptScaleRoot: "C",
+            promptScaleType: "major" as ScaleType,
+            correctNoteNames: ["C", "D", "E", "F", "G", "A", "B"],
+            answerLabel: "C / D / E / F / G / A / B",
+          }),
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "メジャースケール" }));
+
+    expect(screen.getByRole("dialog", { name: "スケール一覧" }).className).toContain(
+      "bottom-[calc(100%+0.5rem)]",
+    );
+  });
+
   it("回答済みのとき種別ドロップダウンは disabled", () => {
     render(<QuizPanel {...makeProps({ selectedAnswer: "G" })} />);
     const btn = screen.getByText("音名・12択").closest("button");
@@ -180,24 +287,23 @@ describe("QuizPanel", () => {
     expect(props.onNextQuestion).toHaveBeenCalled();
   });
 
-  it("コード構成音の12択では途中で正解を保持できる", () => {
-    render(
-      <QuizPanel
-        {...makeProps({
-          mode: "chord" as QuizMode,
-          quizType: "choice" as QuizType,
-          quizSelectedChoices: ["C", "G"],
-          question: makeQuestion({
-            promptChordLabel: "C",
-            correctNoteNames: ["C", "E", "G"],
-            answerLabel: "C / E / G",
-          }),
-        })}
-      />,
-    );
+  it("scale モードでは回答後にもう一度ボタンが表示される", () => {
+    const props = makeProps({
+      mode: "scale" as QuizMode,
+      selectedAnswer: "C",
+      question: makeQuestion({
+        promptScaleRoot: "C",
+        promptScaleType: "major" as ScaleType,
+        correctNoteNames: ["C", "D", "E", "F", "G", "A", "B"],
+        answerLabel: "C / D / E / F / G / A / B",
+      }),
+    });
+    render(<QuizPanel {...props} />);
 
-    expect(screen.getByText("C").closest("button")?.className).toContain("bg-green-600");
-    expect(screen.getByText("G").closest("button")?.className).toContain("bg-green-600");
+    expect(screen.getByRole("button", { name: "もう一度" })).toHaveProperty("disabled", false);
+    fireEvent.click(screen.getByRole("button", { name: "もう一度" }));
+
+    expect(props.onRetryQuestion).toHaveBeenCalled();
   });
 
   it("fretboardモードではタップ指示が表示され選択肢グリッドが非表示", () => {
@@ -220,5 +326,20 @@ describe("QuizPanel", () => {
       />,
     );
     expect(screen.getByText(/6弦.*G.*どこ/)).toBeTruthy();
+  });
+
+  it("度数・指板問題文はルートを含む", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "degree" as QuizMode,
+          quizType: "fretboard" as QuizType,
+          rootNote: "C",
+          question: makeQuestion({ stringIdx: 0, correct: "M3", choices: [] }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/6弦.*M3.*ルート: C/)).toBeTruthy();
   });
 });

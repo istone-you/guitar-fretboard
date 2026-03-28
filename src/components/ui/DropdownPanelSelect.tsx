@@ -11,6 +11,7 @@ interface DropdownPanelSelectProps {
   triggerClassName?: string;
   panelClassName?: string;
   align?: "left" | "right";
+  direction?: "down" | "up";
   children: ReactNode | ((args: { closePanel: () => void }) => ReactNode);
 }
 
@@ -22,6 +23,7 @@ export function DropdownPanelSelect({
   triggerClassName,
   panelClassName,
   align = "left",
+  direction = "down",
   children,
 }: DropdownPanelSelectProps) {
   const [open, setOpen] = useState(false);
@@ -52,9 +54,9 @@ export function DropdownPanelSelect({
             role="dialog"
             aria-label={dialogLabel}
             onClick={(e) => e.stopPropagation()}
-            className={`absolute top-[calc(100%+0.5rem)] z-30 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
-              align === "right" ? "right-0" : "left-0"
-            } ${
+            className={`absolute z-30 overflow-hidden rounded-2xl border p-2 shadow-2xl backdrop-blur ${
+              direction === "up" ? "bottom-[calc(100%+0.5rem)]" : "top-[calc(100%+0.5rem)]"
+            } ${align === "right" ? "right-0" : "left-0"} ${
               isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
             } ${panelClassName ?? ""}`}
           >

@@ -9,9 +9,17 @@ interface ScaleSelectProps {
   onChange: (value: string) => void;
   options: { value: ScaleType; label: string }[];
   groups: { title: string; options: { value: ScaleType; label: string }[] }[];
+  direction?: "down" | "up";
 }
 
-export function ScaleSelect({ theme, value, onChange, options, groups }: ScaleSelectProps) {
+export function ScaleSelect({
+  theme,
+  value,
+  onChange,
+  options,
+  groups,
+  direction = "down",
+}: ScaleSelectProps) {
   const { t } = useTranslation();
   const selected = options.find((option) => option.value === value) ?? options[0];
 
@@ -22,6 +30,7 @@ export function ScaleSelect({ theme, value, onChange, options, groups }: ScaleSe
       dialogLabel={t("scaleDialog")}
       triggerClassName="w-44"
       panelClassName="w-64"
+      direction={direction}
     >
       {({ closePanel }) => (
         <div className="space-y-2">

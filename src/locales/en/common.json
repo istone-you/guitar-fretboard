@@ -107,14 +107,17 @@
   "quiz": {
     "questionNote": "String {{string}}, Fret {{fret}} — what note?",
     "questionDegree": "String {{string}}, Fret {{fret}} — what degree? (Root: {{root}})",
-    "questionRelative": "What is {{degree}} from {{root}}?",
+    "questionDegreeFretboard": "Where is {{degree}} on string {{string}}? (Root: {{root}})",
+    "questionScale": "Which notes are in {{root}} {{scale}}?",
     "questionFretboard": "Where is {{note}} on string {{string}}?",
-    "questionRelativeFretboard": "Where is {{degree}} from {{root}}?",
+    "questionScaleFretboard": "Where are the notes of {{root}} {{scale}}?",
     "questionChordFretboard": "Select the chord tones of {{chord}}",
+    "questionChordIdentify": "What chord is this?",
     "tapInstruction": "Tap the fretboard to answer",
     "correct": "Correct!",
     "incorrect": "Wrong… the answer is {{answer}}",
     "next": "Next",
+    "retry": "Retry",
     "mode": {
       "note": "Notes",
       "degree": "Degrees"
@@ -126,12 +129,12 @@
     "kind": {
       "noteChoice": "Note / 12-choice",
       "degreeChoice": "Degree / 12-choice",
-      "relativeChoice": "Relative / 12-choice",
       "noteFretboard": "Note / Fretboard",
       "degreeFretboard": "Degree / Fretboard",
-      "relativeFretboard": "Relative / Fretboard",
-      "chordChoice": "Chord Tones / 12-choice",
-      "chordFretboard": "Chord Tones / Fretboard"
+      "scaleChoice": "Scale / Note Select",
+      "scaleFretboard": "Scale / Fretboard",
+      "chordChoice": "Chord / Identify",
+      "chordFretboard": "Chord / Fretboard"
     },
     "chordTypes": {
       "label": "Chords",

@@ -139,16 +139,22 @@ export default function App() {
     quizCorrectCell,
     quizSelectedCells,
     quizSelectedChoices,
+    quizSelectedChordRoot,
+    quizSelectedChordType,
     quizRevealNoteNames,
     handleQuizKindChange,
     handleQuizAnswer,
+    handleChordQuizRootSelect,
+    handleChordQuizTypeSelect,
     handleFretboardQuizAnswer,
     handleNextQuestion,
+    handleRetryQuestion,
   } = useQuiz({
     accidental,
     chordQuizTypes,
     fretRange,
     rootNote,
+    scaleType,
     showQuiz,
   });
   const triadLayout = `${triadStringSet}-${triadInversion}`;
@@ -185,6 +191,7 @@ export default function App() {
       .sort((left, right) => left - right)
       .map((semitone) => notes[(rootIndex + semitone) % 12]);
   }, [accidental, overlaySemitones, rootNote]);
+  const quizRootChangeEnabled = !showQuiz || quizMode === "degree" || quizMode === "scale";
 
   return (
     <div
@@ -247,42 +254,48 @@ export default function App() {
           baseLabelMode={baseLabelMode}
           fretRange={fretRange}
           showQuiz={showQuiz}
+          rootChangeDisabled={!quizRootChangeEnabled}
           onBaseLabelModeChange={setBaseLabelMode}
-          onRootNoteChange={handleNoteClick}
+          onRootNoteChange={quizRootChangeEnabled ? handleNoteClick : () => {}}
           onFretRangeChange={setFretRange}
         />
         {showQuiz ? (
           <QuizFretboard
             theme={theme}
-            rootNote={rootNote}
+            rootNote={
+              quizMode === "chord" && quizType === "choice" && quizQuestion?.promptChordRoot
+                ? quizQuestion.promptChordRoot
+                : rootNote
+            }
             accidental={accidental}
             baseLabelMode={baseLabelMode}
             displaySize={fretboardDisplaySize}
             fretRange={fretRange}
-            showChord={showChord}
-            chordDisplayMode={chordDisplayMode}
+            showChord={quizMode === "chord" && quizType === "choice"}
+            chordDisplayMode={"form"}
             showScale={showScale}
             scaleType={scaleType}
             showCaged={showCaged}
             cagedForms={cagedForms}
-            chordType={chordType}
+            chordType={
+              quizMode === "chord" && quizType === "choice" && quizQuestion?.promptChordType
+                ? quizQuestion.promptChordType
+                : chordType
+            }
             triadPosition={triadLayout}
             diatonicScaleType={diatonicScaleType}
             diatonicDegree={diatonicDegree}
-            onNoteClick={handleNoteClick}
+            onNoteClick={quizRootChangeEnabled ? handleNoteClick : () => {}}
             hiddenDegrees={hiddenDegrees}
             quizModeActive
             quizCell={
-              quizQuestion &&
-              quizType === "choice" &&
-              quizMode !== "relative" &&
-              quizMode !== "chord"
+              quizQuestion && quizType === "choice" && quizMode !== "chord" && quizMode !== "scale"
                 ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
                 : undefined
             }
             quizAnswerMode={quizType === "fretboard"}
             quizTargetString={
-              quizType === "fretboard" && quizMode !== "relative" && quizMode !== "chord"
+              quizType === "fretboard" && quizMode !== "chord" && quizMode !== "scale"
                 ? quizQuestion?.stringIdx
                 : undefined
             }
@@ -326,12 +339,19 @@ export default function App() {
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
               quizSelectedChoices={quizSelectedChoices}
+              quizSelectedChordRoot={quizSelectedChordRoot}
+              quizSelectedChordType={quizSelectedChordType}
               chordQuizTypes={chordQuizTypes}
               availableChordQuizTypes={CHORD_QUIZ_TYPES_ALL}
+              scaleType={scaleType}
               onKindChange={handleQuizKindChange}
               onChordQuizTypesChange={setChordQuizTypes}
+              onScaleTypeChange={(value) => setScaleType(value as ScaleType)}
               onAnswer={handleQuizAnswer}
+              onChordQuizRootSelect={handleChordQuizRootSelect}
+              onChordQuizTypeSelect={handleChordQuizTypeSelect}
               onNextQuestion={handleNextQuestion}
+              onRetryQuestion={handleRetryQuestion}
             />
           </div>
         )}

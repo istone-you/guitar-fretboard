@@ -72,4 +72,15 @@ describe("FretboardHeader", () => {
 
     expect(screen.getByText("C♯")).toBeTruthy();
   });
+
+  it("rootChangeDisabled のときルート変更ボタンは無効", () => {
+    const props = makeProps({ rootChangeDisabled: true });
+    render(<FretboardHeader {...props} />);
+
+    const buttons = screen.getAllByRole("button");
+    fireEvent.click(buttons[0]);
+    fireEvent.click(buttons[1]);
+
+    expect(props.onRootNoteChange).not.toHaveBeenCalled();
+  });
 });
