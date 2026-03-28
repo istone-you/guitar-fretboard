@@ -10,6 +10,7 @@ const options = [
   { value: "degree-fretboard", label: "度数・指板" },
   { value: "relative-choice", label: "ルート度数・4択" },
   { value: "relative-fretboard", label: "ルート度数・指板" },
+  { value: "chord-fretboard", label: "コード構成音・指板" },
 ];
 
 function makeProps(overrides: Record<string, unknown> = {}) {
@@ -30,7 +31,7 @@ describe("QuizKindSelect", () => {
     fireEvent.click(screen.getByText("音名・4択"));
 
     expect(screen.getByRole("dialog", { name: "quiz-kind-select" })).toBeTruthy();
-    expect(screen.getByText("ルート度数・指板")).toBeTruthy();
+    expect(screen.getByText("コード構成音・指板")).toBeTruthy();
   });
 
   it("選択すると onChange が呼ばれる", () => {
@@ -67,6 +68,7 @@ describe("QuizKindSelect", () => {
       "度数・指板",
       "ルート度数・4択",
       "ルート度数・指板",
+      "コード構成音・指板",
     ]);
   });
 });

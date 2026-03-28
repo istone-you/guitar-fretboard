@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import "../../i18n";
-import type { DegreeName, Theme } from "../../types";
+import type { DegreeName, Theme, ChordType } from "../../types";
 import QuizKindSelect from "./QuizKindSelect";
+import ChordQuizTypeSelect from "./ChordQuizTypeSelect";
 
-export type QuizMode = "note" | "degree" | "relative";
+export type QuizMode = "note" | "degree" | "relative" | "chord";
 export type QuizType = "choice" | "fretboard";
 
 export interface QuizQuestion {
@@ -11,8 +12,11 @@ export interface QuizQuestion {
   fret: number;
   correct: string;
   choices: string[];
+  answerLabel?: string;
   promptRoot?: string;
   promptDegree?: DegreeName;
+  promptChordLabel?: string;
+  correctNoteNames?: string[];
 }
 
 interface QuizPanelProps {
@@ -23,7 +27,10 @@ interface QuizPanelProps {
   score: { correct: number; total: number };
   selectedAnswer: string | null;
   rootNote: string;
+  chordQuizTypes: ChordType[];
+  availableChordQuizTypes: ChordType[];
   onKindChange: (mode: QuizMode, type: QuizType) => void;
+  onChordQuizTypesChange: (value: ChordType[]) => void;
   onAnswer: (answer: string) => void;
 }
 
@@ -35,7 +42,10 @@ export default function QuizPanel({
   score,
   selectedAnswer,
   rootNote,
+  chordQuizTypes,
+  availableChordQuizTypes,
   onKindChange,
+  onChordQuizTypesChange,
   onAnswer,
 }: QuizPanelProps) {
   const { t } = useTranslation();
@@ -52,12 +62,23 @@ export default function QuizPanel({
     { value: "degree-fretboard", label: t("quiz.kind.degreeFretboard") },
     { value: "relative-choice", label: t("quiz.kind.relativeChoice") },
     { value: "relative-fretboard", label: t("quiz.kind.relativeFretboard") },
+    { value: "chord-fretboard", label: t("quiz.kind.chordFretboard") },
   ];
 
   const handleKindChange = (value: string) => {
     if (answered) return;
     const [newMode, newType] = value.split("-") as [QuizMode, QuizType];
     onKindChange(newMode, newType);
+  };
+
+  const handleChordTypeToggle = (value: ChordType) => {
+    if (answered) return;
+    if (chordQuizTypes.includes(value)) {
+      if (chordQuizTypes.length === 1) return;
+      onChordQuizTypesChange(chordQuizTypes.filter((chordType) => chordType !== value));
+      return;
+    }
+    onChordQuizTypesChange([...chordQuizTypes, value]);
   };
 
   return (
@@ -82,6 +103,21 @@ export default function QuizPanel({
         </span>
       </div>
 
+      {mode === "chord" && quizType === "fretboard" && (
+        <div className="flex items-center justify-center gap-3">
+          <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>
+            {t("quiz.chordTypes.label")}
+          </span>
+          <ChordQuizTypeSelect
+            theme={theme}
+            value={chordQuizTypes}
+            options={availableChordQuizTypes}
+            disabled={answered}
+            onToggle={handleChordTypeToggle}
+          />
+        </div>
+      )}
+
       {/* 問題文 */}
       <p
         className={`text-center text-base font-semibold ${
@@ -94,7 +130,11 @@ export default function QuizPanel({
                 root: question.promptRoot,
                 degree: question.promptDegree,
               })
-            : t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
+            : mode === "chord"
+              ? t("quiz.questionChordFretboard", {
+                  chord: question.promptChordLabel,
+                })
+              : t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
           : mode === "relative"
             ? t("quiz.questionRelative", {
                 root: question.promptRoot,
@@ -154,7 +194,9 @@ export default function QuizPanel({
             isCorrect ? "text-green-400" : "text-red-400"
           }`}
         >
-          {isCorrect ? t("quiz.correct") : t("quiz.incorrect", { answer: question.correct })}
+          {isCorrect
+            ? t("quiz.correct")
+            : t("quiz.incorrect", { answer: question.answerLabel ?? question.correct })}
         </p>
       )}
     </div>

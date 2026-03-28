@@ -110,6 +110,7 @@
     "questionRelative": "What is {{degree}} from {{root}}?",
     "questionFretboard": "Where is {{note}} on string {{string}}?",
     "questionRelativeFretboard": "Where is {{degree}} from {{root}}?",
+    "questionChordFretboard": "Select the chord tones of {{chord}}",
     "tapInstruction": "Tap the fretboard to answer",
     "correct": "Correct!",
     "incorrect": "Wrong… the answer is {{answer}}",
@@ -127,7 +128,13 @@
       "relativeChoice": "Relative / 4-choice",
       "noteFretboard": "Note / Fretboard",
       "degreeFretboard": "Degree / Fretboard",
-      "relativeFretboard": "Relative / Fretboard"
+      "relativeFretboard": "Relative / Fretboard",
+      "chordFretboard": "Chord Tones / Fretboard"
+    },
+    "chordTypes": {
+      "label": "Chords",
+      "select": "Select",
+      "selectedCount": "{{count}} types"
     }
   }
 }

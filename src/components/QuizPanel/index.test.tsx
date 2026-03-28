@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import QuizPanel from ".";
-import type { Theme } from "../../types";
+import type { Theme, ChordType } from "../../types";
 import type { QuizMode, QuizType, QuizQuestion } from ".";
 
 function makeQuestion(overrides: Partial<QuizQuestion> = {}): QuizQuestion {
@@ -23,7 +23,10 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     score: { correct: 0, total: 0 },
     selectedAnswer: null,
     rootNote: "C",
+    chordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7"] as ChordType[],
+    availableChordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7", "sus2"] as ChordType[],
     onKindChange: vi.fn(),
+    onChordQuizTypesChange: vi.fn(),
     onAnswer: vi.fn(),
     ...overrides,
   };
@@ -86,6 +89,71 @@ describe("QuizPanel", () => {
     );
 
     expect(screen.getByText(/CのP4は/)).toBeTruthy();
+  });
+
+  it("chord モードではコード構成音の問題文が表示される", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "chord" as QuizMode,
+          quizType: "fretboard" as QuizType,
+          question: makeQuestion({
+            choices: [],
+            promptChordLabel: "Cm7",
+            correctNoteNames: ["C", "E♭", "G", "B♭"],
+            answerLabel: "C / E♭ / G / B♭",
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Cm7 の構成音/)).toBeTruthy();
+  });
+
+  it("chord モードでは出題コード選択が表示される", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "chord" as QuizMode,
+          quizType: "fretboard" as QuizType,
+          question: makeQuestion({
+            choices: [],
+            promptChordLabel: "Cm7",
+            correctNoteNames: ["C", "E♭", "G", "B♭"],
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText("出題コード")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "5種類" })).toBeTruthy();
+  });
+
+  it("chord モードの出題コードを切り替えるとハンドラが呼ばれる", () => {
+    const props = makeProps();
+    render(
+      <QuizPanel
+        {...props}
+        mode={"chord" as QuizMode}
+        quizType={"fretboard" as QuizType}
+        question={makeQuestion({
+          choices: [],
+          promptChordLabel: "Cm7",
+          correctNoteNames: ["C", "E♭", "G", "B♭"],
+        })}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "5種類" }));
+    fireEvent.click(screen.getByRole("button", { name: "sus2" }));
+    expect(props.onChordQuizTypesChange).toHaveBeenCalledWith([
+      "Major",
+      "Minor",
+      "7th",
+      "maj7",
+      "m7",
+      "sus2",
+    ]);
   });
 
   it("回答済みのとき種別ドロップダウンは disabled", () => {

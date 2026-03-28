@@ -257,7 +257,7 @@ describe("ui/Fretboard", () => {
         {...makeProps({
           quizModeActive: true,
           quizCell: undefined,
-          quizRevealNoteName: "F",
+          quizRevealNoteNames: ["F"],
         })}
       />,
     );
@@ -274,11 +274,26 @@ describe("ui/Fretboard", () => {
           quizAnswerMode: true,
           quizAnsweredCell: { stringIdx: 0, fret: 1 },
           quizCorrectCell: { stringIdx: 1, fret: 6 },
-          quizRevealNoteName: "F",
+          quizRevealNoteNames: ["F"],
         })}
       />,
     );
 
     expect(screen.getAllByText("F").length).toBeGreaterThan(1);
+  });
+
+  it("コード構成音クイズの途中選択を保持できる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          quizModeActive: true,
+          quizAnswerMode: true,
+          accidental: "sharp" as Accidental,
+          quizSelectedCells: [{ stringIdx: 0, fret: 8 }],
+        })}
+      />,
+    );
+
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
   });
 });

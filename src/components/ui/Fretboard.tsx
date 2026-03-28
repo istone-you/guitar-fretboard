@@ -141,8 +141,9 @@ export interface FretboardProps {
   quizTargetString?: number;
   quizAnsweredCell?: { stringIdx: number; fret: number } | null;
   quizCorrectCell?: { stringIdx: number; fret: number } | null;
+  quizSelectedCells?: { stringIdx: number; fret: number }[];
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
-  quizRevealNoteName?: string | null;
+  quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
 }
 
@@ -171,8 +172,9 @@ export default function Fretboard({
   quizTargetString,
   quizAnsweredCell,
   quizCorrectCell,
+  quizSelectedCells = [],
   onQuizCellClick,
-  quizRevealNoteName = null,
+  quizRevealNoteNames = null,
   suppressRegularDisplay = false,
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
@@ -364,8 +366,9 @@ export default function Fretboard({
               quizTargetString={quizTargetString}
               quizAnsweredCell={quizAnsweredCell}
               quizCorrectCell={quizCorrectCell}
+              quizSelectedCells={quizSelectedCells}
               onQuizCellClick={onQuizCellClick}
-              quizRevealNoteName={quizRevealNoteName}
+              quizRevealNoteNames={quizRevealNoteNames}
               suppressRegularDisplay={suppressRegularDisplay}
             />
           ))}
@@ -452,8 +455,9 @@ interface StringRowProps {
   quizTargetString?: number;
   quizAnsweredCell?: { stringIdx: number; fret: number } | null;
   quizCorrectCell?: { stringIdx: number; fret: number } | null;
+  quizSelectedCells?: { stringIdx: number; fret: number }[];
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
-  quizRevealNoteName?: string | null;
+  quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
 }
 
@@ -478,8 +482,9 @@ function StringRow({
   quizTargetString,
   quizAnsweredCell,
   quizCorrectCell,
+  quizSelectedCells = [],
   onQuizCellClick,
-  quizRevealNoteName,
+  quizRevealNoteNames,
   suppressRegularDisplay = false,
 }: StringRowProps) {
   const isDark = theme === "dark";
@@ -552,8 +557,11 @@ function StringRow({
           quizAnsweredCell?.fret === fret;
         const isCorrectCell =
           isAnswered && quizCorrectCell?.stringIdx === stringIdx && quizCorrectCell?.fret === fret;
+        const isSelectedCell = quizSelectedCells.some(
+          (cell) => cell.stringIdx === stringIdx && cell.fret === fret,
+        );
         const shouldRevealChoiceAnswer =
-          quizRevealNoteName != null && noteName === quizRevealNoteName;
+          quizRevealNoteNames != null && quizRevealNoteNames.includes(noteName);
 
         let quizAnswerOverlay: "correct" | "wrong" | "correct-hint" | null = null;
         if (isTappedCell) {
@@ -593,6 +601,7 @@ function StringRow({
             quizAnswerMode={quizAnswerMode}
             isTargetStringCell={isTargetString}
             isAnswered={isAnswered}
+            isSelectedCell={isSelectedCell}
             quizAnswerOverlay={quizAnswerOverlay}
             showChoiceAnswerReveal={shouldRevealChoiceAnswer}
           />
@@ -632,6 +641,7 @@ interface FretCellComponentProps {
   quizAnswerMode?: boolean;
   isTargetStringCell?: boolean;
   isAnswered?: boolean;
+  isSelectedCell?: boolean;
   quizAnswerOverlay?: "correct" | "wrong" | "correct-hint" | null;
   showChoiceAnswerReveal?: boolean;
 }
@@ -655,6 +665,7 @@ function FretCellComponent({
   quizAnswerMode = false,
   isTargetStringCell = false,
   isAnswered = false,
+  isSelectedCell = false,
   quizAnswerOverlay = null,
   showChoiceAnswerReveal = false,
 }: FretCellComponentProps) {
@@ -756,6 +767,20 @@ function FretCellComponent({
         <div
           className="absolute rounded-full flex items-center justify-center z-29"
           style={{ inset: size.overlayInset, backgroundColor: "#16a34a", opacity: 0.75 }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            {noteName}
+          </span>
+        </div>
+      )}
+
+      {isSelectedCell && !isAnswered && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-29"
+          style={{ inset: size.overlayInset, backgroundColor: "#16a34a", opacity: 0.9 }}
         >
           <span
             className="font-bold text-white leading-none"

@@ -10,7 +10,7 @@ import FretboardFooter from "./components/FretboardFooter/index";
 import { useDegreeFilter } from "./hooks/useDegreeFilter";
 import { useDiatonicSelection } from "./hooks/useDiatonicSelection";
 import { usePersistedSetting } from "./hooks/usePersistedSetting";
-import { useQuiz } from "./hooks/useQuiz";
+import { CHORD_QUIZ_TYPES_ALL, useQuiz } from "./hooks/useQuiz";
 import {
   NOTES_SHARP,
   NOTES_FLAT,
@@ -26,6 +26,8 @@ import type {
   ScaleType,
   ChordType,
 } from "./types";
+
+const DEFAULT_CHORD_QUIZ_TYPES: ChordType[] = ["Major", "Minor", "7th", "maj7", "m7"];
 
 const STORAGE_KEYS = {
   theme: "guiter:theme",
@@ -60,6 +62,7 @@ export default function App() {
   const [fretRange, setFretRange] = useState<[number, number]>([0, 14]);
   // クイズ機能
   const [showQuiz, setShowQuiz] = useState(false);
+  const [chordQuizTypes, setChordQuizTypes] = useState<ChordType[]>(DEFAULT_CHORD_QUIZ_TYPES);
   // 臨時記号表示（sharp / flat）
   const [accidental, setAccidental] = usePersistedSetting<Accidental>(
     STORAGE_KEYS.accidental,
@@ -134,11 +137,14 @@ export default function App() {
     quizScore,
     quizAnsweredCell,
     quizCorrectCell,
+    quizSelectedCells,
+    quizRevealNoteNames,
     handleQuizKindChange,
     handleQuizAnswer,
     handleFretboardQuizAnswer,
   } = useQuiz({
     accidental,
+    chordQuizTypes,
     fretRange,
     rootNote,
     showQuiz,
@@ -265,24 +271,24 @@ export default function App() {
             hiddenDegrees={hiddenDegrees}
             quizModeActive
             quizCell={
-              quizQuestion && quizType === "choice" && quizMode !== "relative"
+              quizQuestion &&
+              quizType === "choice" &&
+              quizMode !== "relative" &&
+              quizMode !== "chord"
                 ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
                 : undefined
             }
             quizAnswerMode={quizType === "fretboard"}
             quizTargetString={
-              quizType === "fretboard" && quizMode !== "relative"
+              quizType === "fretboard" && quizMode !== "relative" && quizMode !== "chord"
                 ? quizQuestion?.stringIdx
                 : undefined
             }
             quizAnsweredCell={quizAnsweredCell}
             quizCorrectCell={quizCorrectCell}
+            quizSelectedCells={quizSelectedCells}
             onQuizCellClick={handleFretboardQuizAnswer}
-            quizRevealNoteName={
-              quizMode === "relative" && selectedAnswer !== null
-                ? (quizQuestion?.correct ?? null)
-                : null
-            }
+            quizRevealNoteNames={quizRevealNoteNames}
           />
         ) : (
           <NormalFretboard
@@ -317,7 +323,10 @@ export default function App() {
               score={quizScore}
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
+              chordQuizTypes={chordQuizTypes}
+              availableChordQuizTypes={CHORD_QUIZ_TYPES_ALL}
               onKindChange={handleQuizKindChange}
+              onChordQuizTypesChange={setChordQuizTypes}
               onAnswer={handleQuizAnswer}
             />
           </div>
