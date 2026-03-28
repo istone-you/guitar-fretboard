@@ -74,7 +74,17 @@
   - 音名配列: `['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']`
   - 度数計算: `(TargetNoteIndex - RootNoteIndex + 12) % 12`
 
-## 5. 出力依頼
+## 5. 開発ルール
+
+コードを変更した際は必ず以下を実行し、エラーがないことを確認すること。
+
+```bash
+bun run check      # lint / format
+bun run typecheck  # TypeScript 型チェック
+bun run test       # Vitest テスト
+```
+
+## 6. 出力依頼
 
 まずは、この指板ロジックの核となる「音名配置」と「度数計算ロジック」、および指板の基本UI（HTML/CSS）を作成してください。
 その後、レイヤーを重ね合わせるインタラクションを実装してください。
