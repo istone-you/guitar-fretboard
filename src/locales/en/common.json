@@ -104,11 +104,23 @@
   "quiz": {
     "questionNote": "String {{string}}, Fret {{fret}} — what note?",
     "questionDegree": "String {{string}}, Fret {{fret}} — what degree? (Root: {{root}})",
+    "questionFretboard": "Where is {{note}} on string {{string}}?",
+    "tapInstruction": "Tap the fretboard to answer",
     "correct": "Correct!",
     "incorrect": "Wrong… the answer is {{answer}}",
     "mode": {
       "note": "Notes",
       "degree": "Degrees"
+    },
+    "type": {
+      "choice": "4-choice",
+      "fretboard": "Fretboard"
+    },
+    "kind": {
+      "noteChoice": "Note / 4-choice",
+      "degreeChoice": "Degree / 4-choice",
+      "noteFretboard": "Note / Fretboard",
+      "degreeFretboard": "Degree / Fretboard"
     }
   }
 }

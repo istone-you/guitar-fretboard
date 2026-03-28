@@ -136,6 +136,11 @@ interface FretboardProps {
   onNoteClick: (noteName: string) => void;
   hiddenDegrees?: Set<string>;
   quizCell?: { stringIdx: number; fret: number };
+  quizAnswerMode?: boolean;
+  quizTargetString?: number;
+  quizAnsweredCell?: { stringIdx: number; fret: number } | null;
+  quizCorrectFret?: number | null;
+  onQuizCellClick?: (stringIdx: number, fret: number) => void;
 }
 
 export default function Fretboard({
@@ -158,6 +163,11 @@ export default function Fretboard({
   onNoteClick,
   hiddenDegrees = new Set(),
   quizCell,
+  quizAnswerMode = false,
+  quizTargetString,
+  quizAnsweredCell,
+  quizCorrectFret,
+  onQuizCellClick,
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
   const quizActive = quizCell !== undefined;
@@ -349,6 +359,11 @@ export default function Fretboard({
               hiddenDegrees={hiddenDegrees}
               quizActive={quizActive}
               quizTargetFret={quizCell?.stringIdx === stringIdx ? quizCell.fret : null}
+              quizAnswerMode={quizAnswerMode}
+              quizTargetString={quizTargetString}
+              quizAnsweredCell={quizAnsweredCell}
+              quizCorrectFret={quizCorrectFret}
+              onQuizCellClick={onQuizCellClick}
             />
           ))}
         </div>
@@ -431,6 +446,11 @@ interface StringRowProps {
   hiddenDegrees: Set<string>;
   quizActive: boolean;
   quizTargetFret: number | null;
+  quizAnswerMode?: boolean;
+  quizTargetString?: number;
+  quizAnsweredCell?: { stringIdx: number; fret: number } | null;
+  quizCorrectFret?: number | null;
+  onQuizCellClick?: (stringIdx: number, fret: number) => void;
 }
 
 function StringRow({
@@ -450,13 +470,24 @@ function StringRow({
   hiddenDegrees,
   quizActive,
   quizTargetFret,
+  quizAnswerMode = false,
+  quizTargetString,
+  quizAnsweredCell,
+  quizCorrectFret,
+  onQuizCellClick,
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
   const openStringNotes = ["E", "A", "D", "G", "B", "E"];
 
+  const isTargetString = quizAnswerMode && stringIdx === quizTargetString;
+  const isNonTargetString = quizAnswerMode && stringIdx !== quizTargetString;
+
   return (
-    <div className="flex items-center mb-px">
+    <div
+      className="flex items-center mb-px"
+      style={{ opacity: isNonTargetString ? 0.3 : undefined }}
+    >
       {/* 弦ラベル */}
       <div
         className={`shrink-0 text-right font-mono ${isDark ? "text-gray-400" : "text-stone-500"}`}
@@ -466,7 +497,7 @@ function StringRow({
           fontSize: size.stringFontSize,
         }}
       >
-        {openStringNotes[stringIdx]}
+        {!quizActive && !quizAnswerMode && openStringNotes[stringIdx]}
       </div>
 
       {visibleFrets.map((fret) => {
@@ -511,6 +542,31 @@ function StringRow({
 
         const degreeHidden = hiddenDegrees.has(degreeName);
 
+        // Quiz answer mode: determine cell state
+        const isAnswered = quizAnswerMode && quizAnsweredCell != null;
+        const isTappedCell =
+          isAnswered &&
+          quizAnsweredCell?.stringIdx === stringIdx &&
+          quizAnsweredCell?.fret === fret;
+        const isCorrectCell = isAnswered && isTargetString && fret === quizCorrectFret;
+
+        let quizAnswerOverlay: "correct" | "wrong" | "correct-hint" | null = null;
+        if (isTappedCell) {
+          quizAnswerOverlay = fret === quizCorrectFret ? "correct" : "wrong";
+        } else if (isCorrectCell && !isTappedCell) {
+          quizAnswerOverlay = "correct-hint";
+        }
+
+        const handleClick = () => {
+          if (quizAnswerMode) {
+            if (isTargetString && !isAnswered && onQuizCellClick) {
+              onQuizCellClick(stringIdx, fret);
+            }
+          } else {
+            onNoteClick(noteName);
+          }
+        };
+
         return (
           <FretCellComponent
             key={fret}
@@ -526,9 +582,13 @@ function StringRow({
             opacity={opacity}
             theme={theme}
             size={size}
-            onClick={() => onNoteClick(noteName)}
+            onClick={handleClick}
             isQuizTarget={fret === quizTargetFret}
             quizActive={quizActive}
+            quizAnswerMode={quizAnswerMode}
+            isTargetStringCell={isTargetString}
+            isAnswered={isAnswered}
+            quizAnswerOverlay={quizAnswerOverlay}
           />
         );
       })}
@@ -563,6 +623,10 @@ interface FretCellComponentProps {
   onClick: () => void;
   isQuizTarget: boolean;
   quizActive: boolean;
+  quizAnswerMode?: boolean;
+  isTargetStringCell?: boolean;
+  isAnswered?: boolean;
+  quizAnswerOverlay?: "correct" | "wrong" | "correct-hint" | null;
 }
 
 function FretCellComponent({
@@ -581,9 +645,14 @@ function FretCellComponent({
   onClick,
   isQuizTarget,
   quizActive,
+  quizAnswerMode = false,
+  isTargetStringCell = false,
+  isAnswered = false,
+  quizAnswerOverlay = null,
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
-  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !quizActive;
+  const shouldShowBaseLabel =
+    !overlayColor && !inChord && !hidden && !quizActive && !quizAnswerMode;
 
   return (
     <div
@@ -602,7 +671,7 @@ function FretCellComponent({
       </div>
 
       {/* ルート共通ハイライト */}
-      {isRoot && !quizActive && (
+      {isRoot && !quizActive && !quizAnswerMode && (
         <div
           className="absolute rounded-full border-2 border-red-500 z-[18]"
           style={{ inset: size.rootRingInset }}
@@ -663,7 +732,7 @@ function FretCellComponent({
         </div>
       )}
 
-      {/* クイズターゲット */}
+      {/* クイズターゲット (choice mode) */}
       {isQuizTarget && (
         <div
           className="absolute rounded-full flex items-center justify-center z-30 animate-pulse"
@@ -674,6 +743,55 @@ function FretCellComponent({
             style={{ fontSize: size.overlayFontSize }}
           >
             ?
+          </span>
+        </div>
+      )}
+
+      {/* 指板クイズ: ターゲット弦でまだ未回答のセルに薄いリング */}
+      {quizAnswerMode && isTargetStringCell && !isAnswered && (
+        <div
+          className="absolute rounded-full border-2 border-indigo-400/50 z-[15]"
+          style={{ inset: size.overlayInset }}
+        />
+      )}
+
+      {/* 指板クイズ: 回答結果オーバーレイ */}
+      {quizAnswerOverlay === "correct" && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-30"
+          style={{ inset: size.overlayInset, backgroundColor: "#16a34a" }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            {noteName}
+          </span>
+        </div>
+      )}
+      {quizAnswerOverlay === "wrong" && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-30"
+          style={{ inset: size.overlayInset, backgroundColor: "#ef4444" }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            {noteName}
+          </span>
+        </div>
+      )}
+      {quizAnswerOverlay === "correct-hint" && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-29"
+          style={{ inset: size.overlayInset, backgroundColor: "#16a34a", opacity: 0.7 }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            {noteName}
           </span>
         </div>
       )}

@@ -104,11 +104,23 @@
   "quiz": {
     "questionNote": "{{string}}弦 {{fret}}フレットの音は？",
     "questionDegree": "{{string}}弦 {{fret}}フレットの度数は？（ルート: {{root}}）",
+    "questionFretboard": "{{string}}弦の {{note}} はどこ？",
+    "tapInstruction": "指板をタップして答えてね",
     "correct": "正解！",
     "incorrect": "不正解… 正解は {{answer}}",
     "mode": {
       "note": "音名",
       "degree": "度数"
+    },
+    "type": {
+      "choice": "4択",
+      "fretboard": "指板"
+    },
+    "kind": {
+      "noteChoice": "音名・4択",
+      "degreeChoice": "度数・4択",
+      "noteFretboard": "音名・指板",
+      "degreeFretboard": "度数・指板"
     }
   }
 }

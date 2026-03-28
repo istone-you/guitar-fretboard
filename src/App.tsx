@@ -4,7 +4,7 @@ import "./i18n";
 import Controls from "./components/Controls";
 import SettingsMenu from "./components/SettingsMenu";
 import Fretboard from "./components/Fretboard";
-import QuizPanel, { type QuizMode, type QuizQuestion } from "./components/QuizPanel";
+import QuizPanel, { type QuizMode, type QuizType, type QuizQuestion } from "./components/QuizPanel";
 import FretboardHeader from "./components/FretboardHeader";
 import {
   DIATONIC_CHORDS,
@@ -63,9 +63,15 @@ export default function App() {
   // クイズ機能
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizMode, setQuizMode] = useState<QuizMode>("note");
+  const [quizType, setQuizType] = useState<QuizType>("choice");
   const [quizQuestion, setQuizQuestion] = useState<QuizQuestion | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
+  const [quizAnsweredCell, setQuizAnsweredCell] = useState<{
+    stringIdx: number;
+    fret: number;
+  } | null>(null);
+  const [quizCorrectFret, setQuizCorrectFret] = useState<number | null>(null);
   // 臨時記号表示（sharp / flat）
   const [accidental, setAccidental] = useState<Accidental>(readStoredAccidental);
   // ベースレイヤー表示
@@ -124,12 +130,24 @@ export default function App() {
   const DEGREE_NAMES = ["P1", "m2", "M2", "m3", "M3", "P4", "b5", "P5", "m6", "M6", "m7", "M7"];
 
   const generateQuizQuestion = useCallback(
-    (mode: QuizMode): QuizQuestion => {
+    (mode: QuizMode, type: QuizType = "choice"): QuizQuestion => {
       const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
       const stringIdx = Math.floor(Math.random() * 6);
       const fret = fretRange[0] + Math.floor(Math.random() * (fretRange[1] - fretRange[0] + 1));
       const noteIdx = getNoteIndex(stringIdx, fret);
       const rootIdx = getRootIndex(rootNote);
+
+      if (type === "fretboard") {
+        // In fretboard mode, the correct answer is the note/degree name at the chosen position.
+        // fret stores the reference correct fret for later highlight if user taps wrong.
+        if (mode === "note") {
+          const correct = notes[noteIdx];
+          return { stringIdx, fret, correct, choices: [] };
+        } else {
+          const correct = getDegreeName(noteIdx, rootIdx);
+          return { stringIdx, fret, correct, choices: [] };
+        }
+      }
 
       if (mode === "note") {
         const correct = notes[noteIdx];
@@ -149,17 +167,33 @@ export default function App() {
   const startQuiz = useCallback(() => {
     setQuizScore({ correct: 0, total: 0 });
     setSelectedAnswer(null);
-    setQuizQuestion(generateQuizQuestion(quizMode));
-  }, [generateQuizQuestion, quizMode]);
+    setQuizAnsweredCell(null);
+    setQuizCorrectFret(null);
+    setQuizQuestion(generateQuizQuestion(quizMode, quizType));
+  }, [generateQuizQuestion, quizMode, quizType]);
 
   const handleQuizModeChange = useCallback(
     (mode: QuizMode) => {
       setQuizMode(mode);
       setSelectedAnswer(null);
+      setQuizAnsweredCell(null);
+      setQuizCorrectFret(null);
       setQuizScore({ correct: 0, total: 0 });
-      setQuizQuestion(generateQuizQuestion(mode));
+      setQuizQuestion(generateQuizQuestion(mode, quizType));
     },
-    [generateQuizQuestion],
+    [generateQuizQuestion, quizType],
+  );
+
+  const handleQuizTypeChange = useCallback(
+    (type: QuizType) => {
+      setQuizType(type);
+      setSelectedAnswer(null);
+      setQuizAnsweredCell(null);
+      setQuizCorrectFret(null);
+      setQuizScore({ correct: 0, total: 0 });
+      setQuizQuestion(generateQuizQuestion(quizMode, type));
+    },
+    [generateQuizQuestion, quizMode],
   );
 
   const handleQuizAnswer = useCallback(
@@ -190,12 +224,40 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
 
+  const handleFretboardCellClick = useCallback(
+    (stringIdx: number, fret: number) => {
+      if (!showQuiz || quizType !== "fretboard" || selectedAnswer !== null || quizQuestion === null)
+        return;
+      const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+      const rootIdx = getRootIndex(rootNote);
+      const clickedNoteIdx = getNoteIndex(stringIdx, fret);
+
+      let isCorrect: boolean;
+      if (quizMode === "note") {
+        isCorrect = notes[clickedNoteIdx] === quizQuestion.correct;
+      } else {
+        isCorrect = getDegreeName(clickedNoteIdx, rootIdx) === quizQuestion.correct;
+      }
+
+      setQuizAnsweredCell({ stringIdx, fret });
+      setQuizCorrectFret(isCorrect ? fret : quizQuestion.fret);
+      setSelectedAnswer(isCorrect ? quizQuestion.correct : notes[clickedNoteIdx]);
+      setQuizScore((prev) => ({
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        total: prev.total + 1,
+      }));
+    },
+    [showQuiz, quizType, selectedAnswer, quizQuestion, accidental, rootNote, quizMode],
+  );
+
   // クイズ自動進行
   useEffect(() => {
     if (selectedAnswer === null || quizQuestion === null) return;
     const timer = setTimeout(() => {
       setSelectedAnswer(null);
-      setQuizQuestion(generateQuizQuestion(quizMode));
+      setQuizAnsweredCell(null);
+      setQuizCorrectFret(null);
+      setQuizQuestion(generateQuizQuestion(quizMode, quizType));
     }, 1200);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -362,10 +424,17 @@ export default function App() {
           onNoteClick={handleNoteClick}
           hiddenDegrees={hiddenDegrees}
           quizCell={
-            showQuiz && quizQuestion
+            showQuiz && quizQuestion && quizType === "choice"
               ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
               : undefined
           }
+          quizAnswerMode={showQuiz && quizType === "fretboard"}
+          quizTargetString={
+            showQuiz && quizType === "fretboard" ? quizQuestion?.stringIdx : undefined
+          }
+          quizAnsweredCell={quizAnsweredCell}
+          quizCorrectFret={quizCorrectFret}
+          onQuizCellClick={handleFretboardCellClick}
         />
 
         {showQuiz && quizQuestion && (
@@ -373,11 +442,13 @@ export default function App() {
             <QuizPanel
               theme={theme}
               mode={quizMode}
+              quizType={quizType}
               question={quizQuestion}
               score={quizScore}
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
               onModeChange={handleQuizModeChange}
+              onQuizTypeChange={handleQuizTypeChange}
               onAnswer={handleQuizAnswer}
             />
           </div>
