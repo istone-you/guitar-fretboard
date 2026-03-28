@@ -2,9 +2,7 @@ import { useTranslation } from "react-i18next";
 import "../../i18n";
 import type { Accidental, BaseLabelMode, Theme } from "../../types";
 import { SegmentedToggle } from "../ui/SegmentedToggle";
-
-const NOTES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-const NOTES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+import { NOTES_SHARP, NOTES_FLAT } from "../../logic/fretboard";
 const FRET_MAX = 14;
 
 interface FretboardHeaderProps {
@@ -33,7 +31,7 @@ export default function FretboardHeader({
   const { t, i18n } = useTranslation();
   const isEnglish = i18n.language === "en";
 
-  const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+  const notes: string[] = [...(accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT)];
   const currentIndex = notes.indexOf(rootNote);
 
   const stepNote = (dir: 1 | -1) => {

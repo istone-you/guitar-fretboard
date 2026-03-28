@@ -25,7 +25,7 @@ export default function QuizKindSelect({
       dialogLabel="quiz-kind-select"
       disabled={disabled}
       triggerClassName="w-48 max-w-[calc(100vw-6rem)]"
-      panelClassName="w-[min(16rem,calc(100vw-2rem))]"
+      panelClassName="w-[min(20rem,calc(100vw-2rem))]"
     >
       {({ closePanel }) => (
         <div className="grid grid-cols-2 gap-1">
@@ -39,7 +39,7 @@ export default function QuizKindSelect({
                   onChange(option.value);
                   closePanel();
                 }}
-                className={`min-w-0 rounded-xl border px-2.5 py-2 text-left text-sm leading-tight whitespace-normal break-words transition-colors ${
+                className={`min-w-0 rounded-xl border px-2.5 py-2 text-left text-sm leading-tight whitespace-nowrap transition-colors ${
                   active
                     ? "border-transparent bg-indigo-600 text-white"
                     : theme === "dark"

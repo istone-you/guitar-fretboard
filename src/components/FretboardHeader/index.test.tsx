@@ -56,4 +56,20 @@ describe("FretboardHeader", () => {
     expect(screen.getByText("ルート:")).toBeTruthy();
     expect(screen.getByRole("button", { name: "度数" })).toBeTruthy();
   });
+
+  it("♭表記では D♭ が表示される", () => {
+    render(
+      <FretboardHeader {...makeProps({ rootNote: "D♭", accidental: "flat" as Accidental })} />,
+    );
+
+    expect(screen.getByText("D♭")).toBeTruthy();
+  });
+
+  it("♯表記では C♯ が表示される", () => {
+    render(
+      <FretboardHeader {...makeProps({ rootNote: "C♯", accidental: "sharp" as Accidental })} />,
+    );
+
+    expect(screen.getByText("C♯")).toBeTruthy();
+  });
 });

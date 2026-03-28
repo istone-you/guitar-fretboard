@@ -204,6 +204,19 @@ describe("ui/Fretboard", () => {
     expect(screen.getAllByText("P5").length).toBeGreaterThan(0);
   });
 
+  it("音名モードでは hiddenDegrees があっても音名表示は消えない", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          baseLabelMode: "note" as BaseLabelMode,
+          hiddenDegrees: new Set(["P1"]),
+        })}
+      />,
+    );
+
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
   it("ライトテーマでもレンダリングできる", () => {
     render(<Fretboard {...makeProps({ theme: "light" as Theme })} />);
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);

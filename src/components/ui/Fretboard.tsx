@@ -549,7 +549,7 @@ function StringRow({
           overlayLabel = noteName;
         }
 
-        const degreeHidden = hiddenDegrees.has(degreeName);
+        const degreeHidden = baseLabelMode === "degree" && hiddenDegrees.has(degreeName);
         const isAnswered = quizAnswerMode && quizAnsweredCell != null;
         const isTappedCell =
           isAnswered &&

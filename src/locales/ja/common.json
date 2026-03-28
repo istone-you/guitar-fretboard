@@ -6,7 +6,7 @@
   "settings": "設定",
   "howToUse": "使い方",
   "howToUseItems": {
-    "changeRoot": "指板の音をクリック（タップ）してルートを変更",
+    "changeRoot": "指板の音、または上部のルート欄からルートを変更",
     "switchLabels": "「音名 / 度数」で表示内容を切り替え",
     "togglePanel": "各パネルをクリック（タップ）して表示 / 非表示を切り替え",
     "switchMode": "パネル内のコントロールでモードを切り替え",
