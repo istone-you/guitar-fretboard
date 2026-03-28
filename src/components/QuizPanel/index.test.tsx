@@ -23,8 +23,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     score: { correct: 0, total: 0 },
     selectedAnswer: null,
     rootNote: "C",
-    onModeChange: vi.fn(),
-    onQuizTypeChange: vi.fn(),
+    onKindChange: vi.fn(),
     onAnswer: vi.fn(),
     ...overrides,
   };
@@ -64,13 +63,29 @@ describe("QuizPanel", () => {
     expect(screen.getByText("音名・4択")).toBeTruthy();
   });
 
-  it("種別ドロップダウンで度数・指板を選ぶと両方のハンドラが呼ばれる", () => {
+  it("種別ドロップダウンで度数・指板を選ぶと統合ハンドラが呼ばれる", () => {
     const props = makeProps();
     render(<QuizPanel {...props} />);
     fireEvent.click(screen.getByText("音名・4択"));
     fireEvent.click(screen.getByText("度数・指板"));
-    expect(props.onModeChange).toHaveBeenCalledWith("degree");
-    expect(props.onQuizTypeChange).toHaveBeenCalledWith("fretboard");
+    expect(props.onKindChange).toHaveBeenCalledWith("degree", "fretboard");
+  });
+
+  it("relative モードではルート基準の問題文が表示される", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "relative" as QuizMode,
+          question: makeQuestion({
+            correct: "F",
+            promptRoot: "C",
+            promptDegree: "P4",
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/CのP4は/)).toBeTruthy();
   });
 
   it("回答済みのとき種別ドロップダウンは disabled", () => {

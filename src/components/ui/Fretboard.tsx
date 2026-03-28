@@ -116,7 +116,7 @@ interface ChordGroup {
   rootStringIdx?: number;
 }
 
-interface FretboardProps {
+export interface FretboardProps {
   theme: Theme;
   rootNote: string;
   accidental: Accidental;
@@ -135,12 +135,15 @@ interface FretboardProps {
   diatonicDegree: string;
   onNoteClick: (noteName: string) => void;
   hiddenDegrees?: Set<string>;
+  quizModeActive?: boolean;
   quizCell?: { stringIdx: number; fret: number };
   quizAnswerMode?: boolean;
   quizTargetString?: number;
   quizAnsweredCell?: { stringIdx: number; fret: number } | null;
-  quizCorrectFret?: number | null;
+  quizCorrectCell?: { stringIdx: number; fret: number } | null;
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
+  quizRevealNoteName?: string | null;
+  suppressRegularDisplay?: boolean;
 }
 
 export default function Fretboard({
@@ -162,15 +165,18 @@ export default function Fretboard({
   diatonicDegree,
   onNoteClick,
   hiddenDegrees = new Set(),
+  quizModeActive = false,
   quizCell,
   quizAnswerMode = false,
   quizTargetString,
   quizAnsweredCell,
-  quizCorrectFret,
+  quizCorrectCell,
   onQuizCellClick,
+  quizRevealNoteName = null,
+  suppressRegularDisplay = false,
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
-  const quizActive = quizCell !== undefined;
+  const quizActive = quizModeActive && quizCell !== undefined;
   const size = FRETBOARD_SIZE_CONFIG[displaySize];
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
@@ -280,7 +286,6 @@ export default function Fretboard({
     return set;
   }, [chordGroups]);
 
-  // CAGEDポジションマップ（選択中の全フォームをマージ）
   const cagedPositions = useMemo(() => {
     if (!showCaged || cagedForms.size === 0) return new Map<string, CagedPositionValue>();
     const merged = new Map<string, CagedPositionValue>();
@@ -295,13 +300,11 @@ export default function Fretboard({
   }, [showCaged, cagedForms, rootIndex]);
 
   const opacity = 0.85;
-
   const visibleFrets = Array.from({ length: fretMax - fretMin + 1 }, (_, i) => fretMin + i);
 
   return (
     <div className="overflow-x-auto">
       <div className="w-fit mx-auto">
-        {/* フレット番号ヘッダー */}
         <div className="flex mb-1">
           <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
           {visibleFrets.map((fret) => (
@@ -309,7 +312,6 @@ export default function Fretboard({
           ))}
         </div>
 
-        {/* ポジションマーク行 */}
         <div className="flex mb-2">
           <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
           {visibleFrets.map((fret) => (
@@ -317,7 +319,6 @@ export default function Fretboard({
           ))}
         </div>
 
-        {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
         <div className="relative">
           {chordGroups
             .filter((group) => group.maxFret >= fretMin && group.minFret <= fretMax)
@@ -362,8 +363,10 @@ export default function Fretboard({
               quizAnswerMode={quizAnswerMode}
               quizTargetString={quizTargetString}
               quizAnsweredCell={quizAnsweredCell}
-              quizCorrectFret={quizCorrectFret}
+              quizCorrectCell={quizCorrectCell}
               onQuizCellClick={onQuizCellClick}
+              quizRevealNoteName={quizRevealNoteName}
+              suppressRegularDisplay={suppressRegularDisplay}
             />
           ))}
         </div>
@@ -382,9 +385,7 @@ function FretHeader({ fret, theme, size }: FretHeaderProps) {
   const isDark = theme === "dark";
   return (
     <div
-      className={`shrink-0 text-center font-mono
-      ${isDark ? "text-gray-500" : "text-stone-500"}
-    `}
+      className={`shrink-0 text-center font-mono ${isDark ? "text-gray-500" : "text-stone-500"}`}
       style={{ width: size.cellWidth, fontSize: size.headerFontSize }}
     >
       {fret}
@@ -401,8 +402,9 @@ interface PositionMarkProps {
 function PositionMark({ fret, theme, size }: PositionMarkProps) {
   const isDark = theme === "dark";
   const mark = POSITION_MARKS[fret];
-  if (!mark)
+  if (!mark) {
     return <div className="shrink-0" style={{ width: size.cellWidth, height: size.markHeight }} />;
+  }
   return (
     <div
       className="shrink-0 flex items-center justify-center"
@@ -449,8 +451,10 @@ interface StringRowProps {
   quizAnswerMode?: boolean;
   quizTargetString?: number;
   quizAnsweredCell?: { stringIdx: number; fret: number } | null;
-  quizCorrectFret?: number | null;
+  quizCorrectCell?: { stringIdx: number; fret: number } | null;
   onQuizCellClick?: (stringIdx: number, fret: number) => void;
+  quizRevealNoteName?: string | null;
+  suppressRegularDisplay?: boolean;
 }
 
 function StringRow({
@@ -473,22 +477,26 @@ function StringRow({
   quizAnswerMode = false,
   quizTargetString,
   quizAnsweredCell,
-  quizCorrectFret,
+  quizCorrectCell,
   onQuizCellClick,
+  quizRevealNoteName,
+  suppressRegularDisplay = false,
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
   const openStringNotes = ["E", "A", "D", "G", "B", "E"];
+  const shouldSuppressRegularDisplay = suppressRegularDisplay || quizActive || quizAnswerMode;
 
-  const isTargetString = quizAnswerMode && stringIdx === quizTargetString;
-  const isNonTargetString = quizAnswerMode && stringIdx !== quizTargetString;
+  const isTargetString =
+    quizAnswerMode && (quizTargetString == null || stringIdx === quizTargetString);
+  const isNonTargetString =
+    quizAnswerMode && quizTargetString != null && stringIdx !== quizTargetString;
 
   return (
     <div
       className="flex items-center mb-px"
       style={{ opacity: isNonTargetString ? 0.3 : undefined }}
     >
-      {/* 弦ラベル */}
       <div
         className={`shrink-0 text-right font-mono ${isDark ? "text-gray-400" : "text-stone-500"}`}
         style={{
@@ -497,7 +505,7 @@ function StringRow({
           fontSize: size.stringFontSize,
         }}
       >
-        {!quizActive && !quizAnswerMode && openStringNotes[stringIdx]}
+        {!shouldSuppressRegularDisplay && openStringNotes[stringIdx]}
       </div>
 
       {visibleFrets.map((fret) => {
@@ -524,16 +532,12 @@ function StringRow({
         const degreeRing =
           baseLabelMode === "degree" ? { color: baseLabel.color, label: degreeName } : null;
 
-        // メインオーバーレイ（後勝ち = ボタン後半が前面に来る）
-        // ボタン順: スケール < CAGED → 後ろほど前面
         let overlayColor: { bg: string; text: string } | null = null;
         let overlayLabel = noteName;
 
-        if (showScale) {
-          if (isInScale(semitone, scaleType)) {
-            overlayColor = { bg: "#22c55e", text: "#fff" };
-            overlayLabel = noteName;
-          }
+        if (showScale && isInScale(semitone, scaleType)) {
+          overlayColor = { bg: "#22c55e", text: "#fff" };
+          overlayLabel = noteName;
         }
         if (cagedCell) {
           overlayColor = { bg: cagedCell.color, text: "#fff" };
@@ -541,18 +545,19 @@ function StringRow({
         }
 
         const degreeHidden = hiddenDegrees.has(degreeName);
-
-        // Quiz answer mode: determine cell state
         const isAnswered = quizAnswerMode && quizAnsweredCell != null;
         const isTappedCell =
           isAnswered &&
           quizAnsweredCell?.stringIdx === stringIdx &&
           quizAnsweredCell?.fret === fret;
-        const isCorrectCell = isAnswered && isTargetString && fret === quizCorrectFret;
+        const isCorrectCell =
+          isAnswered && quizCorrectCell?.stringIdx === stringIdx && quizCorrectCell?.fret === fret;
+        const shouldRevealChoiceAnswer =
+          quizRevealNoteName != null && noteName === quizRevealNoteName;
 
         let quizAnswerOverlay: "correct" | "wrong" | "correct-hint" | null = null;
         if (isTappedCell) {
-          quizAnswerOverlay = fret === quizCorrectFret ? "correct" : "wrong";
+          quizAnswerOverlay = isCorrectCell ? "correct" : "wrong";
         } else if (isCorrectCell && !isTappedCell) {
           quizAnswerOverlay = "correct-hint";
         }
@@ -562,9 +567,9 @@ function StringRow({
             if (isTargetString && !isAnswered && onQuizCellClick) {
               onQuizCellClick(stringIdx, fret);
             }
-          } else {
-            onNoteClick(noteName);
+            return;
           }
+          onNoteClick(noteName);
         };
 
         return (
@@ -573,7 +578,7 @@ function StringRow({
             fret={fret}
             baseLabel={baseLabel}
             noteName={noteName}
-            degreeRing={degreeHidden ? null : degreeRing}
+            degreeRing={degreeHidden || shouldSuppressRegularDisplay ? null : degreeRing}
             overlayColor={overlayColor}
             overlayLabel={overlayLabel}
             inChord={inChord}
@@ -584,11 +589,12 @@ function StringRow({
             size={size}
             onClick={handleClick}
             isQuizTarget={fret === quizTargetFret}
-            quizActive={quizActive}
+            suppressRegularDisplay={shouldSuppressRegularDisplay}
             quizAnswerMode={quizAnswerMode}
             isTargetStringCell={isTargetString}
             isAnswered={isAnswered}
             quizAnswerOverlay={quizAnswerOverlay}
+            showChoiceAnswerReveal={shouldRevealChoiceAnswer}
           />
         );
       })}
@@ -622,11 +628,12 @@ interface FretCellComponentProps {
   size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
   onClick: () => void;
   isQuizTarget: boolean;
-  quizActive: boolean;
+  suppressRegularDisplay: boolean;
   quizAnswerMode?: boolean;
   isTargetStringCell?: boolean;
   isAnswered?: boolean;
   quizAnswerOverlay?: "correct" | "wrong" | "correct-hint" | null;
+  showChoiceAnswerReveal?: boolean;
 }
 
 function FretCellComponent({
@@ -644,53 +651,54 @@ function FretCellComponent({
   size,
   onClick,
   isQuizTarget,
-  quizActive,
+  suppressRegularDisplay,
   quizAnswerMode = false,
   isTargetStringCell = false,
   isAnswered = false,
   quizAnswerOverlay = null,
+  showChoiceAnswerReveal = false,
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
-  const shouldShowBaseLabel =
-    !overlayColor && !inChord && !hidden && !quizActive && !quizAnswerMode;
+  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !suppressRegularDisplay;
 
   return (
     <div
-      className={`shrink-0 relative flex items-center justify-center
-        cursor-pointer
-        ${isDark ? "border-l border-gray-600" : "border-l border-stone-300"}
-        ${fret === 0 ? (isDark ? "border-r-4 border-r-gray-300" : "border-r-4 border-r-stone-500") : ""}
-        ${isDark ? "[@media(hover:hover)]:hover:bg-gray-700/30" : "[@media(hover:hover)]:hover:bg-stone-200/70"} transition-colors
-      `}
+      className={`shrink-0 relative flex items-center justify-center cursor-pointer ${
+        isDark ? "border-l border-gray-600" : "border-l border-stone-300"
+      } ${
+        fret === 0
+          ? isDark
+            ? "border-r-4 border-r-gray-300"
+            : "border-r-4 border-r-stone-500"
+          : ""
+      } ${
+        isDark
+          ? "[@media(hover:hover)]:hover:bg-gray-700/30"
+          : "[@media(hover:hover)]:hover:bg-stone-200/70"
+      } transition-colors`}
       style={{ width: size.cellWidth, height: size.rowHeight }}
       onClick={onClick}
     >
-      {/* 弦ライン */}
       <div className="absolute inset-0 flex items-center pointer-events-none">
         <div className={`w-full h-px ${isDark ? "bg-gray-500" : "bg-stone-400"}`} />
       </div>
 
-      {/* ルート共通ハイライト */}
-      {isRoot && !quizActive && !quizAnswerMode && (
+      {isRoot && !suppressRegularDisplay && (
         <div
           className="absolute rounded-full border-2 border-red-500 z-[18]"
           style={{ inset: size.rootRingInset }}
         />
       )}
 
-      {/* ベースレイヤー表示（音名 or 度数） */}
       {shouldShowBaseLabel && (
         <span
-          className={`absolute font-mono z-0 select-none
-          ${baseLabel.isDegree ? "font-bold" : ""}
-        `}
+          className={`absolute font-mono z-0 select-none ${baseLabel.isDegree ? "font-bold" : ""}`}
           style={{ fontSize: size.baseFontSize }}
         >
           <span style={{ color: baseLabel.color }}>{baseLabel.text}</span>
         </span>
       )}
 
-      {/* 度数表示時の色枠 */}
       {degreeRing && (
         <div
           className="absolute rounded-full border-2 z-[8]"
@@ -698,7 +706,6 @@ function FretCellComponent({
         />
       )}
 
-      {/* メインオーバーレイ（スケール / CAGED） */}
       {overlayColor && (
         <div
           className="absolute rounded-full flex items-center justify-center z-10"
@@ -715,7 +722,6 @@ function FretCellComponent({
         </div>
       )}
 
-      {/* コードフォームドット */}
       {inChord && (
         <div
           className="absolute rounded-full border-amber-500 z-20"
@@ -732,7 +738,6 @@ function FretCellComponent({
         </div>
       )}
 
-      {/* クイズターゲット (choice mode) */}
       {isQuizTarget && (
         <div
           className="absolute rounded-full flex items-center justify-center z-30 animate-pulse"
@@ -747,7 +752,20 @@ function FretCellComponent({
         </div>
       )}
 
-      {/* 指板クイズ: ターゲット弦でまだ未回答のセルに薄いリング */}
+      {showChoiceAnswerReveal && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-29"
+          style={{ inset: size.overlayInset, backgroundColor: "#16a34a", opacity: 0.75 }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            {noteName}
+          </span>
+        </div>
+      )}
+
       {quizAnswerMode && isTargetStringCell && !isAnswered && (
         <div
           className="absolute rounded-full border-2 border-indigo-400/50 z-[15]"
@@ -755,7 +773,6 @@ function FretCellComponent({
         />
       )}
 
-      {/* 指板クイズ: 回答結果オーバーレイ */}
       {quizAnswerOverlay === "correct" && (
         <div
           className="absolute rounded-full flex items-center justify-center z-30"

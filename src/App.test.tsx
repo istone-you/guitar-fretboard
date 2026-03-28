@@ -3,7 +3,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import App from "./App";
 
 const controlsState: { latest: Record<string, unknown> | null } = { latest: null };
-const fretboardState: { latest: Record<string, unknown> | null } = { latest: null };
+const normalFretboardState: { latest: Record<string, unknown> | null } = { latest: null };
+const quizFretboardState: { latest: Record<string, unknown> | null } = { latest: null };
 const headerState: { latest: Record<string, unknown> | null } = { latest: null };
 
 vi.mock("./components/SettingsMenu/index", () => ({
@@ -74,9 +75,9 @@ vi.mock("./components/FretboardHeader/index", () => ({
   },
 }));
 
-vi.mock("./components/Fretboard/index", () => ({
+vi.mock("./components/NormalFretboard/index", () => ({
   default: (props: any) => {
-    fretboardState.latest = props;
+    normalFretboardState.latest = props;
     return (
       <div>
         <span>fb-root:{String(props.rootNote)}</span>
@@ -95,11 +96,25 @@ vi.mock("./components/Fretboard/index", () => ({
   },
 }));
 
+vi.mock("./components/QuizFretboard/index", () => ({
+  default: (props: any) => {
+    quizFretboardState.latest = props;
+    return (
+      <div>
+        <span>quiz-fb-root:{String(props.rootNote)}</span>
+        <span>quiz-fb-mode:{String(props.chordDisplayMode)}</span>
+        <span>quiz-fb-scale:{String(props.scaleType)}</span>
+      </div>
+    );
+  },
+}));
+
 describe("App", () => {
   beforeEach(() => {
     window.localStorage.clear();
     controlsState.latest = null;
-    fretboardState.latest = null;
+    normalFretboardState.latest = null;
+    quizFretboardState.latest = null;
     headerState.latest = null;
   });
 
@@ -152,11 +167,11 @@ describe("App", () => {
     expect(window.localStorage.getItem("guiter:theme")).toBe("light");
     expect(screen.getByText("fb-scale:blues")).toBeTruthy();
     expect(screen.getByText("fb-mode:power")).toBeTruthy();
-    expect(fretboardState.latest).toBeTruthy();
-    expect((fretboardState.latest!.cagedForms as Set<string>).has("C")).toBe(true);
+    expect(normalFretboardState.latest).toBeTruthy();
+    expect((normalFretboardState.latest!.cagedForms as Set<string>).has("C")).toBe(true);
 
     fireEvent.click(screen.getByText("caged-e"));
-    expect((fretboardState.latest!.cagedForms as Set<string>).has("E")).toBe(false);
+    expect((normalFretboardState.latest!.cagedForms as Set<string>).has("E")).toBe(false);
   });
 
   it("ダイアトニックとトライアド設定を更新する", () => {
@@ -204,8 +219,8 @@ describe("App", () => {
     fireEvent.click(screen.getByText("degree-v"));
     fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
 
-    expect(fretboardState.latest).toBeTruthy();
-    expect((fretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect(normalFretboardState.latest).toBeTruthy();
+    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
   });
 
   it("度数チップをトグルできる", () => {
@@ -228,13 +243,13 @@ describe("App", () => {
     fireEvent.click(screen.getByText("header-degree"));
     fireEvent.click(screen.getByText("chord-toggle"));
     fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
-    expect(fretboardState.latest).toBeTruthy();
-    expect((fretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect(normalFretboardState.latest).toBeTruthy();
+    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByText("リセット"));
     fireEvent.click(screen.getByText("mode-power"));
     fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
-    expect((fretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
   });
 
   it("CAGED表示のみでも自動絞り込みできる", () => {
@@ -244,7 +259,7 @@ describe("App", () => {
     fireEvent.click(screen.getByText("caged-toggle"));
     fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
 
-    expect(fretboardState.latest).toBeTruthy();
-    expect((fretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect(normalFretboardState.latest).toBeTruthy();
+    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
   });
 });

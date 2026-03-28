@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import {
   NOTES_SHARP,
   NOTES_FLAT,
+  SEMITONE_TO_DEGREE,
   getDegreeName,
   getNoteIndex,
   getRootIndex,
@@ -28,7 +29,10 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
     stringIdx: number;
     fret: number;
   } | null>(null);
-  const [quizCorrectFret, setQuizCorrectFret] = useState<number | null>(null);
+  const [quizCorrectCell, setQuizCorrectCell] = useState<{
+    stringIdx: number;
+    fret: number;
+  } | null>(null);
 
   const generateQuizQuestion = useCallback(
     (mode: QuizMode, type: QuizType = "choice"): QuizQuestion => {
@@ -37,6 +41,47 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
       const fret = fretRange[0] + Math.floor(Math.random() * (fretRange[1] - fretRange[0] + 1));
       const noteIdx = getNoteIndex(stringIdx, fret);
       const rootIdx = getRootIndex(rootNote);
+
+      if (mode === "relative") {
+        const promptRootIndex = Math.floor(Math.random() * 12);
+        const promptRoot = notes[promptRootIndex];
+        const promptDegree =
+          SEMITONE_TO_DEGREE[1 + Math.floor(Math.random() * (SEMITONE_TO_DEGREE.length - 1))];
+        const degreeSemitone = SEMITONE_TO_DEGREE.indexOf(promptDegree);
+        const correctIndex = (promptRootIndex + degreeSemitone) % 12;
+        const correct = notes[correctIndex];
+
+        if (type === "fretboard") {
+          const matchingCells: { stringIdx: number; fret: number }[] = [];
+          for (let currentStringIdx = 0; currentStringIdx < 6; currentStringIdx += 1) {
+            for (let currentFret = fretRange[0]; currentFret <= fretRange[1]; currentFret += 1) {
+              if (getNoteIndex(currentStringIdx, currentFret) === correctIndex) {
+                matchingCells.push({ stringIdx: currentStringIdx, fret: currentFret });
+              }
+            }
+          }
+          const targetCell = matchingCells[Math.floor(Math.random() * matchingCells.length)];
+          return {
+            stringIdx: targetCell.stringIdx,
+            fret: targetCell.fret,
+            correct,
+            choices: [],
+            promptRoot,
+            promptDegree,
+          };
+        }
+
+        const pool = notes.filter((note) => note !== correct).sort(() => Math.random() - 0.5);
+        const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+        return {
+          stringIdx,
+          fret,
+          correct,
+          choices,
+          promptRoot,
+          promptDegree,
+        };
+      }
 
       if (type === "fretboard") {
         const correct = mode === "note" ? notes[noteIdx] : getDegreeName(noteIdx, rootIdx);
@@ -63,7 +108,7 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
   const resetQuizProgress = useCallback(() => {
     setSelectedAnswer(null);
     setQuizAnsweredCell(null);
-    setQuizCorrectFret(null);
+    setQuizCorrectCell(null);
     setQuizScore({ correct: 0, total: 0 });
   }, []);
 
@@ -90,6 +135,16 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
     [generateQuizQuestion, quizMode, resetQuizProgress],
   );
 
+  const handleQuizKindChange = useCallback(
+    (mode: QuizMode, type: QuizType) => {
+      setQuizMode(mode);
+      setQuizType(type);
+      resetQuizProgress();
+      setQuizQuestion(generateQuizQuestion(mode, type));
+    },
+    [generateQuizQuestion, resetQuizProgress],
+  );
+
   const handleQuizAnswer = useCallback(
     (answer: string) => {
       if (selectedAnswer !== null || quizQuestion === null) return;
@@ -112,12 +167,16 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
       const rootIdx = getRootIndex(rootNote);
       const clickedNoteIdx = getNoteIndex(stringIdx, fret);
       const isCorrect =
-        quizMode === "note"
+        quizMode === "note" || quizMode === "relative"
           ? notes[clickedNoteIdx] === quizQuestion.correct
           : getDegreeName(clickedNoteIdx, rootIdx) === quizQuestion.correct;
 
       setQuizAnsweredCell({ stringIdx, fret });
-      setQuizCorrectFret(isCorrect ? fret : quizQuestion.fret);
+      setQuizCorrectCell(
+        isCorrect
+          ? { stringIdx, fret }
+          : { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret },
+      );
       setSelectedAnswer(isCorrect ? quizQuestion.correct : notes[clickedNoteIdx]);
       setQuizScore((prev) => ({
         correct: prev.correct + (isCorrect ? 1 : 0),
@@ -132,7 +191,7 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
     const timer = window.setTimeout(() => {
       setSelectedAnswer(null);
       setQuizAnsweredCell(null);
-      setQuizCorrectFret(null);
+      setQuizCorrectCell(null);
       setQuizQuestion(generateQuizQuestion(quizMode, quizType));
     }, 1200);
     return () => window.clearTimeout(timer);
@@ -146,7 +205,7 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
       setQuizQuestion(null);
       setSelectedAnswer(null);
       setQuizAnsweredCell(null);
-      setQuizCorrectFret(null);
+      setQuizCorrectCell(null);
     }
   }, [quizQuestion, showQuiz, startQuiz]);
 
@@ -157,12 +216,13 @@ export function useQuiz({ accidental, fretRange, rootNote, showQuiz }: UseQuizPa
     selectedAnswer,
     quizScore,
     quizAnsweredCell,
-    quizCorrectFret,
+    quizCorrectCell,
     setQuizMode,
     setQuizType,
     setQuizQuestion,
     handleQuizModeChange,
     handleQuizTypeChange,
+    handleQuizKindChange,
     handleQuizAnswer,
     handleFretboardQuizAnswer,
   };

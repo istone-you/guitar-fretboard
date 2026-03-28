@@ -1,29 +1,34 @@
-import { useTranslation } from "react-i18next";
-import "../../i18n";
-import type { Theme, ChordType } from "../../types";
 import { DropdownPanelSelect } from "../ui/DropdownPanelSelect";
+import type { Theme } from "../../types";
 
-interface ChordTypeSelectProps {
+interface QuizKindSelectProps {
   theme: Theme;
-  value: ChordType;
+  value: string;
+  options: { value: string; label: string }[];
+  disabled?: boolean;
   onChange: (value: string) => void;
-  options: { value: ChordType; label: string }[];
 }
 
-export function ChordTypeSelect({ theme, value, onChange, options }: ChordTypeSelectProps) {
-  const { t } = useTranslation();
+export default function QuizKindSelect({
+  theme,
+  value,
+  options,
+  disabled = false,
+  onChange,
+}: QuizKindSelectProps) {
   const selected = options.find((option) => option.value === value) ?? options[0];
 
   return (
     <DropdownPanelSelect
       theme={theme}
       label={selected.label}
-      dialogLabel={t("controls.chordType")}
-      triggerClassName="w-36"
-      panelClassName="w-48"
+      dialogLabel="quiz-kind-select"
+      disabled={disabled}
+      triggerClassName="w-40 max-w-[calc(100vw-6rem)]"
+      panelClassName="w-[min(16rem,calc(100vw-2rem))]"
     >
       {({ closePanel }) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="grid grid-cols-2 gap-1">
           {options.map((option) => {
             const active = option.value === value;
             return (
@@ -34,9 +39,9 @@ export function ChordTypeSelect({ theme, value, onChange, options }: ChordTypeSe
                   onChange(option.value);
                   closePanel();
                 }}
-                className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                className={`min-w-0 rounded-xl border px-2.5 py-2 text-left text-sm leading-tight whitespace-normal break-words transition-colors ${
                   active
-                    ? "border-transparent bg-amber-500 text-white"
+                    ? "border-transparent bg-indigo-600 text-white"
                     : theme === "dark"
                       ? "border-gray-600 bg-gray-800 text-gray-200 hover:border-gray-400"
                       : "border-stone-300 bg-stone-50 text-stone-700 hover:border-stone-500"

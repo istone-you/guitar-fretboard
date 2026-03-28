@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import "../../i18n";
-import { DropdownSelect } from "../ui/DropdownSelect";
-import type { Theme } from "../../types";
+import type { DegreeName, Theme } from "../../types";
+import QuizKindSelect from "./QuizKindSelect";
 
-export type QuizMode = "note" | "degree";
+export type QuizMode = "note" | "degree" | "relative";
 export type QuizType = "choice" | "fretboard";
 
 export interface QuizQuestion {
@@ -11,6 +11,8 @@ export interface QuizQuestion {
   fret: number;
   correct: string;
   choices: string[];
+  promptRoot?: string;
+  promptDegree?: DegreeName;
 }
 
 interface QuizPanelProps {
@@ -21,8 +23,7 @@ interface QuizPanelProps {
   score: { correct: number; total: number };
   selectedAnswer: string | null;
   rootNote: string;
-  onModeChange: (mode: QuizMode) => void;
-  onQuizTypeChange: (type: QuizType) => void;
+  onKindChange: (mode: QuizMode, type: QuizType) => void;
   onAnswer: (answer: string) => void;
 }
 
@@ -34,8 +35,7 @@ export default function QuizPanel({
   score,
   selectedAnswer,
   rootNote,
-  onModeChange,
-  onQuizTypeChange,
+  onKindChange,
   onAnswer,
 }: QuizPanelProps) {
   const { t } = useTranslation();
@@ -47,16 +47,17 @@ export default function QuizPanel({
   const quizKindValue = `${mode}-${quizType}`;
   const quizKindOptions = [
     { value: "note-choice", label: t("quiz.kind.noteChoice") },
-    { value: "degree-choice", label: t("quiz.kind.degreeChoice") },
     { value: "note-fretboard", label: t("quiz.kind.noteFretboard") },
+    { value: "degree-choice", label: t("quiz.kind.degreeChoice") },
     { value: "degree-fretboard", label: t("quiz.kind.degreeFretboard") },
+    { value: "relative-choice", label: t("quiz.kind.relativeChoice") },
+    { value: "relative-fretboard", label: t("quiz.kind.relativeFretboard") },
   ];
 
   const handleKindChange = (value: string) => {
     if (answered) return;
     const [newMode, newType] = value.split("-") as [QuizMode, QuizType];
-    if (newMode !== mode) onModeChange(newMode);
-    if (newType !== quizType) onQuizTypeChange(newType);
+    onKindChange(newMode, newType);
   };
 
   return (
@@ -66,16 +67,17 @@ export default function QuizPanel({
       }`}
     >
       {/* 種別 + スコア */}
-      <div className="flex items-center justify-between gap-2">
-        <DropdownSelect
+      <div className="flex items-center justify-between gap-2 min-w-0">
+        <QuizKindSelect
           theme={theme}
           value={quizKindValue}
-          onChange={handleKindChange}
           options={quizKindOptions}
           disabled={answered}
-          widthClass="w-36"
+          onChange={handleKindChange}
         />
-        <span className={`text-sm font-mono ${isDark ? "text-gray-400" : "text-stone-500"}`}>
+        <span
+          className={`shrink-0 text-xs font-mono sm:text-sm ${isDark ? "text-gray-400" : "text-stone-500"}`}
+        >
           ✓ {score.correct} / {score.total}
         </span>
       </div>
@@ -87,14 +89,24 @@ export default function QuizPanel({
         }`}
       >
         {quizType === "fretboard"
-          ? t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
-          : mode === "note"
-            ? t("quiz.questionNote", { string: stringNumber, fret: question.fret })
-            : t("quiz.questionDegree", {
-                string: stringNumber,
-                fret: question.fret,
-                root: rootNote,
-              })}
+          ? mode === "relative"
+            ? t("quiz.questionRelativeFretboard", {
+                root: question.promptRoot,
+                degree: question.promptDegree,
+              })
+            : t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
+          : mode === "relative"
+            ? t("quiz.questionRelative", {
+                root: question.promptRoot,
+                degree: question.promptDegree,
+              })
+            : mode === "note"
+              ? t("quiz.questionNote", { string: stringNumber, fret: question.fret })
+              : t("quiz.questionDegree", {
+                  string: stringNumber,
+                  fret: question.fret,
+                  root: rootNote,
+                })}
       </p>
 
       {/* 選択肢（choiceモードのみ） */}

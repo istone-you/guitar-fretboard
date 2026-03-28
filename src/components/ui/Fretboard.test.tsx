@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Fretboard from ".";
+import Fretboard from "./Fretboard";
 import type {
   Theme,
   Accidental,
@@ -34,7 +34,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
   };
 }
 
-describe("Fretboard", () => {
+describe("ui/Fretboard", () => {
   const scaleCases: ScaleType[] = [
     "major",
     "natural-minor",
@@ -52,10 +52,8 @@ describe("Fretboard", () => {
     "locrian",
   ];
 
-  // ===== レンダリング =====
   it("6弦分の開放弦ラベルが表示される", () => {
     render(<Fretboard {...makeProps()} />);
-    // 弦ラベル（E,A,D,G,B,E）が存在する（指板セルと重複するため getAllByText）
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("A").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("D").length).toBeGreaterThanOrEqual(1);
@@ -72,46 +70,36 @@ describe("Fretboard", () => {
 
   it("音名モードで C が表示される", () => {
     render(<Fretboard {...makeProps({ rootNote: "C", baseLabelMode: "note" as BaseLabelMode })} />);
-    const cells = screen.getAllByText("C");
-    expect(cells.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("C").length).toBeGreaterThan(0);
   });
 
   it("度数モードで P1 が表示される", () => {
     render(<Fretboard {...makeProps({ baseLabelMode: "degree" as BaseLabelMode })} />);
-    const cells = screen.getAllByText("P1");
-    expect(cells.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("P1").length).toBeGreaterThan(0);
   });
 
-  // ===== ルートクリック =====
   it("指板のセルをクリックすると onNoteClick が呼ばれる", () => {
     const props = makeProps();
     render(<Fretboard {...props} />);
-    // 音名が表示されているセル（C）をクリック
-    const cell = screen.getAllByText("C")[0];
-    fireEvent.click(cell);
+    fireEvent.click(screen.getAllByText("C")[0]);
     expect(props.onNoteClick).toHaveBeenCalled();
   });
 
   it("onNoteClick に音名文字列が渡される", () => {
     const props = makeProps({ rootNote: "C" });
     render(<Fretboard {...props} />);
-    // C はセルとして表示されている（弦ラベルと被らない）
-    const cells = screen.getAllByText("C");
-    fireEvent.click(cells[0]);
+    fireEvent.click(screen.getAllByText("C")[0]);
     expect(props.onNoteClick).toHaveBeenCalledWith("C");
   });
 
-  // ===== ♯/♭表示切り替え =====
   it("♯モードで C♯ が表示される", () => {
     render(<Fretboard {...makeProps({ accidental: "sharp" as Accidental })} />);
-    const cells = screen.getAllByText("C♯");
-    expect(cells.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("C♯").length).toBeGreaterThan(0);
   });
 
   it("♭モードで D♭ が表示される", () => {
     render(<Fretboard {...makeProps({ accidental: "flat" as Accidental })} />);
-    const cells = screen.getAllByText("D♭");
-    expect(cells.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("D♭").length).toBeGreaterThan(0);
   });
 
   it("♯モードで D♭ が表示されない", () => {
@@ -124,11 +112,9 @@ describe("Fretboard", () => {
     expect(screen.queryAllByText("C♯")).toHaveLength(0);
   });
 
-  // ===== ルート音ハイライト =====
   it("ルートが変わると対応する音のセルが存在する", () => {
     render(<Fretboard {...makeProps({ rootNote: "A" })} />);
-    const cells = screen.getAllByText("A");
-    expect(cells.length).toBeGreaterThan(0);
+    expect(screen.getAllByText("A").length).toBeGreaterThan(0);
   });
 
   scaleCases.forEach((scaleType) => {
@@ -263,5 +249,36 @@ describe("Fretboard", () => {
       />,
     );
     expect(screen.getAllByText("D♭").length).toBeGreaterThan(0);
+  });
+
+  it("relative 4択の回答後は正解音を複数箇所に表示できる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          quizModeActive: true,
+          quizCell: undefined,
+          quizRevealNoteName: "F",
+        })}
+      />,
+    );
+
+    expect(screen.queryByText("?")).toBeNull();
+    expect(screen.getAllByText("F").length).toBeGreaterThan(1);
+  });
+
+  it("relative 指板クイズの回答後も正解音を複数箇所に表示できる", () => {
+    render(
+      <Fretboard
+        {...makeProps({
+          quizModeActive: true,
+          quizAnswerMode: true,
+          quizAnsweredCell: { stringIdx: 0, fret: 1 },
+          quizCorrectCell: { stringIdx: 1, fret: 6 },
+          quizRevealNoteName: "F",
+        })}
+      />,
+    );
+
+    expect(screen.getAllByText("F").length).toBeGreaterThan(1);
   });
 });

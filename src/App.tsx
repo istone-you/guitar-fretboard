@@ -3,7 +3,8 @@ import { useTranslation } from "react-i18next";
 import "./i18n";
 import Controls from "./components/Controls/index";
 import SettingsMenu from "./components/SettingsMenu/index";
-import Fretboard from "./components/Fretboard/index";
+import NormalFretboard from "./components/NormalFretboard/index";
+import QuizFretboard from "./components/QuizFretboard/index";
 import QuizPanel from "./components/QuizPanel/index";
 import FretboardHeader from "./components/FretboardHeader/index";
 import { useDegreeFilter } from "./hooks/useDegreeFilter";
@@ -128,9 +129,8 @@ export default function App() {
     selectedAnswer,
     quizScore,
     quizAnsweredCell,
-    quizCorrectFret,
-    handleQuizModeChange,
-    handleQuizTypeChange,
+    quizCorrectCell,
+    handleQuizKindChange,
     handleQuizAnswer,
     handleFretboardQuizAnswer,
   } = useQuiz({
@@ -207,38 +207,69 @@ export default function App() {
           onRootNoteChange={handleNoteClick}
           onFretRangeChange={setFretRange}
         />
-        <Fretboard
-          theme={theme}
-          rootNote={rootNote}
-          accidental={accidental}
-          baseLabelMode={baseLabelMode}
-          displaySize={fretboardDisplaySize}
-          fretRange={fretRange}
-          showChord={showQuiz ? false : showChord}
-          chordDisplayMode={chordDisplayMode}
-          showScale={showQuiz ? false : showScale}
-          scaleType={scaleType}
-          showCaged={showQuiz ? false : showCaged}
-          cagedForms={cagedForms}
-          chordType={chordType}
-          triadPosition={triadLayout}
-          diatonicScaleType={diatonicScaleType}
-          diatonicDegree={diatonicDegree}
-          onNoteClick={handleNoteClick}
-          hiddenDegrees={hiddenDegrees}
-          quizCell={
-            showQuiz && quizQuestion && quizType === "choice"
-              ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
-              : undefined
-          }
-          quizAnswerMode={showQuiz && quizType === "fretboard"}
-          quizTargetString={
-            showQuiz && quizType === "fretboard" ? quizQuestion?.stringIdx : undefined
-          }
-          quizAnsweredCell={quizAnsweredCell}
-          quizCorrectFret={quizCorrectFret}
-          onQuizCellClick={handleFretboardQuizAnswer}
-        />
+        {showQuiz ? (
+          <QuizFretboard
+            theme={theme}
+            rootNote={rootNote}
+            accidental={accidental}
+            baseLabelMode={baseLabelMode}
+            displaySize={fretboardDisplaySize}
+            fretRange={fretRange}
+            showChord={showChord}
+            chordDisplayMode={chordDisplayMode}
+            showScale={showScale}
+            scaleType={scaleType}
+            showCaged={showCaged}
+            cagedForms={cagedForms}
+            chordType={chordType}
+            triadPosition={triadLayout}
+            diatonicScaleType={diatonicScaleType}
+            diatonicDegree={diatonicDegree}
+            onNoteClick={handleNoteClick}
+            hiddenDegrees={hiddenDegrees}
+            quizModeActive
+            quizCell={
+              quizQuestion && quizType === "choice" && quizMode !== "relative"
+                ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
+                : undefined
+            }
+            quizAnswerMode={quizType === "fretboard"}
+            quizTargetString={
+              quizType === "fretboard" && quizMode !== "relative"
+                ? quizQuestion?.stringIdx
+                : undefined
+            }
+            quizAnsweredCell={quizAnsweredCell}
+            quizCorrectCell={quizCorrectCell}
+            onQuizCellClick={handleFretboardQuizAnswer}
+            quizRevealNoteName={
+              quizMode === "relative" && selectedAnswer !== null
+                ? (quizQuestion?.correct ?? null)
+                : null
+            }
+          />
+        ) : (
+          <NormalFretboard
+            theme={theme}
+            rootNote={rootNote}
+            accidental={accidental}
+            baseLabelMode={baseLabelMode}
+            displaySize={fretboardDisplaySize}
+            fretRange={fretRange}
+            showChord={showChord}
+            chordDisplayMode={chordDisplayMode}
+            showScale={showScale}
+            scaleType={scaleType}
+            showCaged={showCaged}
+            cagedForms={cagedForms}
+            chordType={chordType}
+            triadPosition={triadLayout}
+            diatonicScaleType={diatonicScaleType}
+            diatonicDegree={diatonicDegree}
+            onNoteClick={handleNoteClick}
+            hiddenDegrees={hiddenDegrees}
+          />
+        )}
 
         {showQuiz && quizQuestion && (
           <div className="max-w-[840px] mx-auto w-full">
@@ -250,15 +281,14 @@ export default function App() {
               score={quizScore}
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
-              onModeChange={handleQuizModeChange}
-              onQuizTypeChange={handleQuizTypeChange}
+              onKindChange={handleQuizKindChange}
               onAnswer={handleQuizAnswer}
             />
           </div>
         )}
 
         <div className="mt-4 min-h-[5.75rem]">
-          {baseLabelMode === "degree" && (
+          {baseLabelMode === "degree" && !showQuiz && (
             <>
               <div className="flex items-center justify-center gap-2 mb-3">
                 <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
