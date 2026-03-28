@@ -27,11 +27,13 @@ interface QuizPanelProps {
   score: { correct: number; total: number };
   selectedAnswer: string | null;
   rootNote: string;
+  quizSelectedChoices: string[];
   chordQuizTypes: ChordType[];
   availableChordQuizTypes: ChordType[];
   onKindChange: (mode: QuizMode, type: QuizType) => void;
   onChordQuizTypesChange: (value: ChordType[]) => void;
   onAnswer: (answer: string) => void;
+  onNextQuestion: () => void;
 }
 
 export default function QuizPanel({
@@ -42,11 +44,13 @@ export default function QuizPanel({
   score,
   selectedAnswer,
   rootNote,
+  quizSelectedChoices,
   chordQuizTypes,
   availableChordQuizTypes,
   onKindChange,
   onChordQuizTypesChange,
   onAnswer,
+  onNextQuestion,
 }: QuizPanelProps) {
   const { t } = useTranslation();
   const isDark = theme === "dark";
@@ -62,6 +66,7 @@ export default function QuizPanel({
     { value: "degree-fretboard", label: t("quiz.kind.degreeFretboard") },
     { value: "relative-choice", label: t("quiz.kind.relativeChoice") },
     { value: "relative-fretboard", label: t("quiz.kind.relativeFretboard") },
+    { value: "chord-choice", label: t("quiz.kind.chordChoice") },
     { value: "chord-fretboard", label: t("quiz.kind.chordFretboard") },
   ];
 
@@ -103,7 +108,7 @@ export default function QuizPanel({
         </span>
       </div>
 
-      {mode === "chord" && quizType === "fretboard" && (
+      {mode === "chord" && (
         <div className="flex items-center justify-center gap-3">
           <span className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}>
             {t("quiz.chordTypes.label")}
@@ -140,21 +145,44 @@ export default function QuizPanel({
                 root: question.promptRoot,
                 degree: question.promptDegree,
               })
-            : mode === "note"
-              ? t("quiz.questionNote", { string: stringNumber, fret: question.fret })
-              : t("quiz.questionDegree", {
-                  string: stringNumber,
-                  fret: question.fret,
-                  root: rootNote,
-                })}
+            : mode === "chord"
+              ? t("quiz.questionChordFretboard", {
+                  chord: question.promptChordLabel,
+                })
+              : mode === "note"
+                ? t("quiz.questionNote", { string: stringNumber, fret: question.fret })
+                : t("quiz.questionDegree", {
+                    string: stringNumber,
+                    fret: question.fret,
+                    root: rootNote,
+                  })}
       </p>
 
       {/* 選択肢（choiceモードのみ） */}
       {quizType === "choice" && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {question.choices.map((choice) => {
             let btnClass: string;
-            if (!answered) {
+            if (mode === "chord") {
+              const isSelectedCorrect = quizSelectedChoices.includes(choice);
+              const isCorrectChoice = question.correctNoteNames?.includes(choice);
+
+              if (!answered) {
+                btnClass = isSelectedCorrect
+                  ? "bg-green-600 text-white"
+                  : isDark
+                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
+                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+              } else if (isCorrectChoice) {
+                btnClass = "bg-green-600 text-white";
+              } else if (choice === selectedAnswer) {
+                btnClass = "bg-red-500 text-white";
+              } else {
+                btnClass = isDark
+                  ? "bg-gray-700 text-gray-500"
+                  : "bg-white text-stone-400 border border-stone-200";
+              }
+            } else if (!answered) {
               btnClass = isDark
                 ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
                 : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
@@ -187,18 +215,35 @@ export default function QuizPanel({
         </p>
       )}
 
-      {/* 正誤フィードバック */}
-      {answered && (
+      <div className="space-y-3">
         <p
-          className={`text-center text-sm font-semibold ${
-            isCorrect ? "text-green-400" : "text-red-400"
+          className={`min-h-5 text-center text-sm font-semibold ${
+            answered ? (isCorrect ? "text-green-400" : "text-red-400") : "text-transparent"
           }`}
         >
-          {isCorrect
-            ? t("quiz.correct")
-            : t("quiz.incorrect", { answer: question.answerLabel ?? question.correct })}
+          {answered
+            ? isCorrect
+              ? t("quiz.correct")
+              : t("quiz.incorrect", { answer: question.answerLabel ?? question.correct })
+            : t("quiz.correct")}
         </p>
-      )}
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={onNextQuestion}
+            disabled={!answered}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+              answered
+                ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                : isDark
+                  ? "bg-gray-700 text-gray-500"
+                  : "bg-stone-200 text-stone-400"
+            }`}
+          >
+            {t("quiz.next")}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

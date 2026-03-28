@@ -114,21 +114,23 @@
     "tapInstruction": "Tap the fretboard to answer",
     "correct": "Correct!",
     "incorrect": "Wrong… the answer is {{answer}}",
+    "next": "Next",
     "mode": {
       "note": "Notes",
       "degree": "Degrees"
     },
     "type": {
-      "choice": "4-choice",
+      "choice": "12-choice",
       "fretboard": "Fretboard"
     },
     "kind": {
-      "noteChoice": "Note / 4-choice",
-      "degreeChoice": "Degree / 4-choice",
-      "relativeChoice": "Relative / 4-choice",
+      "noteChoice": "Note / 12-choice",
+      "degreeChoice": "Degree / 12-choice",
+      "relativeChoice": "Relative / 12-choice",
       "noteFretboard": "Note / Fretboard",
       "degreeFretboard": "Degree / Fretboard",
       "relativeFretboard": "Relative / Fretboard",
+      "chordChoice": "Chord Tones / 12-choice",
       "chordFretboard": "Chord Tones / Fretboard"
     },
     "chordTypes": {

@@ -138,10 +138,12 @@ export default function App() {
     quizAnsweredCell,
     quizCorrectCell,
     quizSelectedCells,
+    quizSelectedChoices,
     quizRevealNoteNames,
     handleQuizKindChange,
     handleQuizAnswer,
     handleFretboardQuizAnswer,
+    handleNextQuestion,
   } = useQuiz({
     accidental,
     chordQuizTypes,
@@ -323,11 +325,13 @@ export default function App() {
               score={quizScore}
               selectedAnswer={selectedAnswer}
               rootNote={rootNote}
+              quizSelectedChoices={quizSelectedChoices}
               chordQuizTypes={chordQuizTypes}
               availableChordQuizTypes={CHORD_QUIZ_TYPES_ALL}
               onKindChange={handleQuizKindChange}
               onChordQuizTypesChange={setChordQuizTypes}
               onAnswer={handleQuizAnswer}
+              onNextQuestion={handleNextQuestion}
             />
           </div>
         )}

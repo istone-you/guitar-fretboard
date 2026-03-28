@@ -114,21 +114,23 @@
     "tapInstruction": "指板をタップして答えてね",
     "correct": "正解！",
     "incorrect": "不正解… 正解は {{answer}}",
+    "next": "次へ",
     "mode": {
       "note": "音名",
       "degree": "度数"
     },
     "type": {
-      "choice": "4択",
+      "choice": "12択",
       "fretboard": "指板"
     },
     "kind": {
-      "noteChoice": "音名・4択",
-      "degreeChoice": "度数・4択",
-      "relativeChoice": "ルート度数・4択",
+      "noteChoice": "音名・12択",
+      "degreeChoice": "度数・12択",
+      "relativeChoice": "ルート度数・12択",
       "noteFretboard": "音名・指板",
       "degreeFretboard": "度数・指板",
       "relativeFretboard": "ルート度数・指板",
+      "chordChoice": "コード構成音・12択",
       "chordFretboard": "コード構成音・指板"
     },
     "chordTypes": {

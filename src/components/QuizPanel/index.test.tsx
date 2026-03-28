@@ -9,7 +9,7 @@ function makeQuestion(overrides: Partial<QuizQuestion> = {}): QuizQuestion {
     stringIdx: 0,
     fret: 3,
     correct: "G",
-    choices: ["G", "A", "B", "C"],
+    choices: ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"],
     ...overrides,
   };
 }
@@ -23,11 +23,13 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     score: { correct: 0, total: 0 },
     selectedAnswer: null,
     rootNote: "C",
+    quizSelectedChoices: [],
     chordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7"] as ChordType[],
     availableChordQuizTypes: ["Major", "Minor", "7th", "maj7", "m7", "sus2"] as ChordType[],
     onKindChange: vi.fn(),
     onChordQuizTypesChange: vi.fn(),
     onAnswer: vi.fn(),
+    onNextQuestion: vi.fn(),
     ...overrides,
   };
 }
@@ -63,13 +65,13 @@ describe("QuizPanel", () => {
 
   it("種別ドロップダウンが表示される", () => {
     render(<QuizPanel {...makeProps()} />);
-    expect(screen.getByText("音名・4択")).toBeTruthy();
+    expect(screen.getByText("音名・12択")).toBeTruthy();
   });
 
   it("種別ドロップダウンで度数・指板を選ぶと統合ハンドラが呼ばれる", () => {
     const props = makeProps();
     render(<QuizPanel {...props} />);
-    fireEvent.click(screen.getByText("音名・4択"));
+    fireEvent.click(screen.getByText("音名・12択"));
     fireEvent.click(screen.getByText("度数・指板"));
     expect(props.onKindChange).toHaveBeenCalledWith("degree", "fretboard");
   });
@@ -96,9 +98,9 @@ describe("QuizPanel", () => {
       <QuizPanel
         {...makeProps({
           mode: "chord" as QuizMode,
-          quizType: "fretboard" as QuizType,
+          quizType: "choice" as QuizType,
           question: makeQuestion({
-            choices: [],
+            choices: ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"],
             promptChordLabel: "Cm7",
             correctNoteNames: ["C", "E♭", "G", "B♭"],
             answerLabel: "C / E♭ / G / B♭",
@@ -115,9 +117,9 @@ describe("QuizPanel", () => {
       <QuizPanel
         {...makeProps({
           mode: "chord" as QuizMode,
-          quizType: "fretboard" as QuizType,
+          quizType: "choice" as QuizType,
           question: makeQuestion({
-            choices: [],
+            choices: ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"],
             promptChordLabel: "Cm7",
             correctNoteNames: ["C", "E♭", "G", "B♭"],
           }),
@@ -135,9 +137,9 @@ describe("QuizPanel", () => {
       <QuizPanel
         {...props}
         mode={"chord" as QuizMode}
-        quizType={"fretboard" as QuizType}
+        quizType={"choice" as QuizType}
         question={makeQuestion({
-          choices: [],
+          choices: ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"],
           promptChordLabel: "Cm7",
           correctNoteNames: ["C", "E♭", "G", "B♭"],
         })}
@@ -158,8 +160,44 @@ describe("QuizPanel", () => {
 
   it("回答済みのとき種別ドロップダウンは disabled", () => {
     render(<QuizPanel {...makeProps({ selectedAnswer: "G" })} />);
-    const btn = screen.getByText("音名・4択").closest("button");
+    const btn = screen.getByText("音名・12択").closest("button");
     expect(btn).toHaveProperty("disabled", true);
+  });
+
+  it("未回答時の次へボタンは disabled", () => {
+    render(<QuizPanel {...makeProps()} />);
+
+    expect(screen.getByRole("button", { name: "次へ" })).toHaveProperty("disabled", true);
+  });
+
+  it("回答後は次へボタンが表示される", () => {
+    const props = makeProps({ selectedAnswer: "G" });
+    render(<QuizPanel {...props} />);
+
+    expect(screen.getByRole("button", { name: "次へ" })).toHaveProperty("disabled", false);
+    fireEvent.click(screen.getByRole("button", { name: "次へ" }));
+
+    expect(props.onNextQuestion).toHaveBeenCalled();
+  });
+
+  it("コード構成音の12択では途中で正解を保持できる", () => {
+    render(
+      <QuizPanel
+        {...makeProps({
+          mode: "chord" as QuizMode,
+          quizType: "choice" as QuizType,
+          quizSelectedChoices: ["C", "G"],
+          question: makeQuestion({
+            promptChordLabel: "C",
+            correctNoteNames: ["C", "E", "G"],
+            answerLabel: "C / E / G",
+          }),
+        })}
+      />,
+    );
+
+    expect(screen.getByText("C").closest("button")?.className).toContain("bg-green-600");
+    expect(screen.getByText("G").closest("button")?.className).toContain("bg-green-600");
   });
 
   it("fretboardモードではタップ指示が表示され選択肢グリッドが非表示", () => {

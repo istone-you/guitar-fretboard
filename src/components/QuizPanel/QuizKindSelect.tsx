@@ -24,7 +24,7 @@ export default function QuizKindSelect({
       label={selected.label}
       dialogLabel="quiz-kind-select"
       disabled={disabled}
-      triggerClassName="w-40 max-w-[calc(100vw-6rem)]"
+      triggerClassName="w-48 max-w-[calc(100vw-6rem)]"
       panelClassName="w-[min(16rem,calc(100vw-2rem))]"
     >
       {({ closePanel }) => (

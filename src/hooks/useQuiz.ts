@@ -78,6 +78,7 @@ export function useQuiz({
   const [quizSelectedCells, setQuizSelectedCells] = useState<{ stringIdx: number; fret: number }[]>(
     [],
   );
+  const [quizSelectedChoices, setQuizSelectedChoices] = useState<string[]>([]);
   const [quizRevealNoteNames, setQuizRevealNoteNames] = useState<string[] | null>(null);
   const chordQuizTypesKey = chordQuizTypes.join("|");
   const previousChordQuizTypesKeyRef = useRef(chordQuizTypesKey);
@@ -116,7 +117,7 @@ export function useQuiz({
           stringIdx: targetCell?.stringIdx ?? stringIdx,
           fret: targetCell?.fret ?? fret,
           correct: correctNoteNames[0] ?? "",
-          choices: [],
+          choices: type === "choice" ? [...notes] : [],
           answerLabel: correctNoteNames.join(" / "),
           promptChordLabel,
           correctNoteNames,
@@ -152,8 +153,7 @@ export function useQuiz({
           };
         }
 
-        const pool = notes.filter((note) => note !== correct).sort(() => Math.random() - 0.5);
-        const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+        const choices = [...notes];
         return {
           stringIdx,
           fret,
@@ -171,16 +171,12 @@ export function useQuiz({
 
       if (mode === "note") {
         const correct = notes[noteIdx];
-        const pool = notes.filter((note) => note !== correct).sort(() => Math.random() - 0.5);
-        const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+        const choices = [...notes];
         return { stringIdx, fret, correct, choices };
       }
 
       const correct = getDegreeName(noteIdx, rootIdx);
-      const pool = DEGREE_NAMES.filter((degree) => degree !== correct).sort(
-        () => Math.random() - 0.5,
-      );
-      const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+      const choices = DEGREE_NAMES;
       return { stringIdx, fret, correct, choices };
     },
     [accidental, chordQuizTypes, fretRange, rootNote],
@@ -191,6 +187,7 @@ export function useQuiz({
     setQuizAnsweredCell(null);
     setQuizCorrectCell(null);
     setQuizSelectedCells([]);
+    setQuizSelectedChoices([]);
     setQuizRevealNoteNames(null);
     setQuizScore({ correct: 0, total: 0 });
   }, []);
@@ -200,6 +197,7 @@ export function useQuiz({
     setQuizAnsweredCell(null);
     setQuizCorrectCell(null);
     setQuizSelectedCells([]);
+    setQuizSelectedChoices([]);
     setQuizRevealNoteNames(null);
   }, []);
 
@@ -239,6 +237,38 @@ export function useQuiz({
   const handleQuizAnswer = useCallback(
     (answer: string) => {
       if (selectedAnswer !== null || quizQuestion === null) return;
+
+      if (quizMode === "chord" && quizType === "choice") {
+        const correctNoteNames = quizQuestion.correctNoteNames ?? [];
+        const isCorrectNote = correctNoteNames.includes(answer);
+
+        if (!isCorrectNote) {
+          setSelectedAnswer(answer);
+          setQuizScore((prev) => ({
+            correct: prev.correct,
+            total: prev.total + 1,
+          }));
+          return;
+        }
+
+        const nextSelectedChoices = quizSelectedChoices.includes(answer)
+          ? quizSelectedChoices
+          : [...quizSelectedChoices, answer];
+        setQuizSelectedChoices(nextSelectedChoices);
+
+        const completed = correctNoteNames.every((noteName) =>
+          nextSelectedChoices.includes(noteName),
+        );
+        if (completed) {
+          setSelectedAnswer(quizQuestion.correct);
+          setQuizScore((prev) => ({
+            correct: prev.correct + 1,
+            total: prev.total + 1,
+          }));
+        }
+        return;
+      }
+
       const isCorrect = answer === quizQuestion.correct;
       setSelectedAnswer(answer);
       setQuizScore((prev) => ({
@@ -246,7 +276,7 @@ export function useQuiz({
         total: prev.total + 1,
       }));
     },
-    [selectedAnswer, quizQuestion],
+    [quizMode, quizQuestion, quizSelectedChoices, quizType, selectedAnswer],
   );
 
   const handleFretboardQuizAnswer = useCallback(
@@ -327,27 +357,17 @@ export function useQuiz({
     ],
   );
 
-  useEffect(() => {
-    if (selectedAnswer === null || quizQuestion === null) return;
-    const timer = window.setTimeout(() => {
-      clearCurrentQuizState();
-      setQuizQuestion(generateQuizQuestion(quizMode, quizType));
-    }, 1200);
-    return () => window.clearTimeout(timer);
-  }, [
-    clearCurrentQuizState,
-    generateQuizQuestion,
-    quizMode,
-    quizQuestion,
-    quizType,
-    selectedAnswer,
-  ]);
+  const handleNextQuestion = useCallback(() => {
+    if (quizQuestion === null) return;
+    clearCurrentQuizState();
+    setQuizQuestion(generateQuizQuestion(quizMode, quizType));
+  }, [clearCurrentQuizState, generateQuizQuestion, quizMode, quizQuestion, quizType]);
 
   useEffect(() => {
     if (previousChordQuizTypesKeyRef.current === chordQuizTypesKey) return;
     previousChordQuizTypesKeyRef.current = chordQuizTypesKey;
     if (!showQuiz || quizQuestion === null) return;
-    if (quizMode !== "chord" || quizType !== "fretboard") return;
+    if (quizMode !== "chord") return;
 
     clearCurrentQuizState();
     setQuizQuestion(generateQuizQuestion(quizMode, quizType));
@@ -380,6 +400,7 @@ export function useQuiz({
     quizAnsweredCell,
     quizCorrectCell,
     quizSelectedCells,
+    quizSelectedChoices,
     quizRevealNoteNames,
     setQuizMode,
     setQuizType,
@@ -389,5 +410,6 @@ export function useQuiz({
     handleQuizKindChange,
     handleQuizAnswer,
     handleFretboardQuizAnswer,
+    handleNextQuestion,
   };
 }
