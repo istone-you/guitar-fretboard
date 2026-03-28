@@ -70,6 +70,7 @@ bun run preview
 bun run lint
 bun run fmt
 bun run test
+bun run test:e2e
 bun run coverage
 ```
 
@@ -77,6 +78,7 @@ bun run coverage
 
 ```bash
 bun run test
+bun run test:e2e
 ```
 
 カバレッジを確認する場合:
