@@ -19,7 +19,7 @@ import {
   getRootIndex,
   type FretCell,
   type CagedPositionValue,
-} from "../logic/fretboard";
+} from "../../logic/fretboard";
 import type {
   Theme,
   Accidental,
@@ -29,7 +29,7 @@ import type {
   ScaleType,
   ChordType,
   DegreeName,
-} from "../types";
+} from "../../types";
 
 const STRING_COUNT = 6;
 const FRETBOARD_SIZE_CONFIG: Record<

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { fireEvent, render, screen } from "@testing-library/react";
-import FretboardHeader from "./FretboardHeader";
-import type { Accidental, BaseLabelMode, Theme } from "../types";
+import FretboardHeader from ".";
+import type { Accidental, BaseLabelMode, Theme } from "../../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {

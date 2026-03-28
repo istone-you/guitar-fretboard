@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import SettingsMenu from "./SettingsMenu";
-import type { Theme, Accidental, FretboardDisplaySize } from "../types";
+import SettingsMenu from ".";
+import type { Theme, Accidental, FretboardDisplaySize } from "../../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {

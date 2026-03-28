@@ -6,7 +6,7 @@ const controlsState: { latest: Record<string, unknown> | null } = { latest: null
 const fretboardState: { latest: Record<string, unknown> | null } = { latest: null };
 const headerState: { latest: Record<string, unknown> | null } = { latest: null };
 
-vi.mock("./components/SettingsMenu", () => ({
+vi.mock("./components/SettingsMenu/index", () => ({
   default: (props: any) => (
     <div>
       <button onClick={() => props.setShowQuiz?.(true)}>quiz-toggle</button>
@@ -26,7 +26,7 @@ vi.mock("./components/SettingsMenu", () => ({
   ),
 }));
 
-vi.mock("./components/Controls", () => ({
+vi.mock("./components/Controls/index", () => ({
   default: (props: any) => {
     controlsState.latest = props;
     return (
@@ -60,7 +60,7 @@ vi.mock("./components/Controls", () => ({
   },
 }));
 
-vi.mock("./components/FretboardHeader", () => ({
+vi.mock("./components/FretboardHeader/index", () => ({
   default: (props: any) => {
     headerState.latest = props;
     return (
@@ -74,7 +74,7 @@ vi.mock("./components/FretboardHeader", () => ({
   },
 }));
 
-vi.mock("./components/Fretboard", () => ({
+vi.mock("./components/Fretboard/index", () => ({
   default: (props: any) => {
     fretboardState.latest = props;
     return (

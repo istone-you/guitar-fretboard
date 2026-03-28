@@ -1,8 +1,8 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import QuizPanel from "./QuizPanel";
-import type { Theme } from "../types";
-import type { QuizMode, QuizType, QuizQuestion } from "./QuizPanel";
+import QuizPanel from ".";
+import type { Theme } from "../../types";
+import type { QuizMode, QuizType, QuizQuestion } from ".";
 
 function makeQuestion(overrides: Partial<QuizQuestion> = {}): QuizQuestion {
   return {

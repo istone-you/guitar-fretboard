@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Fretboard from "./Fretboard";
+import Fretboard from ".";
 import type {
   Theme,
   Accidental,
@@ -9,7 +9,7 @@ import type {
   ChordDisplayMode,
   ScaleType,
   ChordType,
-} from "../types";
+} from "../../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {

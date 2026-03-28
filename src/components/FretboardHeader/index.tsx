@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import "../i18n";
-import type { Accidental, BaseLabelMode, Theme } from "../types";
+import "../../i18n";
+import type { Accidental, BaseLabelMode, Theme } from "../../types";
+import { SegmentedToggle } from "../ui/SegmentedToggle";
 
 const NOTES_SHARP = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 const NOTES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
@@ -109,30 +110,22 @@ export default function FretboardHeader({
         />
       </span>
       {!showQuiz && (
-        <div
-          className={`inline-flex items-center gap-2 rounded-lg p-1 ${
-            theme === "dark" ? "bg-gray-800" : "bg-stone-100"
-          }`}
-        >
-          {[
+        <SegmentedToggle
+          theme={theme}
+          value={baseLabelMode}
+          onChange={onBaseLabelModeChange}
+          options={[
             { value: "note" as BaseLabelMode, label: t("header.note") },
             { value: "degree" as BaseLabelMode, label: t("header.degree") },
-          ].map(({ value, label }) => (
-            <button
-              key={value}
-              onClick={() => onBaseLabelModeChange(value)}
-              className={`${isEnglish ? "min-w-[4rem]" : "w-[4rem]"} whitespace-nowrap rounded px-2.5 py-1 text-sm font-semibold transition-all ${
-                baseLabelMode === value
-                  ? "bg-indigo-600 text-white"
-                  : theme === "dark"
-                    ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
-                    : "bg-white text-stone-600 hover:bg-stone-200"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+          ]}
+          size="compact"
+          buttonWidthClass={`${isEnglish ? "min-w-[4rem]" : "w-[4rem]"} whitespace-nowrap`}
+          inactiveClassName={
+            theme === "dark"
+              ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
+              : "bg-white text-stone-600 hover:bg-stone-200"
+          }
+        />
       )}
     </div>
   );

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import Controls, { DropdownSelect } from "./Controls";
-import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
+import Controls from ".";
+import { DropdownSelect } from "../ui/DropdownSelect";
+import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {
