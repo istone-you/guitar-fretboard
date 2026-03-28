@@ -13,7 +13,14 @@ import {
   getRootIndex,
 } from "../logic/fretboard";
 import { changeLocale } from "../i18n";
-import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
+import type {
+  Theme,
+  Accidental,
+  FretboardDisplaySize,
+  ChordDisplayMode,
+  ScaleType,
+  ChordType,
+} from "../types";
 
 const CHORD_TYPES: ChordType[] = [
   "Major",
@@ -39,6 +46,8 @@ interface ControlsProps {
   rootNote: string;
   accidental: Accidental;
   onAccidentalChange: (mode: Accidental) => void;
+  fretboardDisplaySize: FretboardDisplaySize;
+  onFretboardDisplaySizeChange: (size: FretboardDisplaySize) => void;
   showChord: boolean;
   setShowChord: (value: boolean) => void;
   chordDisplayMode: ChordDisplayMode;
@@ -71,6 +80,8 @@ export default function Controls({
   rootNote,
   accidental,
   onAccidentalChange,
+  fretboardDisplaySize,
+  onFretboardDisplaySizeChange,
   showChord,
   setShowChord,
   chordDisplayMode,
@@ -114,6 +125,11 @@ export default function Controls({
   const diatonicChordSizeOptions = [
     { value: "triad", label: t("options.diatonicChordSize.triad") },
     { value: "seventh", label: t("options.diatonicChordSize.seventh") },
+  ];
+  const fretboardDisplaySizeOptions: { value: FretboardDisplaySize; label: string }[] = [
+    { value: "standard", label: t("options.displaySize.standard") },
+    { value: "compact", label: t("options.displaySize.compact") },
+    { value: "tiny", label: t("options.displaySize.tiny") },
   ];
   const scaleOptions: { value: ScaleType; label: string }[] = [
     { value: "major", label: t("options.scale.major") },
@@ -241,6 +257,23 @@ export default function Controls({
                 </div>
 
                 <div className={`border-t ${isDark ? "border-gray-700" : "border-stone-200"}`} />
+
+                <div className="flex items-center justify-between gap-3">
+                  <span
+                    className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
+                  >
+                    {t("displaySize")}
+                  </span>
+                  <DropdownSelect
+                    theme={theme}
+                    value={fretboardDisplaySize}
+                    onChange={(value) =>
+                      onFretboardDisplaySizeChange(value as FretboardDisplaySize)
+                    }
+                    options={fretboardDisplaySizeOptions}
+                    widthClass="w-28"
+                  />
+                </div>
 
                 {/* テーマ */}
                 <div className="flex items-center justify-between gap-3">

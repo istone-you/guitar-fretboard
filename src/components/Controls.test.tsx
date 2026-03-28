@@ -1,7 +1,14 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Controls, { DropdownSelect } from "./Controls";
-import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
+import type {
+  Theme,
+  Accidental,
+  FretboardDisplaySize,
+  ChordDisplayMode,
+  ScaleType,
+  ChordType,
+} from "../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {
@@ -10,6 +17,8 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     setRootNote: vi.fn(),
     accidental: "flat" as Accidental,
     onAccidentalChange: vi.fn(),
+    fretboardDisplaySize: "standard" as FretboardDisplaySize,
+    onFretboardDisplaySizeChange: vi.fn(),
     showChord: false,
     setShowChord: vi.fn(),
     chordDisplayMode: "form" as ChordDisplayMode,
@@ -44,8 +53,18 @@ describe("Controls", () => {
   it("設定ボタンをクリックすると♯/♭トグルが表示される", () => {
     render(<Controls {...makeProps()} />);
     fireEvent.click(screen.getByTitle("設定"));
+    expect(screen.getByText("表示サイズ")).toBeTruthy();
     expect(screen.getByText("♯")).toBeTruthy();
     expect(screen.getByText("♭")).toBeTruthy();
+  });
+
+  it("表示サイズプルダウンを選ぶと onFretboardDisplaySizeChange が呼ばれる", () => {
+    const props = makeProps();
+    render(<Controls {...props} />);
+    fireEvent.click(screen.getByTitle("設定"));
+    fireEvent.click(screen.getByRole("button", { name: "標準" }));
+    fireEvent.click(screen.getByText("コンパクト"));
+    expect(props.onFretboardDisplaySizeChange).toHaveBeenCalledWith("compact");
   });
 
   it("設定オーバーレイ外をクリックすると閉じる", () => {

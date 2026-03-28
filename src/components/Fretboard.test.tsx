@@ -5,6 +5,7 @@ import type {
   Theme,
   Accidental,
   BaseLabelMode,
+  FretboardDisplaySize,
   ChordDisplayMode,
   ScaleType,
   ChordType,
@@ -16,6 +17,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     rootNote: "C",
     accidental: "flat" as Accidental,
     baseLabelMode: "note" as BaseLabelMode,
+    displaySize: "standard" as FretboardDisplaySize,
     showChord: false,
     chordDisplayMode: "form" as ChordDisplayMode,
     showScale: false,
@@ -217,6 +219,16 @@ describe("Fretboard", () => {
 
   it("ライトテーマでもレンダリングできる", () => {
     render(<Fretboard {...makeProps({ theme: "light" as Theme })} />);
+    expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("コンパクト表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ displaySize: "compact" as FretboardDisplaySize })} />);
+    expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("極小表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ displaySize: "tiny" as FretboardDisplaySize })} />);
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
   });
 

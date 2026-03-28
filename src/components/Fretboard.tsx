@@ -24,6 +24,7 @@ import type {
   Theme,
   Accidental,
   BaseLabelMode,
+  FretboardDisplaySize,
   ChordDisplayMode,
   ScaleType,
   ChordType,
@@ -31,10 +32,78 @@ import type {
 } from "../types";
 
 const STRING_COUNT = 6;
-const FRET_CELL_WIDTH = 56;
-const STRING_LABEL_WIDTH = 32;
-const STRING_ROW_HEIGHT = 40;
-const STRING_ROW_GAP = 1;
+const FRETBOARD_SIZE_CONFIG: Record<
+  FretboardDisplaySize,
+  {
+    cellWidth: number;
+    stringLabelWidth: number;
+    rowHeight: number;
+    rowGap: number;
+    headerFontSize: number;
+    stringFontSize: number;
+    markHeight: number;
+    markerSize: number;
+    markerGap: number;
+    baseFontSize: number;
+    overlayFontSize: number;
+    stringLabelPaddingRight: number;
+    rootRingInset: number;
+    overlayInset: number;
+    chordBorderWidth: number;
+  }
+> = {
+  standard: {
+    cellWidth: 56,
+    stringLabelWidth: 32,
+    rowHeight: 40,
+    rowGap: 1,
+    headerFontSize: 14,
+    stringFontSize: 14,
+    markHeight: 20,
+    markerSize: 8,
+    markerGap: 4,
+    baseFontSize: 14,
+    overlayFontSize: 14,
+    stringLabelPaddingRight: 4,
+    rootRingInset: 2,
+    overlayInset: 4,
+    chordBorderWidth: 4,
+  },
+  compact: {
+    cellWidth: 41,
+    stringLabelWidth: 23,
+    rowHeight: 31,
+    rowGap: 1,
+    headerFontSize: 12,
+    stringFontSize: 12,
+    markHeight: 15,
+    markerSize: 6,
+    markerGap: 3,
+    baseFontSize: 12,
+    overlayFontSize: 12,
+    stringLabelPaddingRight: 3,
+    rootRingInset: 2,
+    overlayInset: 3,
+    chordBorderWidth: 3,
+  },
+  tiny: {
+    cellWidth: 34,
+    stringLabelWidth: 18,
+    rowHeight: 26,
+    rowGap: 1,
+    headerFontSize: 10,
+    stringFontSize: 10,
+    markHeight: 12,
+    markerSize: 4,
+    markerGap: 2,
+    baseFontSize: 10,
+    overlayFontSize: 10,
+    stringLabelPaddingRight: 2,
+    rootRingInset: 1,
+    overlayInset: 2,
+    chordBorderWidth: 2,
+  },
+};
 
 interface ChordGroup {
   id: string;
@@ -52,6 +121,7 @@ interface FretboardProps {
   rootNote: string;
   accidental: Accidental;
   baseLabelMode: BaseLabelMode;
+  displaySize: FretboardDisplaySize;
   showChord: boolean;
   chordDisplayMode: ChordDisplayMode;
   showScale: boolean;
@@ -71,6 +141,7 @@ export default function Fretboard({
   rootNote,
   accidental,
   baseLabelMode,
+  displaySize,
   showChord,
   chordDisplayMode,
   showScale,
@@ -84,6 +155,7 @@ export default function Fretboard({
   onNoteClick,
   hiddenDegrees = new Set(),
 }: FretboardProps) {
+  const size = FRETBOARD_SIZE_CONFIG[displaySize];
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
     chordDisplayMode === "diatonic"
@@ -213,29 +285,29 @@ export default function Fretboard({
       <div className="w-fit mx-auto">
         {/* フレット番号ヘッダー */}
         <div className="flex mb-1">
-          <div className="w-8 shrink-0" />
+          <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
           {Array.from({ length: FRET_COUNT }, (_, fret) => (
-            <FretHeader key={fret} fret={fret} theme={theme} />
+            <FretHeader key={fret} fret={fret} theme={theme} size={size} />
           ))}
         </div>
 
         {/* ポジションマーク行 */}
         <div className="flex mb-2">
-          <div className="w-8 shrink-0" />
+          <div className="shrink-0" style={{ width: size.stringLabelWidth }} />
           {Array.from({ length: FRET_COUNT }, (_, fret) => (
-            <PositionMark key={fret} fret={fret} theme={theme} />
+            <PositionMark key={fret} fret={fret} theme={theme} size={size} />
           ))}
         </div>
 
         {/* 指板本体（1弦 → 6弦、タブ譜標準：上が高音） */}
         <div className="relative">
           {chordGroups.map((group) => {
-            const top = (STRING_COUNT - 1 - group.maxString) * (STRING_ROW_HEIGHT + STRING_ROW_GAP);
-            const left = STRING_LABEL_WIDTH + group.minFret * FRET_CELL_WIDTH;
-            const width = (group.maxFret - group.minFret + 1) * FRET_CELL_WIDTH;
+            const top = (STRING_COUNT - 1 - group.maxString) * (size.rowHeight + size.rowGap);
+            const left = size.stringLabelWidth + group.minFret * size.cellWidth;
+            const width = (group.maxFret - group.minFret + 1) * size.cellWidth;
             const height =
-              (group.maxString - group.minString + 1) * STRING_ROW_HEIGHT +
-              (group.maxString - group.minString) * STRING_ROW_GAP;
+              (group.maxString - group.minString + 1) * size.rowHeight +
+              (group.maxString - group.minString) * size.rowGap;
 
             return (
               <div
@@ -259,6 +331,7 @@ export default function Fretboard({
               cagedPositions={cagedPositions}
               chordPositions={chordPositions}
               opacity={opacity}
+              size={size}
               onNoteClick={onNoteClick}
               hiddenDegrees={hiddenDegrees}
             />
@@ -272,15 +345,17 @@ export default function Fretboard({
 interface FretHeaderProps {
   fret: number;
   theme: Theme;
+  size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
 }
 
-function FretHeader({ fret, theme }: FretHeaderProps) {
+function FretHeader({ fret, theme, size }: FretHeaderProps) {
   const isDark = theme === "dark";
   return (
     <div
-      className={`w-14 shrink-0 text-center text-sm font-mono
+      className={`shrink-0 text-center font-mono
       ${isDark ? "text-gray-500" : "text-stone-500"}
     `}
+      style={{ width: size.cellWidth, fontSize: size.headerFontSize }}
     >
       {fret}
     </div>
@@ -290,21 +365,35 @@ function FretHeader({ fret, theme }: FretHeaderProps) {
 interface PositionMarkProps {
   fret: number;
   theme: Theme;
+  size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
 }
 
-function PositionMark({ fret, theme }: PositionMarkProps) {
+function PositionMark({ fret, theme, size }: PositionMarkProps) {
   const isDark = theme === "dark";
   const mark = POSITION_MARKS[fret];
-  if (!mark) return <div className="w-14 shrink-0 h-5" />;
+  if (!mark)
+    return <div className="shrink-0" style={{ width: size.cellWidth, height: size.markHeight }} />;
   return (
-    <div className="w-14 shrink-0 h-5 flex items-center justify-center gap-1">
+    <div
+      className="shrink-0 flex items-center justify-center"
+      style={{ width: size.cellWidth, height: size.markHeight, gap: size.markerGap }}
+    >
       {mark === "double" ? (
         <>
-          <div className={`w-2 h-2 rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`} />
-          <div className={`w-2 h-2 rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`} />
+          <div
+            className={`rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`}
+            style={{ width: size.markerSize, height: size.markerSize }}
+          />
+          <div
+            className={`rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`}
+            style={{ width: size.markerSize, height: size.markerSize }}
+          />
         </>
       ) : (
-        <div className={`w-2 h-2 rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`} />
+        <div
+          className={`rounded-full ${isDark ? "bg-gray-500" : "bg-stone-400"}`}
+          style={{ width: size.markerSize, height: size.markerSize }}
+        />
       )}
     </div>
   );
@@ -321,6 +410,7 @@ interface StringRowProps {
   cagedPositions: Map<string, CagedPositionValue>;
   chordPositions: Set<string>;
   opacity: number;
+  size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
   onNoteClick: (noteName: string) => void;
   hiddenDegrees: Set<string>;
 }
@@ -336,6 +426,7 @@ function StringRow({
   cagedPositions,
   chordPositions,
   opacity,
+  size,
   onNoteClick,
   hiddenDegrees,
 }: StringRowProps) {
@@ -347,7 +438,12 @@ function StringRow({
     <div className="flex items-center mb-px">
       {/* 弦ラベル */}
       <div
-        className={`w-8 shrink-0 text-right pr-1 text-sm font-mono ${isDark ? "text-gray-400" : "text-stone-500"}`}
+        className={`shrink-0 text-right font-mono ${isDark ? "text-gray-400" : "text-stone-500"}`}
+        style={{
+          width: size.stringLabelWidth,
+          paddingRight: size.stringLabelPaddingRight,
+          fontSize: size.stringFontSize,
+        }}
       >
         {openStringNotes[stringIdx]}
       </div>
@@ -408,6 +504,7 @@ function StringRow({
             hidden={degreeHidden}
             opacity={opacity}
             theme={theme}
+            size={size}
             onClick={() => onNoteClick(noteName)}
           />
         );
@@ -439,6 +536,7 @@ interface FretCellComponentProps {
   hidden: boolean;
   opacity: number;
   theme: Theme;
+  size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
   onClick: () => void;
 }
 
@@ -454,6 +552,7 @@ function FretCellComponent({
   hidden,
   opacity,
   theme,
+  size,
   onClick,
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
@@ -461,12 +560,13 @@ function FretCellComponent({
 
   return (
     <div
-      className={`w-14 h-10 shrink-0 relative flex items-center justify-center
+      className={`shrink-0 relative flex items-center justify-center
         cursor-pointer
         ${isDark ? "border-l border-gray-600" : "border-l border-stone-300"}
         ${fret === 0 ? (isDark ? "border-r-4 border-r-gray-300" : "border-r-4 border-r-stone-500") : ""}
         ${isDark ? "hover:bg-gray-700/30" : "hover:bg-stone-200/70"} transition-colors
       `}
+      style={{ width: size.cellWidth, height: size.rowHeight }}
       onClick={onClick}
     >
       {/* 弦ライン */}
@@ -475,14 +575,20 @@ function FretCellComponent({
       </div>
 
       {/* ルート共通ハイライト */}
-      {isRoot && <div className="absolute inset-0.5 rounded-full border-2 border-red-500 z-[18]" />}
+      {isRoot && (
+        <div
+          className="absolute rounded-full border-2 border-red-500 z-[18]"
+          style={{ inset: size.rootRingInset }}
+        />
+      )}
 
       {/* ベースレイヤー表示（音名 or 度数） */}
       {shouldShowBaseLabel && (
         <span
-          className={`absolute text-sm font-mono z-0 select-none
+          className={`absolute font-mono z-0 select-none
           ${baseLabel.isDegree ? "font-bold" : ""}
         `}
+          style={{ fontSize: size.baseFontSize }}
         >
           <span style={{ color: baseLabel.color }}>{baseLabel.text}</span>
         </span>
@@ -491,33 +597,41 @@ function FretCellComponent({
       {/* 度数表示時の色枠 */}
       {degreeRing && (
         <div
-          className="absolute inset-0.5 rounded-full border-2 z-[8]"
-          style={{ borderColor: degreeRing.color }}
+          className="absolute rounded-full border-2 z-[8]"
+          style={{ inset: size.rootRingInset, borderColor: degreeRing.color }}
         />
       )}
 
       {/* メインオーバーレイ（スケール / CAGED） */}
       {overlayColor && (
         <div
-          className="absolute inset-1 rounded-full flex items-center justify-center z-10"
+          className="absolute rounded-full flex items-center justify-center z-10"
           style={{
+            inset: size.overlayInset,
             backgroundColor: overlayColor.bg,
             color: overlayColor.text,
             opacity,
           }}
         >
-          <span className="text-sm font-bold leading-none">{overlayLabel}</span>
+          <span className="font-bold leading-none" style={{ fontSize: size.overlayFontSize }}>
+            {overlayLabel}
+          </span>
         </div>
       )}
 
       {/* コードフォームドット */}
       {inChord && (
         <div
-          className="absolute inset-1 rounded-full border-4 border-amber-500 z-20"
-          style={{ opacity }}
+          className="absolute rounded-full border-amber-500 z-20"
+          style={{ inset: size.overlayInset, borderWidth: size.chordBorderWidth, opacity }}
         >
           <div className="w-full h-full rounded-full bg-amber-500 flex items-center justify-center">
-            <span className="text-sm font-bold text-white leading-none">{noteName}</span>
+            <span
+              className="font-bold text-white leading-none"
+              style={{ fontSize: size.overlayFontSize }}
+            >
+              {noteName}
+            </span>
           </div>
         </div>
       )}

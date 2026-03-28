@@ -10,6 +10,7 @@
     "filterOverlay": "「絞り込む」で表示中のスケールやコードに含まれない度数を非表示"
   },
   "theme": "テーマ",
+  "displaySize": "表示サイズ",
   "language": "言語",
   "accidental": "♯/♭",
   "layers": {
@@ -59,6 +60,11 @@
     "diatonicChordSize": {
       "triad": "3和音",
       "seventh": "4和音"
+    },
+    "displaySize": {
+      "standard": "標準",
+      "compact": "コンパクト",
+      "tiny": "極小"
     },
     "triadStrings": {
       "1-3": "1~3",

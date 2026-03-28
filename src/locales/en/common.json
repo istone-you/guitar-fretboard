@@ -3,12 +3,14 @@
   "howToUse": "How to Use",
   "howToUseItems": {
     "changeRoot": "Click a fretboard note to change the root",
+    "switchLabels": "Use Notes / Degrees to switch what is shown",
     "togglePanel": "Click each panel to toggle it on or off",
     "switchMode": "Use panel controls to switch modes",
     "toggleDegree": "In degree mode, click degrees to hide or show them on the fretboard",
     "filterOverlay": "Use \"Filter\" to show only notes included in the active overlays"
   },
   "theme": "Theme",
+  "displaySize": "Display Size",
   "language": "Language",
   "accidental": "♯/♭",
   "layers": {
@@ -58,6 +60,11 @@
     "diatonicChordSize": {
       "triad": "Triad",
       "seventh": "7th"
+    },
+    "displaySize": {
+      "standard": "Std",
+      "compact": "Compact",
+      "tiny": "Tiny"
     },
     "triadStrings": {
       "1-3": "1-3",

@@ -17,6 +17,7 @@ import type {
   Theme,
   Accidental,
   BaseLabelMode,
+  FretboardDisplaySize,
   ChordDisplayMode,
   ScaleType,
   ChordType,
@@ -26,6 +27,7 @@ import type {
 const STORAGE_KEYS = {
   theme: "guiter:theme",
   accidental: "guiter:accidental",
+  fretboardDisplaySize: "guiter:fretboard-display-size",
 } as const;
 
 function readStoredTheme(): Theme {
@@ -40,6 +42,13 @@ function readStoredAccidental(): Accidental {
   return stored === "sharp" || stored === "flat" ? stored : "flat";
 }
 
+function readStoredFretboardDisplaySize(): FretboardDisplaySize {
+  if (typeof window === "undefined") return "standard";
+  const stored = window.localStorage.getItem(STORAGE_KEYS.fretboardDisplaySize);
+  if (stored === "standard" || stored === "compact" || stored === "tiny") return stored;
+  return window.innerWidth < 640 ? "compact" : "standard";
+}
+
 export default function App() {
   const { t } = useTranslation();
   // ルート音
@@ -48,6 +57,9 @@ export default function App() {
   const [accidental, setAccidental] = useState<Accidental>(readStoredAccidental);
   // ベースレイヤー表示
   const [baseLabelMode, setBaseLabelMode] = useState<BaseLabelMode>("note");
+  const [fretboardDisplaySize, setFretboardDisplaySize] = useState<FretboardDisplaySize>(
+    readStoredFretboardDisplaySize,
+  );
 
   // レイヤー表示フラグ
   const [showChord, setShowChord] = useState(false);
@@ -109,6 +121,11 @@ export default function App() {
 
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
+
+  const handleFretboardDisplaySizeChange = (size: FretboardDisplaySize) => {
+    setFretboardDisplaySize(size);
+    window.localStorage.setItem(STORAGE_KEYS.fretboardDisplaySize, size);
+  };
 
   const DEGREE_BY_SEMITONE: DegreeName[] = [
     "P1",
@@ -188,6 +205,8 @@ export default function App() {
           rootNote={rootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
+          fretboardDisplaySize={fretboardDisplaySize}
+          onFretboardDisplaySizeChange={handleFretboardDisplaySizeChange}
           showChord={showChord}
           setShowChord={setShowChord}
           chordDisplayMode={chordDisplayMode}
@@ -225,6 +244,7 @@ export default function App() {
           rootNote={rootNote}
           accidental={accidental}
           baseLabelMode={baseLabelMode}
+          displaySize={fretboardDisplaySize}
           showChord={showChord}
           chordDisplayMode={chordDisplayMode}
           showScale={showScale}
