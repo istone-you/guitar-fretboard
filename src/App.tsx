@@ -236,8 +236,10 @@ export default function App() {
         <FretboardHeader
           theme={theme}
           rootNote={rootNote}
+          accidental={accidental}
           baseLabelMode={baseLabelMode}
           onBaseLabelModeChange={setBaseLabelMode}
+          onRootNoteChange={handleNoteClick}
         />
         <Fretboard
           theme={theme}

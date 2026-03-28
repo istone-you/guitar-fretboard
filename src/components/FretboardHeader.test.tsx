@@ -1,14 +1,16 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { fireEvent, render, screen } from "@testing-library/react";
 import FretboardHeader from "./FretboardHeader";
-import type { BaseLabelMode, Theme } from "../types";
+import type { Accidental, BaseLabelMode, Theme } from "../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {
     theme: "dark" as Theme,
     rootNote: "C",
+    accidental: "flat" as Accidental,
     baseLabelMode: "note" as BaseLabelMode,
     onBaseLabelModeChange: vi.fn(),
+    onRootNoteChange: vi.fn(),
     ...overrides,
   };
 }
