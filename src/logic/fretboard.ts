@@ -1,4 +1,4 @@
-import type { ChordType, TriadChordType, DegreeName, ScaleType } from "../types";
+import type { ChordDisplayMode, ChordType, TriadChordType, DegreeName, ScaleType } from "../types";
 
 // 音名配列（半音12音）
 export const NOTES_SHARP = [
@@ -1284,6 +1284,56 @@ export const CHORD_SEMITONES: Record<string, Set<number>> = {
   aug: new Set([0, 4, 8]),
   power: new Set([0, 7]),
 };
+
+interface ActiveOverlaySemitoneParams {
+  rootNote: string;
+  showScale: boolean;
+  scaleType: ScaleType;
+  showCaged: boolean;
+  showChord: boolean;
+  chordDisplayMode: ChordDisplayMode;
+  diatonicScaleType: string;
+  diatonicDegree: string;
+  chordType: ChordType;
+}
+
+export function getActiveOverlaySemitones({
+  rootNote,
+  showScale,
+  scaleType,
+  showCaged,
+  showChord,
+  chordDisplayMode,
+  diatonicScaleType,
+  diatonicDegree,
+  chordType,
+}: ActiveOverlaySemitoneParams): Set<number> {
+  const active = new Set<number>();
+  const keyRootIndex = getRootIndex(rootNote);
+
+  if (showScale) {
+    for (const semitone of SCALE_DEGREES[scaleType] ?? []) active.add(semitone);
+  }
+
+  if (showCaged) {
+    for (const semitone of CHORD_SEMITONES.Major) active.add(semitone);
+  }
+
+  if (showChord) {
+    let semitones: Set<number> | undefined;
+    if (chordDisplayMode === "power") {
+      semitones = CHORD_SEMITONES.power;
+    } else if (chordDisplayMode === "diatonic") {
+      semitones = getDiatonicChordSemitones(keyRootIndex, diatonicScaleType, diatonicDegree);
+    } else {
+      semitones = CHORD_SEMITONES[chordType];
+    }
+
+    for (const semitone of semitones ?? []) active.add(semitone);
+  }
+
+  return active;
+}
 
 export function isInBluesScale(semitone: number): boolean {
   return BLUES_SCALE_DEGREES.has(semitone);

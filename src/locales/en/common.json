@@ -47,6 +47,9 @@
     "reset": "Reset",
     "hideAll": "Hide all"
   },
+  "overlayNotes": {
+    "title": "Visible notes"
+  },
   "scaleGroups": {
     "basics": "Basics",
     "minorDerived": "Minor Derived",

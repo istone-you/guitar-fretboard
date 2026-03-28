@@ -15,6 +15,7 @@ import {
   isInScale,
   getDiatonicChord,
   getDiatonicChordSemitones,
+  getActiveOverlaySemitones,
   getTriadLayout,
   CHORD_SEMITONES,
   calcCagedPositions,
@@ -278,6 +279,40 @@ describe("getDiatonicChord", () => {
     // B (rootIndex=11) のメジャー V = F♯ (index=6)
     const chord = getDiatonicChord(11, "major-triad", "V");
     expect(chord.rootIndex).toBe(6);
+  });
+});
+
+describe("getActiveOverlaySemitones", () => {
+  it("表示中のスケール・CAGED・コードの構成音を統合する", () => {
+    const semitones = getActiveOverlaySemitones({
+      rootNote: "C",
+      showScale: true,
+      scaleType: "major",
+      showCaged: true,
+      showChord: true,
+      chordDisplayMode: "power",
+      diatonicScaleType: "major-triad",
+      diatonicDegree: "I",
+      chordType: "Major",
+    });
+
+    expect([...semitones].sort((a, b) => a - b)).toEqual([0, 2, 4, 5, 7, 9, 11]);
+  });
+
+  it("ダイアトニックコードはキー基準で構成音を返す", () => {
+    const semitones = getActiveOverlaySemitones({
+      rootNote: "C",
+      showScale: false,
+      scaleType: "major",
+      showCaged: false,
+      showChord: true,
+      chordDisplayMode: "diatonic",
+      diatonicScaleType: "major-seventh",
+      diatonicDegree: "V",
+      chordType: "Major",
+    });
+
+    expect([...semitones].sort((a, b) => a - b)).toEqual([2, 5, 7, 11]);
   });
 });
 
