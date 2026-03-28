@@ -113,13 +113,20 @@
     "questionScaleFretboard": "{{root}}{{scale}}の音はどこ？",
     "questionChordFretboard": "{{chord}} の構成音は？",
     "questionChordIdentify": "このコードは？",
-    "questionDiatonicIdentify": "{{root}}{{keyType}} / {{chordSize}} / {{degree}} は？",
     "questionDiatonicAll": "{{root}}{{keyType}} / {{chordSize}} のダイアトニックコードは？",
+    "questionNoteAllStrings": "{{note}} はどこ？",
+    "questionDegreeAllStrings": "{{degree}} はどこ？（ルート: {{root}}）",
+    "fretboardMode": {
+      "singleString": "弦指定",
+      "allStrings": "全弦"
+    },
     "tapInstruction": "指板をタップして答えてね",
     "correct": "正解！",
     "incorrect": "不正解… 正解は {{answer}}",
+    "incorrectOnly": "不正解…",
     "next": "次へ",
     "retry": "もう一度",
+    "submit": "回答",
     "mode": {
       "note": "音名",
       "degree": "度数"
@@ -135,7 +142,6 @@
       "degreeFretboard": "度数・指板",
       "scaleChoice": "スケール・音名選択",
       "scaleFretboard": "スケール・指板",
-      "diatonicIdentify": "ダイアトニック・識別",
       "diatonicAll": "ダイアトニック・全答",
       "chordChoice": "コード・識別",
       "chordFretboard": "コード・指板"

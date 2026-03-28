@@ -9,7 +9,7 @@ import { buildScaleOptions } from "../Controls/scaleOptions";
 import { DropdownSelect } from "../ui/DropdownSelect";
 
 export type QuizMode = "note" | "degree" | "chord" | "scale" | "diatonic";
-export type QuizType = "choice" | "fretboard" | "identify" | "all";
+export type QuizType = "choice" | "fretboard" | "all";
 
 export interface DiatonicAnswerEntry {
   degree: string;
@@ -24,7 +24,6 @@ export interface QuizQuestion {
   correct: string;
   choices: string[];
   answerLabel?: string;
-  promptRoot?: string;
   promptDegree?: DegreeName;
   promptChordLabel?: string;
   promptChordRoot?: string;
@@ -32,7 +31,6 @@ export interface QuizQuestion {
   promptScaleRoot?: string;
   promptScaleType?: ScaleType;
   correctNoteNames?: string[];
-  promptDiatonicDegree?: string;
   promptDiatonicKeyType?: "major" | "natural-minor";
   promptDiatonicChordSize?: "triad" | "seventh";
   diatonicChordTypeOptions?: ChordType[];
@@ -54,6 +52,7 @@ interface QuizPanelProps {
   diatonicSelectedRoot: string | null;
   diatonicSelectedChordType: ChordType | null;
   diatonicAllAnswers: Record<string, { root: string; chordType: ChordType }>;
+  diatonicEditingDegree: string | null;
   diatonicQuizKeyType: "major" | "natural-minor";
   diatonicQuizChordSize: "triad" | "seventh";
   chordQuizTypes: ChordType[];
@@ -69,8 +68,12 @@ interface QuizPanelProps {
   onChordQuizTypeSelect: (chordType: ChordType) => void;
   onDiatonicAnswerRootSelect: (root: string) => void;
   onDiatonicAnswerTypeSelect: (chordType: ChordType) => void;
+  onDiatonicDegreeCardClick: (degree: string) => void;
+  onDiatonicSubmitAll: () => void;
   onNextQuestion: () => void;
   onRetryQuestion: () => void;
+  fretboardAllStrings: boolean;
+  onFretboardAllStringsChange: (value: boolean) => void;
 }
 
 export default function QuizPanel({
@@ -88,6 +91,7 @@ export default function QuizPanel({
   diatonicSelectedRoot,
   diatonicSelectedChordType,
   diatonicAllAnswers,
+  diatonicEditingDegree,
   diatonicQuizKeyType,
   diatonicQuizChordSize,
   chordQuizTypes,
@@ -103,12 +107,17 @@ export default function QuizPanel({
   onChordQuizTypeSelect,
   onDiatonicAnswerRootSelect,
   onDiatonicAnswerTypeSelect,
+  onDiatonicDegreeCardClick,
+  onDiatonicSubmitAll,
   onNextQuestion,
   onRetryQuestion,
+  fretboardAllStrings,
+  onFretboardAllStringsChange,
 }: QuizPanelProps) {
   const { t } = useTranslation();
   const isDark = theme === "dark";
   const answered = selectedAnswer !== null;
+  const scaleTypeKey = (s: string) => s.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
   const isCorrect = selectedAnswer === question.correct;
   const stringNumber = 6 - question.stringIdx;
   const { options: scaleOptions, groups: scaleGroups } = buildScaleOptions(t);
@@ -120,10 +129,17 @@ export default function QuizPanel({
     { value: "triad", label: t("options.diatonicChordSize.triad") },
     { value: "seventh", label: t("options.diatonicChordSize.seventh") },
   ];
-  const currentDiatonicDegree = useMemo(
-    () =>
+  const currentDiatonicDegree = useMemo(() => {
+    if (diatonicEditingDegree != null) return diatonicEditingDegree;
+    return (
       question.diatonicAnswers?.find((entry) => diatonicAllAnswers[entry.degree] == null)?.degree ??
-      null,
+      null
+    );
+  }, [diatonicEditingDegree, diatonicAllAnswers, question.diatonicAnswers]);
+
+  const diatonicAllFilled = useMemo(
+    () =>
+      question.diatonicAnswers?.every((entry) => diatonicAllAnswers[entry.degree] != null) ?? false,
     [diatonicAllAnswers, question.diatonicAnswers],
   );
 
@@ -137,7 +153,6 @@ export default function QuizPanel({
     { value: "chord-fretboard", label: t("quiz.kind.chordFretboard") },
     { value: "scale-choice", label: t("quiz.kind.scaleChoice") },
     { value: "scale-fretboard", label: t("quiz.kind.scaleFretboard") },
-    { value: "diatonic-identify", label: t("quiz.kind.diatonicIdentify") },
     { value: "diatonic-all", label: t("quiz.kind.diatonicAll") },
   ];
 
@@ -210,6 +225,21 @@ export default function QuizPanel({
         </div>
       )}
 
+      {quizType === "fretboard" && (mode === "note" || mode === "degree") && (
+        <div className="flex items-center justify-center gap-3">
+          <DropdownSelect
+            theme={theme}
+            value={String(fretboardAllStrings)}
+            onChange={(v) => !answered && onFretboardAllStringsChange(v === "true")}
+            options={[
+              { value: "false", label: t("quiz.fretboardMode.singleString") },
+              { value: "true", label: t("quiz.fretboardMode.allStrings") },
+            ]}
+            disabled={answered}
+          />
+        </div>
+      )}
+
       {mode === "diatonic" && (
         <div className="flex flex-wrap items-center justify-center gap-3">
           <div className="flex items-center gap-2">
@@ -253,45 +283,40 @@ export default function QuizPanel({
       >
         {quizType === "fretboard"
           ? mode === "degree"
-            ? t("quiz.questionDegreeFretboard", {
-                string: stringNumber,
-                degree: question.correct,
-                root: rootNote,
-              })
+            ? fretboardAllStrings
+              ? t("quiz.questionDegreeAllStrings", { degree: question.correct, root: rootNote })
+              : t("quiz.questionDegreeFretboard", {
+                  string: stringNumber,
+                  degree: question.correct,
+                  root: rootNote,
+                })
             : mode === "diatonic"
               ? ""
               : mode === "scale"
                 ? t("quiz.questionScaleFretboard", {
                     root: question.promptScaleRoot,
-                    scale: t(`options.scale.${question.promptScaleType}`),
+                    scale: t(`options.scale.${scaleTypeKey(question.promptScaleType ?? "")}`),
                   })
                 : mode === "chord"
                   ? t("quiz.questionChordFretboard", {
                       chord: question.promptChordLabel,
                     })
-                  : t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
+                  : fretboardAllStrings
+                    ? t("quiz.questionNoteAllStrings", { note: question.correct })
+                    : t("quiz.questionFretboard", { string: stringNumber, note: question.correct })
           : mode === "scale"
             ? t("quiz.questionScale", {
                 root: question.promptScaleRoot,
-                scale: t(`options.scale.${question.promptScaleType}`),
+                scale: t(`options.scale.${scaleTypeKey(question.promptScaleType ?? "")}`),
               })
             : mode === "diatonic"
-              ? quizType === "identify"
-                ? t("quiz.questionDiatonicIdentify", {
-                    root: rootNote,
-                    keyType: t(
-                      `options.diatonicKey.${question.promptDiatonicKeyType === "major" ? "major" : "naturalMinor"}`,
-                    ),
-                    chordSize: t(`options.diatonicChordSize.${question.promptDiatonicChordSize}`),
-                    degree: question.promptDiatonicDegree,
-                  })
-                : t("quiz.questionDiatonicAll", {
-                    root: rootNote,
-                    keyType: t(
-                      `options.diatonicKey.${question.promptDiatonicKeyType === "major" ? "major" : "naturalMinor"}`,
-                    ),
-                    chordSize: t(`options.diatonicChordSize.${question.promptDiatonicChordSize}`),
-                  })
+              ? t("quiz.questionDiatonicAll", {
+                  root: rootNote,
+                  keyType: t(
+                    `options.diatonicKey.${question.promptDiatonicKeyType === "major" ? "major" : "naturalMinor"}`,
+                  ),
+                  chordSize: t(`options.diatonicChordSize.${question.promptDiatonicChordSize}`),
+                })
               : mode === "chord"
                 ? t("quiz.questionChordIdentify")
                 : mode === "note"
@@ -304,115 +329,80 @@ export default function QuizPanel({
       </p>
 
       {/* 選択肢（choiceモードのみ） */}
-      {(quizType === "choice" && mode === "chord") ||
-      (quizType === "identify" && mode === "diatonic") ? (
+      {quizType === "choice" && mode === "chord" ? (
         <div className="space-y-3">
           <div className="flex flex-wrap justify-center gap-2">
-            {(mode === "chord" ? ["A", "B", "C", "D", "E", "F", "G"] : noteOptions).map(
-              (choice) => {
-                const isCorrectChoice =
-                  mode === "chord"
-                    ? choice === question.promptChordRoot
-                    : choice === question.promptRoot;
-                const isSelectedChoice =
-                  mode === "chord"
-                    ? choice === quizSelectedChordRoot
-                    : choice === diatonicSelectedRoot;
-                let btnClass: string;
+            {["A", "B", "C", "D", "E", "F", "G"].map((choice) => {
+              const isCorrectChoice = choice === question.promptChordRoot;
+              const isSelectedChoice = choice === quizSelectedChordRoot;
+              let btnClass: string;
 
-                if (!answered) {
-                  btnClass = isSelectedChoice
-                    ? "bg-indigo-600 text-white"
-                    : isDark
-                      ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                      : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
-                } else if (isCorrectChoice) {
-                  btnClass = "bg-green-600 text-white";
-                } else if (isSelectedChoice) {
-                  btnClass = "bg-red-500 text-white";
-                } else {
-                  btnClass = isDark
-                    ? "bg-gray-700 text-gray-500"
-                    : "bg-white text-stone-400 border border-stone-200";
-                }
+              if (!answered) {
+                btnClass = isSelectedChoice
+                  ? "bg-indigo-600 text-white"
+                  : isDark
+                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
+                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+              } else if (isCorrectChoice) {
+                btnClass = "bg-green-600 text-white";
+              } else if (isSelectedChoice) {
+                btnClass = "bg-red-500 text-white";
+              } else {
+                btnClass = isDark
+                  ? "bg-gray-700 text-gray-500"
+                  : "bg-white text-stone-400 border border-stone-200";
+              }
 
-                return (
-                  <button
-                    key={choice}
-                    type="button"
-                    onClick={() =>
-                      !answered &&
-                      (mode === "chord"
-                        ? onChordQuizRootSelect(choice)
-                        : onDiatonicAnswerRootSelect(choice))
-                    }
-                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-bold transition-all ${btnClass}`}
-                  >
-                    {choice}
-                  </button>
-                );
-              },
-            )}
+              return (
+                <button
+                  key={choice}
+                  type="button"
+                  onClick={() => !answered && onChordQuizRootSelect(choice)}
+                  className={`min-w-10 rounded-xl px-3 py-2 text-sm font-bold transition-all ${btnClass}`}
+                >
+                  {choice}
+                </button>
+              );
+            })}
           </div>
           <div className="flex flex-wrap justify-center gap-2">
-            {(mode === "chord" ? chordQuizTypes : (question.diatonicChordTypeOptions ?? [])).map(
-              (choice) => {
-                const isCorrectChoice =
-                  mode === "chord"
-                    ? choice === question.promptChordType
-                    : choice === question.promptChordType;
-                const isSelectedChoice =
-                  mode === "chord"
-                    ? choice === quizSelectedChordType
-                    : choice === diatonicSelectedChordType;
-                let btnClass: string;
+            {chordQuizTypes.map((choice) => {
+              const isCorrectChoice = choice === question.promptChordType;
+              const isSelectedChoice = choice === quizSelectedChordType;
+              let btnClass: string;
 
-                if (!answered) {
-                  btnClass = isSelectedChoice
-                    ? "bg-indigo-600 text-white"
-                    : isDark
-                      ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                      : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
-                } else if (isCorrectChoice) {
-                  btnClass = "bg-green-600 text-white";
-                } else if (isSelectedChoice) {
-                  btnClass = "bg-red-500 text-white";
-                } else {
-                  btnClass = isDark
-                    ? "bg-gray-700 text-gray-500"
-                    : "bg-white text-stone-400 border border-stone-200";
-                }
+              if (!answered) {
+                btnClass = isSelectedChoice
+                  ? "bg-indigo-600 text-white"
+                  : isDark
+                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
+                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+              } else if (isCorrectChoice) {
+                btnClass = "bg-green-600 text-white";
+              } else if (isSelectedChoice) {
+                btnClass = "bg-red-500 text-white";
+              } else {
+                btnClass = isDark
+                  ? "bg-gray-700 text-gray-500"
+                  : "bg-white text-stone-400 border border-stone-200";
+              }
 
-                return (
-                  <button
-                    key={choice}
-                    type="button"
-                    disabled={
-                      !answered &&
-                      (mode === "chord"
-                        ? quizSelectedChordRoot == null
-                        : diatonicSelectedRoot == null)
-                    }
-                    onClick={() =>
-                      !answered &&
-                      (mode === "chord"
-                        ? onChordQuizTypeSelect(choice)
-                        : onDiatonicAnswerTypeSelect(choice))
-                    }
-                    className={`rounded-xl px-3 py-2 text-sm font-bold transition-all ${
-                      !answered &&
-                      (mode === "chord"
-                        ? quizSelectedChordRoot == null
-                        : diatonicSelectedRoot == null)
-                        ? "cursor-not-allowed opacity-50"
-                        : ""
-                    } ${btnClass}`}
-                  >
-                    {choice}
-                  </button>
-                );
-              },
-            )}
+              return (
+                <button
+                  key={choice}
+                  type="button"
+                  disabled={!answered && quizSelectedChordRoot == null}
+                  onClick={() => !answered && onChordQuizTypeSelect(choice)}
+                  className={`rounded-xl px-3 py-2 text-sm font-bold transition-all ${
+                    !answered && quizSelectedChordRoot == null
+                      ? "cursor-not-allowed opacity-50"
+                      : ""
+                  } ${btnClass}`}
+                >
+                  {choice}
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : quizType === "all" && mode === "diatonic" ? (
@@ -435,21 +425,26 @@ export default function QuizPanel({
                 answeredEntry?.root === entry.root &&
                 answeredEntry?.chordType === entry.chordType;
               return (
-                <div
+                <button
                   key={entry.degree}
-                  className={`rounded-xl border px-3 py-2 text-center text-sm ${
+                  type="button"
+                  disabled={answered}
+                  onClick={() => !answered && onDiatonicDegreeCardClick(entry.degree)}
+                  className={`rounded-xl border px-3 py-2 text-center text-sm transition-all ${
                     isCorrectEntry
                       ? "border-green-500 bg-green-600/20 text-white"
-                      : isCurrent
-                        ? "border-indigo-500 bg-indigo-600/20 text-white"
-                        : isDark
-                          ? "border-gray-600 bg-gray-700 text-gray-200"
-                          : "border-stone-300 bg-white text-stone-700"
+                      : answered && !isCorrectEntry && answeredEntry != null
+                        ? "border-red-400 bg-red-900/20 text-white"
+                        : isCurrent
+                          ? "border-indigo-500 bg-indigo-600/20 text-white"
+                          : isDark
+                            ? "border-gray-600 bg-gray-700 text-gray-200 [@media(hover:hover)]:hover:border-indigo-400 cursor-pointer"
+                            : "border-stone-300 bg-white text-stone-700 [@media(hover:hover)]:hover:border-indigo-400 cursor-pointer"
                   }`}
                 >
                   <div className="font-semibold">{entry.degree}</div>
                   <div>{label}</div>
-                </div>
+                </button>
               );
             })}
           </div>
@@ -570,24 +565,43 @@ export default function QuizPanel({
           {answered
             ? isCorrect
               ? t("quiz.correct")
-              : t("quiz.incorrect", { answer: question.answerLabel ?? question.correct })
+              : quizType === "fretboard"
+                ? t("quiz.incorrectOnly")
+                : t("quiz.incorrect", { answer: question.answerLabel ?? question.correct })
             : t("quiz.correct")}
         </p>
         <div className="flex justify-center">
-          <button
-            type="button"
-            onClick={mode === "scale" ? onRetryQuestion : onNextQuestion}
-            disabled={!answered}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-              answered
-                ? "bg-indigo-600 text-white hover:bg-indigo-500"
-                : isDark
-                  ? "bg-gray-700 text-gray-500"
-                  : "bg-stone-200 text-stone-400"
-            }`}
-          >
-            {mode === "scale" ? t("quiz.retry") : t("quiz.next")}
-          </button>
+          {mode === "diatonic" && quizType === "all" && !answered ? (
+            <button
+              type="button"
+              onClick={onDiatonicSubmitAll}
+              disabled={!diatonicAllFilled}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+                diatonicAllFilled
+                  ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                  : isDark
+                    ? "bg-gray-700 text-gray-500"
+                    : "bg-stone-200 text-stone-400"
+              }`}
+            >
+              {t("quiz.submit")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={mode === "scale" ? onRetryQuestion : onNextQuestion}
+              disabled={!answered}
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+                answered
+                  ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                  : isDark
+                    ? "bg-gray-700 text-gray-500"
+                    : "bg-stone-200 text-stone-400"
+              }`}
+            >
+              {mode === "scale" ? t("quiz.retry") : t("quiz.next")}
+            </button>
+          )}
         </div>
       </div>
     </div>

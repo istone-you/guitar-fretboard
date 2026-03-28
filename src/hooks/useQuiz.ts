@@ -78,6 +78,7 @@ export function useQuiz({
 }: UseQuizParams) {
   const [quizMode, setQuizMode] = useState<QuizMode>("note");
   const [quizType, setQuizType] = useState<QuizType>("choice");
+  const [fretboardAllStrings, setFretboardAllStrings] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState<QuizQuestion | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
@@ -106,6 +107,7 @@ export function useQuiz({
   const [diatonicAllAnswers, setDiatonicAllAnswers] = useState<
     Record<string, { root: string; chordType: ChordType }>
   >({});
+  const [diatonicEditingDegree, setDiatonicEditingDegree] = useState<string | null>(null);
   const [quizRevealNoteNames, setQuizRevealNoteNames] = useState<string[] | null>(null);
   const chordQuizTypesKey = chordQuizTypes.join("|");
   const previousChordQuizTypesKeyRef = useRef(chordQuizTypesKey);
@@ -216,38 +218,24 @@ export function useQuiz({
           };
         });
 
-        if (type === "all") {
-          return {
-            stringIdx,
-            fret,
-            correct: answers.map((entry) => entry.label).join(" / "),
-            choices: [],
-            answerLabel: answers.map((entry) => `${entry.degree}: ${entry.label}`).join(", "),
-            promptDiatonicKeyType: diatonicQuizKeyType,
-            promptDiatonicChordSize: diatonicQuizChordSize,
-            diatonicChordTypeOptions: uniqueChordTypes,
-            diatonicAnswers: answers,
-          };
-        }
-
-        const selected = answers[Math.floor(Math.random() * answers.length)];
         return {
           stringIdx,
           fret,
-          correct: `${selected.degree}|${selected.root}|${selected.chordType}`,
+          correct: answers.map((entry) => entry.label).join(" / "),
           choices: [],
-          answerLabel: selected.label,
-          promptRoot: selected.root,
-          promptChordType: selected.chordType,
-          promptDiatonicDegree: selected.degree,
+          answerLabel: answers.map((entry) => `${entry.degree}: ${entry.label}`).join(", "),
           promptDiatonicKeyType: diatonicQuizKeyType,
           promptDiatonicChordSize: diatonicQuizChordSize,
           diatonicChordTypeOptions: uniqueChordTypes,
+          diatonicAnswers: answers,
         };
       }
 
       if (type === "fretboard") {
         const correct = mode === "note" ? notes[noteIdx] : getDegreeName(noteIdx, rootIdx);
+        if (fretboardAllStrings && (mode === "note" || mode === "degree")) {
+          return { stringIdx, fret, correct, choices: [], correctNoteNames: [notes[noteIdx]] };
+        }
         return { stringIdx, fret, correct, choices: [] };
       }
 
@@ -267,6 +255,7 @@ export function useQuiz({
       diatonicQuizChordSize,
       diatonicQuizKeyType,
       fretRange,
+      fretboardAllStrings,
       rootNote,
       scaleType,
     ],
@@ -283,6 +272,7 @@ export function useQuiz({
     setDiatonicSelectedRoot(null);
     setDiatonicSelectedChordType(null);
     setDiatonicAllAnswers({});
+    setDiatonicEditingDegree(null);
     setQuizRevealNoteNames(null);
     setQuizScore({ correct: 0, total: 0 });
   }, []);
@@ -298,6 +288,7 @@ export function useQuiz({
     setDiatonicSelectedRoot(null);
     setDiatonicSelectedChordType(null);
     setDiatonicAllAnswers({});
+    setDiatonicEditingDegree(null);
     setQuizRevealNoteNames(null);
   }, []);
 
@@ -469,6 +460,46 @@ export function useQuiz({
         return;
       }
 
+      if ((quizMode === "note" || quizMode === "degree") && fretboardAllStrings) {
+        const clickedNoteName = notes[clickedNoteIdx];
+        const correctNoteNames = quizQuestion.correctNoteNames ?? [];
+        const isCorrectNote = correctNoteNames.includes(clickedNoteName);
+
+        if (!isCorrectNote) {
+          setQuizAnsweredCell({ stringIdx, fret });
+          setQuizCorrectCell(null);
+          setQuizRevealNoteNames(correctNoteNames);
+          setSelectedAnswer(clickedNoteName);
+          setQuizScore((prev) => ({ correct: prev.correct, total: prev.total + 1 }));
+          return;
+        }
+
+        const nextSelectedCells = [
+          ...quizSelectedCells,
+          ...(quizSelectedCells.some((cell) => cell.stringIdx === stringIdx && cell.fret === fret)
+            ? []
+            : [{ stringIdx, fret }]),
+        ];
+        setQuizSelectedCells(nextSelectedCells);
+
+        const totalCorrectCells = Array.from({ length: 6 }, (_, s) => s).reduce(
+          (count, s) =>
+            count +
+            Array.from(
+              { length: fretRange[1] - fretRange[0] + 1 },
+              (_, i) => fretRange[0] + i,
+            ).filter((f) => correctNoteNames.includes(notes[getNoteIndex(s, f)])).length,
+          0,
+        );
+
+        if (nextSelectedCells.length === totalCorrectCells) {
+          setQuizRevealNoteNames(correctNoteNames);
+          setSelectedAnswer(quizQuestion.correct);
+          setQuizScore((prev) => ({ correct: prev.correct + 1, total: prev.total + 1 }));
+        }
+        return;
+      }
+
       const isCorrect =
         quizMode === "note"
           ? notes[clickedNoteIdx] === quizQuestion.correct
@@ -495,6 +526,8 @@ export function useQuiz({
       rootNote,
       quizMode,
       quizSelectedCells,
+      fretboardAllStrings,
+      fretRange,
     ],
   );
 
@@ -517,6 +550,34 @@ export function useQuiz({
     [quizMode, selectedAnswer],
   );
 
+  const handleDiatonicDegreeCardClick = useCallback(
+    (degree: string) => {
+      if (quizMode !== "diatonic" || quizType !== "all" || selectedAnswer !== null) return;
+      // どの度数カードでもクリックで編集対象を切り替え（回答はそのまま残す）
+      setDiatonicEditingDegree(degree);
+      setDiatonicSelectedRoot(null);
+      setDiatonicSelectedChordType(null);
+    },
+    [quizMode, quizType, selectedAnswer],
+  );
+
+  const handleDiatonicSubmitAll = useCallback(() => {
+    if (quizMode !== "diatonic" || quizType !== "all" || selectedAnswer !== null) return;
+    if (quizQuestion?.diatonicAnswers == null) return;
+
+    const isCorrect =
+      quizQuestion.diatonicAnswers.every(
+        (entry) =>
+          diatonicAllAnswers[entry.degree]?.root === entry.root &&
+          diatonicAllAnswers[entry.degree]?.chordType === entry.chordType,
+      ) ?? false;
+    setSelectedAnswer(isCorrect ? quizQuestion.correct : "diatonic-all");
+    setQuizScore((prev) => ({
+      correct: prev.correct + (isCorrect ? 1 : 0),
+      total: prev.total + 1,
+    }));
+  }, [quizMode, quizType, selectedAnswer, quizQuestion, diatonicAllAnswers]);
+
   const handleDiatonicAnswerTypeSelect = useCallback(
     (chordType: ChordType) => {
       if (quizMode !== "diatonic" || selectedAnswer !== null || quizQuestion == null) return;
@@ -524,51 +585,37 @@ export function useQuiz({
 
       setDiatonicSelectedChordType(chordType);
 
-      if (quizType === "identify") {
-        const isCorrect =
-          diatonicSelectedRoot === quizQuestion.promptRoot &&
-          chordType === quizQuestion.promptChordType;
-        setSelectedAnswer(
-          `${quizQuestion.promptDiatonicDegree}|${diatonicSelectedRoot}|${chordType}`,
-        );
-        setQuizScore((prev) => ({
-          correct: prev.correct + (isCorrect ? 1 : 0),
-          total: prev.total + 1,
-        }));
-        return;
-      }
-
-      const nextDegree =
+      // allモード: 編集対象の度数に上書き保存、自動で次の未回答へ移動
+      const targetDegree =
+        diatonicEditingDegree ??
         quizQuestion.diatonicAnswers?.find((entry) => diatonicAllAnswers[entry.degree] == null)
-          ?.degree ?? null;
-      if (nextDegree == null) return;
+          ?.degree ??
+        null;
+      if (targetDegree == null) return;
 
       const nextAnswers = {
         ...diatonicAllAnswers,
-        [nextDegree]: { root: diatonicSelectedRoot, chordType },
+        [targetDegree]: { root: diatonicSelectedRoot, chordType },
       };
       setDiatonicAllAnswers(nextAnswers);
       setDiatonicSelectedRoot(null);
       setDiatonicSelectedChordType(null);
 
-      const completed = quizQuestion.diatonicAnswers?.every(
-        (entry) => nextAnswers[entry.degree] != null,
-      );
-      if (!completed) return;
-
-      const isCorrect =
-        quizQuestion.diatonicAnswers?.every(
-          (entry) =>
-            nextAnswers[entry.degree]?.root === entry.root &&
-            nextAnswers[entry.degree]?.chordType === entry.chordType,
-        ) ?? false;
-      setSelectedAnswer(isCorrect ? quizQuestion.correct : "diatonic-all");
-      setQuizScore((prev) => ({
-        correct: prev.correct + (isCorrect ? 1 : 0),
-        total: prev.total + 1,
-      }));
+      // 次の未回答度数へ自動移動（なければ今のままキープ）
+      const nextUnanswered =
+        quizQuestion.diatonicAnswers?.find((entry) => nextAnswers[entry.degree] == null)?.degree ??
+        null;
+      setDiatonicEditingDegree(nextUnanswered ?? targetDegree);
     },
-    [diatonicAllAnswers, diatonicSelectedRoot, quizMode, quizQuestion, quizType, selectedAnswer],
+    [
+      diatonicAllAnswers,
+      diatonicEditingDegree,
+      diatonicSelectedRoot,
+      quizMode,
+      quizQuestion,
+      quizType,
+      selectedAnswer,
+    ],
   );
 
   useEffect(() => {
@@ -671,6 +718,7 @@ export function useQuiz({
     diatonicSelectedRoot,
     diatonicSelectedChordType,
     diatonicAllAnswers,
+    diatonicEditingDegree,
     quizRevealNoteNames,
     setQuizMode,
     setQuizType,
@@ -683,10 +731,14 @@ export function useQuiz({
     handleChordQuizTypeSelect,
     handleDiatonicAnswerRootSelect,
     handleDiatonicAnswerTypeSelect,
+    handleDiatonicDegreeCardClick,
+    handleDiatonicSubmitAll,
     handleFretboardQuizAnswer,
     handleNextQuestion,
     handleRetryQuestion,
     setDiatonicQuizKeyType,
     setDiatonicQuizChordSize,
+    fretboardAllStrings,
+    setFretboardAllStrings,
   };
 }

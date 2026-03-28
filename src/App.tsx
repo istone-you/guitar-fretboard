@@ -146,6 +146,7 @@ export default function App() {
     diatonicSelectedRoot,
     diatonicSelectedChordType,
     diatonicAllAnswers,
+    diatonicEditingDegree,
     quizRevealNoteNames,
     handleQuizKindChange,
     handleQuizAnswer,
@@ -153,11 +154,15 @@ export default function App() {
     handleChordQuizTypeSelect,
     handleDiatonicAnswerRootSelect,
     handleDiatonicAnswerTypeSelect,
+    handleDiatonicDegreeCardClick,
+    handleDiatonicSubmitAll,
     handleFretboardQuizAnswer,
     handleNextQuestion,
     handleRetryQuestion,
     setDiatonicQuizKeyType,
     setDiatonicQuizChordSize,
+    fretboardAllStrings,
+    setFretboardAllStrings,
   } = useQuiz({
     accidental,
     chordQuizTypes,
@@ -306,7 +311,10 @@ export default function App() {
             }
             quizAnswerMode={quizType === "fretboard"}
             quizTargetString={
-              quizType === "fretboard" && quizMode !== "chord" && quizMode !== "scale"
+              quizType === "fretboard" &&
+              quizMode !== "chord" &&
+              quizMode !== "scale" &&
+              !fretboardAllStrings
                 ? quizQuestion?.stringIdx
                 : undefined
             }
@@ -356,6 +364,7 @@ export default function App() {
               diatonicSelectedRoot={diatonicSelectedRoot}
               diatonicSelectedChordType={diatonicSelectedChordType}
               diatonicAllAnswers={diatonicAllAnswers}
+              diatonicEditingDegree={diatonicEditingDegree}
               diatonicQuizKeyType={diatonicQuizKeyType}
               diatonicQuizChordSize={diatonicQuizChordSize}
               chordQuizTypes={chordQuizTypes}
@@ -371,8 +380,12 @@ export default function App() {
               onChordQuizTypeSelect={handleChordQuizTypeSelect}
               onDiatonicAnswerRootSelect={handleDiatonicAnswerRootSelect}
               onDiatonicAnswerTypeSelect={handleDiatonicAnswerTypeSelect}
+              onDiatonicDegreeCardClick={handleDiatonicDegreeCardClick}
+              onDiatonicSubmitAll={handleDiatonicSubmitAll}
               onNextQuestion={handleNextQuestion}
               onRetryQuestion={handleRetryQuestion}
+              fretboardAllStrings={fretboardAllStrings}
+              onFretboardAllStringsChange={setFretboardAllStrings}
             />
           </div>
         )}

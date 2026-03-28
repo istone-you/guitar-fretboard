@@ -106,6 +106,10 @@ bun run typecheck  # TypeScript 型チェック
 bun run test       # Vitest テスト
 ```
 
+### useEffect の使用について
+
+`useEffect` を使う場合は https://zenn.dev/begineer/articles/8a0696fda04c09 のチェックリストに該当するかどうかを確認すること。該当しない場合は使わないこと。
+
 ## 6. 出力依頼
 
 まずは、この指板ロジックの核となる「音名配置」と「度数計算ロジック」、および指板の基本UI（HTML/CSS）を作成してください。

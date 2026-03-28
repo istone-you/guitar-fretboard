@@ -113,13 +113,20 @@
     "questionScaleFretboard": "Where are the notes of {{root}} {{scale}}?",
     "questionChordFretboard": "Select the chord tones of {{chord}}",
     "questionChordIdentify": "What chord is this?",
-    "questionDiatonicIdentify": "What is {{degree}} in {{root}} {{keyType}} / {{chordSize}}?",
     "questionDiatonicAll": "What are the diatonic chords in {{root}} {{keyType}} / {{chordSize}}?",
+    "questionNoteAllStrings": "Where is {{note}}?",
+    "questionDegreeAllStrings": "Where is {{degree}}? (Root: {{root}})",
+    "fretboardMode": {
+      "singleString": "Single string",
+      "allStrings": "All strings"
+    },
     "tapInstruction": "Tap the fretboard to answer",
     "correct": "Correct!",
     "incorrect": "Wrong… the answer is {{answer}}",
+    "incorrectOnly": "Wrong…",
     "next": "Next",
     "retry": "Retry",
+    "submit": "Submit",
     "mode": {
       "note": "Notes",
       "degree": "Degrees"
@@ -135,7 +142,6 @@
       "degreeFretboard": "Degree / Fretboard",
       "scaleChoice": "Scale / Note Select",
       "scaleFretboard": "Scale / Fretboard",
-      "diatonicIdentify": "Diatonic / Identify",
       "diatonicAll": "Diatonic / Full",
       "chordChoice": "Chord / Identify",
       "chordFretboard": "Chord / Fretboard"
