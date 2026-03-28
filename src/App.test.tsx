@@ -6,6 +6,7 @@ const controlsState: { latest: Record<string, unknown> | null } = { latest: null
 const normalFretboardState: { latest: Record<string, unknown> | null } = { latest: null };
 const quizFretboardState: { latest: Record<string, unknown> | null } = { latest: null };
 const headerState: { latest: Record<string, unknown> | null } = { latest: null };
+const footerState: { latest: Record<string, unknown> | null } = { latest: null };
 
 vi.mock("./components/SettingsMenu/index", () => ({
   default: (props: any) => (
@@ -75,6 +76,21 @@ vi.mock("./components/FretboardHeader/index", () => ({
   },
 }));
 
+vi.mock("./components/FretboardFooter/index", () => ({
+  default: (props: any) => {
+    footerState.latest = props;
+    return (
+      <div>
+        <span>footer-mode:{String(props.baseLabelMode)}</span>
+        <span>footer-notes:{String((props.overlayNotes as string[]).join(","))}</span>
+        <button onClick={() => props.onAutoFilter?.()}>footer-auto</button>
+        <button onClick={() => props.onResetOrHideAll?.()}>footer-reset</button>
+        <button onClick={() => props.onToggleDegree?.("P1")}>footer-toggle-p1</button>
+      </div>
+    );
+  },
+}));
+
 vi.mock("./components/NormalFretboard/index", () => ({
   default: (props: any) => {
     normalFretboardState.latest = props;
@@ -116,6 +132,7 @@ describe("App", () => {
     normalFretboardState.latest = null;
     quizFretboardState.latest = null;
     headerState.latest = null;
+    footerState.latest = null;
   });
 
   it("ヘッダーと指板に初期状態を渡す", () => {
@@ -127,6 +144,7 @@ describe("App", () => {
     expect(screen.getByText("fb-accidental:flat")).toBeTruthy();
     expect(screen.getByText("fb-triad:1-3-root")).toBeTruthy();
     expect(screen.getByText("fb-diatonic:major-triad:I")).toBeTruthy();
+    expect(screen.getByText("footer-mode:note")).toBeTruthy();
   });
 
   it("theme と accidental を localStorage から復元する", () => {
@@ -202,22 +220,22 @@ describe("App", () => {
     render(<App />);
 
     fireEvent.click(screen.getByText("header-degree"));
-    expect(screen.getByText("絞り込む")).toBeTruthy();
+    expect(screen.getByText("footer-mode:degree")).toBeTruthy();
 
-    fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
+    fireEvent.click(screen.getByText("footer-auto"));
     expect(screen.getByText("fb-hidden:0")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("全非表示"));
+    fireEvent.click(screen.getByText("footer-reset"));
     expect(screen.getByText("fb-hidden:12")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("リセット"));
+    fireEvent.click(screen.getByText("footer-reset"));
     expect(screen.getByText("fb-hidden:0")).toBeTruthy();
 
     fireEvent.click(screen.getByText("scale-toggle"));
     fireEvent.click(screen.getByText("chord-toggle"));
     fireEvent.click(screen.getByText("mode-diatonic"));
     fireEvent.click(screen.getByText("degree-v"));
-    fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
+    fireEvent.click(screen.getByText("footer-auto"));
 
     expect(normalFretboardState.latest).toBeTruthy();
     expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
@@ -227,14 +245,36 @@ describe("App", () => {
     render(<App />);
 
     fireEvent.click(screen.getByText("header-degree"));
-    fireEvent.click(screen.getByText("P1"));
+    fireEvent.click(screen.getByText("footer-toggle-p1"));
     expect(screen.getByText("fb-hidden:1")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("P1"));
+    fireEvent.click(screen.getByText("footer-toggle-p1"));
     expect(screen.getByText("fb-hidden:0")).toBeTruthy();
 
     fireEvent.click(screen.getByText("header-note"));
-    expect(screen.queryByText("絞り込む")).toBeNull();
+    expect(screen.getByText("footer-mode:note")).toBeTruthy();
+  });
+
+  it("音名表示時は表示中オーバーレイの構成音を下に表示する", () => {
+    render(<App />);
+
+    expect(screen.getByText("footer-notes:")).toBeTruthy();
+
+    fireEvent.click(screen.getByText("scale-toggle"));
+
+    expect(screen.getByText("footer-notes:C,D,E,F,G,A,B")).toBeTruthy();
+  });
+
+  it("臨時記号設定に応じて下部の音名表示も切り替わる", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByText("note-db"));
+    fireEvent.click(screen.getByText("scale-toggle"));
+
+    expect(screen.getByText("footer-notes:D♭,E♭,F,G♭,A♭,B♭,C")).toBeTruthy();
+
+    fireEvent.click(screen.getByText("acc-sharp"));
+    expect(screen.getByText("footer-notes:C♯,D♯,F,F♯,G♯,A♯,C")).toBeTruthy();
   });
 
   it("コードフォームとパワーコードでも自動絞り込みできる", () => {
@@ -242,13 +282,13 @@ describe("App", () => {
 
     fireEvent.click(screen.getByText("header-degree"));
     fireEvent.click(screen.getByText("chord-toggle"));
-    fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
+    fireEvent.click(screen.getByText("footer-auto"));
     expect(normalFretboardState.latest).toBeTruthy();
     expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByText("リセット"));
+    fireEvent.click(screen.getByText("footer-reset"));
     fireEvent.click(screen.getByText("mode-power"));
-    fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
+    fireEvent.click(screen.getByText("footer-auto"));
     expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
   });
 
@@ -257,7 +297,7 @@ describe("App", () => {
 
     fireEvent.click(screen.getByText("header-degree"));
     fireEvent.click(screen.getByText("caged-toggle"));
-    fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
+    fireEvent.click(screen.getByText("footer-auto"));
 
     expect(normalFretboardState.latest).toBeTruthy();
     expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);

@@ -47,6 +47,9 @@
     "reset": "リセット",
     "hideAll": "全非表示"
   },
+  "overlayNotes": {
+    "title": "表示中の音名"
+  },
   "scaleGroups": {
     "basics": "基本",
     "minorDerived": "マイナー派生",

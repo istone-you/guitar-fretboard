@@ -81,6 +81,50 @@ test("度数表示で度数フィルターを操作できる", async ({ page }) 
   await expect(degreeSection.getByRole("button", { name: "全非表示", exact: true })).toBeVisible();
 });
 
+test("各レイヤー選択時に下部へ正しい構成音が表示される", async ({ page }) => {
+  await page.goto("/");
+
+  const noteSection = page
+    .getByRole("heading", { name: "表示中の音名", exact: true })
+    .locator("xpath=../..");
+
+  await activateLayer(page, "スケール");
+  await expect(noteSection.getByText("C", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("D", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("F", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("A", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("B", { exact: true })).toBeVisible();
+
+  await selectFromDialog(page, "メジャースケール", "スケール一覧", "ブルーノート");
+  await expect(noteSection.getByText("C", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E♭", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("F", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G♭", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("B♭", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E", { exact: true })).toHaveCount(0);
+  await expect(noteSection.getByText("A", { exact: true })).toHaveCount(0);
+  await expect(noteSection.getByText("B", { exact: true })).toHaveCount(0);
+
+  await activateLayer(page, "コード");
+  await expect(noteSection.getByText("C", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E♭", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G♭", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("B♭", { exact: true })).toBeVisible();
+
+  await activateLayer(page, "スケール");
+  await expect(noteSection.getByText("C", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("G", { exact: true })).toBeVisible();
+  await expect(noteSection.getByText("E♭", { exact: true })).toHaveCount(0);
+  await expect(noteSection.getByText("G♭", { exact: true })).toHaveCount(0);
+  await expect(noteSection.getByText("B♭", { exact: true })).toHaveCount(0);
+});
+
 test("スケールとコードの主要選択 UI を操作できる", async ({ page }) => {
   await page.goto("/");
 

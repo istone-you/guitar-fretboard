@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useMemo, useState } from "react";
 import "./i18n";
 import Controls from "./components/Controls/index";
 import SettingsMenu from "./components/SettingsMenu/index";
@@ -7,11 +6,17 @@ import NormalFretboard from "./components/NormalFretboard/index";
 import QuizFretboard from "./components/QuizFretboard/index";
 import QuizPanel from "./components/QuizPanel/index";
 import FretboardHeader from "./components/FretboardHeader/index";
+import FretboardFooter from "./components/FretboardFooter/index";
 import { useDegreeFilter } from "./hooks/useDegreeFilter";
 import { useDiatonicSelection } from "./hooks/useDiatonicSelection";
 import { usePersistedSetting } from "./hooks/usePersistedSetting";
 import { useQuiz } from "./hooks/useQuiz";
-import { NOTES_SHARP, NOTES_FLAT, getRootIndex } from "./logic/fretboard";
+import {
+  NOTES_SHARP,
+  NOTES_FLAT,
+  getActiveOverlaySemitones,
+  getRootIndex,
+} from "./logic/fretboard";
 import type {
   Theme,
   Accidental,
@@ -49,7 +54,6 @@ function readStoredFretboardDisplaySize(): FretboardDisplaySize {
 }
 
 export default function App() {
-  const { t } = useTranslation();
   // ルート音
   const [rootNote, setRootNote] = useState("C");
   // フレット範囲
@@ -141,6 +145,38 @@ export default function App() {
   });
   const triadLayout = `${triadStringSet}-${triadInversion}`;
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
+  const overlaySemitones = useMemo(
+    () =>
+      getActiveOverlaySemitones({
+        rootNote,
+        showScale,
+        scaleType,
+        showCaged,
+        showChord,
+        chordDisplayMode,
+        diatonicScaleType,
+        diatonicDegree,
+        chordType,
+      }),
+    [
+      rootNote,
+      showScale,
+      scaleType,
+      showCaged,
+      showChord,
+      chordDisplayMode,
+      diatonicScaleType,
+      diatonicDegree,
+      chordType,
+    ],
+  );
+  const overlayNotes = useMemo(() => {
+    const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+    const rootIndex = getRootIndex(rootNote);
+    return [...overlaySemitones]
+      .sort((left, right) => left - right)
+      .map((semitone) => notes[(rootIndex + semitone) % 12]);
+  }, [accidental, overlaySemitones, rootNote]);
 
   return (
     <div
@@ -287,83 +323,30 @@ export default function App() {
           </div>
         )}
 
-        <div className="mt-4 min-h-[5.75rem]">
-          {baseLabelMode === "degree" && !showQuiz && (
-            <>
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-                  {t("degreeFilter.title")}
-                </h3>
-                <button
-                  onClick={() =>
-                    handleAutoFilter({
-                      rootNote,
-                      showScale,
-                      scaleType,
-                      showCaged,
-                      showChord,
-                      chordDisplayMode,
-                      diatonicScaleType,
-                      diatonicDegree,
-                      chordType,
-                    })
-                  }
-                  title={t("degreeFilter.filterTitle")}
-                  className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
-                    theme === "dark"
-                      ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
-                      : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
-                  }`}
-                >
-                  {t("degreeFilter.filter")}
-                </button>
-                <button
-                  onClick={() => (hiddenDegrees.size > 0 ? resetHiddenDegrees() : hideAllDegrees())}
-                  className={`text-xs px-2 py-0.5 rounded-full border transition-all ${
-                    theme === "dark"
-                      ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
-                      : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
-                  }`}
-                >
-                  {hiddenDegrees.size > 0 ? t("degreeFilter.reset") : t("degreeFilter.hideAll")}
-                </button>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                {[
-                  ["P1", "#ef4444"],
-                  ["m2", "#ec4899"],
-                  ["M2", "#84cc16"],
-                  ["m3", "#a855f7"],
-                  ["M3", "#22c55e"],
-                  ["P4", "#06b6d4"],
-                  ["b5", "#6b7280"],
-                  ["P5", "#3b82f6"],
-                  ["m6", "#8b5cf6"],
-                  ["M6", "#10b981"],
-                  ["m7", "#f97316"],
-                  ["M7", "#f59e0b"],
-                ].map(([name, color]) => {
-                  const hidden = hiddenDegrees.has(name);
-                  return (
-                    <div
-                      key={name}
-                      className="flex items-center gap-1 cursor-pointer select-none"
-                      style={{ opacity: hidden ? 0.3 : 1 }}
-                      onClick={() => toggleDegree(name)}
-                    >
-                      <div className="w-6 h-6 rounded-full" style={{ backgroundColor: color }} />
-                      <span
-                        className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
-                      >
-                        {name}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
-        </div>
+        <FretboardFooter
+          theme={theme}
+          baseLabelMode={baseLabelMode}
+          showQuiz={showQuiz}
+          overlayNotes={overlayNotes}
+          hiddenDegrees={hiddenDegrees}
+          onAutoFilter={() =>
+            handleAutoFilter({
+              rootNote,
+              showScale,
+              scaleType,
+              showCaged,
+              showChord,
+              chordDisplayMode,
+              diatonicScaleType,
+              diatonicDegree,
+              chordType,
+            })
+          }
+          onResetOrHideAll={() =>
+            hiddenDegrees.size > 0 ? resetHiddenDegrees() : hideAllDegrees()
+          }
+          onToggleDegree={toggleDegree}
+        />
       </main>
     </div>
   );
