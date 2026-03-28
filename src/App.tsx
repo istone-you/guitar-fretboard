@@ -46,7 +46,8 @@ function readStoredFretboardDisplaySize(): FretboardDisplaySize {
   if (typeof window === "undefined") return "standard";
   const stored = window.localStorage.getItem(STORAGE_KEYS.fretboardDisplaySize);
   if (stored === "standard" || stored === "compact" || stored === "tiny") return stored;
-  return window.innerWidth < 640 ? "compact" : "standard";
+  if (window.innerWidth < 640) return "tiny";
+  return "standard";
 }
 
 export default function App() {
