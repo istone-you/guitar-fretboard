@@ -1,4 +1,8 @@
 {
+  "mode": {
+    "normal": "通常",
+    "quiz": "クイズ"
+  },
   "settings": "設定",
   "howToUse": "使い方",
   "howToUseItems": {
@@ -16,7 +20,8 @@
   "layers": {
     "scale": "スケール",
     "caged": "CAGED",
-    "chord": "コード"
+    "chord": "コード",
+    "quiz": "クイズ"
   },
   "controls": {
     "displayMode": "表示形式",
@@ -32,7 +37,8 @@
     "fret": "フレット",
     "display": "表示",
     "note": "音名",
-    "degree": "度数"
+    "degree": "度数",
+    "quiz": "クイズ"
   },
   "degreeFilter": {
     "title": "度数",
@@ -93,6 +99,16 @@
       "mixolydian": "ミクソリディアン",
       "aeolian": "エオリアン",
       "locrian": "ロクリアン"
+    }
+  },
+  "quiz": {
+    "questionNote": "{{string}}弦 {{fret}}フレットの音は？",
+    "questionDegree": "{{string}}弦 {{fret}}フレットの度数は？（ルート: {{root}}）",
+    "correct": "正解！",
+    "incorrect": "不正解… 正解は {{answer}}",
+    "mode": {
+      "note": "音名",
+      "degree": "度数"
     }
   }
 }

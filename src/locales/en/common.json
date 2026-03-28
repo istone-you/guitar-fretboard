@@ -1,4 +1,8 @@
 {
+  "mode": {
+    "normal": "Normal",
+    "quiz": "Quiz"
+  },
   "settings": "Settings",
   "howToUse": "How to Use",
   "howToUseItems": {
@@ -16,7 +20,8 @@
   "layers": {
     "scale": "Scale",
     "caged": "CAGED",
-    "chord": "Chord"
+    "chord": "Chord",
+    "quiz": "Quiz"
   },
   "controls": {
     "displayMode": "Display",
@@ -32,7 +37,8 @@
     "fret": "Fret",
     "display": "Labels",
     "note": "Notes",
-    "degree": "Degrees"
+    "degree": "Degrees",
+    "quiz": "Quiz"
   },
   "degreeFilter": {
     "title": "Degrees",
@@ -93,6 +99,16 @@
       "mixolydian": "Mixolydian",
       "aeolian": "Aeolian",
       "locrian": "Locrian"
+    }
+  },
+  "quiz": {
+    "questionNote": "String {{string}}, Fret {{fret}} — what note?",
+    "questionDegree": "String {{string}}, Fret {{fret}} — what degree? (Root: {{root}})",
+    "correct": "Correct!",
+    "incorrect": "Wrong… the answer is {{answer}}",
+    "mode": {
+      "note": "Notes",
+      "degree": "Degrees"
     }
   }
 }

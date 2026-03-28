@@ -43,6 +43,8 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     setDiatonicChordSize: vi.fn(),
     diatonicDegree: "I",
     setDiatonicDegree: vi.fn(),
+    showQuiz: false,
+    setShowQuiz: vi.fn(),
     onThemeChange: vi.fn(),
     ...overrides,
   };

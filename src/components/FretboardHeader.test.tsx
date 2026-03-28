@@ -10,6 +10,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     accidental: "flat" as Accidental,
     baseLabelMode: "note" as BaseLabelMode,
     fretRange: [0, 14] as [number, number],
+    showQuiz: false,
     onBaseLabelModeChange: vi.fn(),
     onRootNoteChange: vi.fn(),
     onFretRangeChange: vi.fn(),

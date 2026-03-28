@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import "./i18n";
 import Controls from "./components/Controls";
 import Fretboard from "./components/Fretboard";
+import QuizPanel, { type QuizMode, type QuizQuestion } from "./components/QuizPanel";
 import FretboardHeader from "./components/FretboardHeader";
 import {
   DIATONIC_CHORDS,
@@ -12,6 +13,8 @@ import {
   SCALE_DEGREES,
   CHORD_SEMITONES,
   getDiatonicChordSemitones,
+  getNoteIndex,
+  getDegreeName,
 } from "./logic/fretboard";
 import type {
   Theme,
@@ -56,6 +59,12 @@ export default function App() {
   const [rootNote, setRootNote] = useState("C");
   // フレット範囲
   const [fretRange, setFretRange] = useState<[number, number]>([0, 14]);
+  // クイズ機能
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [quizMode, setQuizMode] = useState<QuizMode>("note");
+  const [quizQuestion, setQuizQuestion] = useState<QuizQuestion | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
   // 臨時記号表示（sharp / flat）
   const [accidental, setAccidental] = useState<Accidental>(readStoredAccidental);
   // ベースレイヤー表示
@@ -110,6 +119,61 @@ export default function App() {
     setRootNote(noteName);
   };
 
+  // クイズ用ヘルパー
+  const DEGREE_NAMES = ["P1", "m2", "M2", "m3", "M3", "P4", "b5", "P5", "m6", "M6", "m7", "M7"];
+
+  const generateQuizQuestion = useCallback(
+    (mode: QuizMode): QuizQuestion => {
+      const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+      const stringIdx = Math.floor(Math.random() * 6);
+      const fret = fretRange[0] + Math.floor(Math.random() * (fretRange[1] - fretRange[0] + 1));
+      const noteIdx = getNoteIndex(stringIdx, fret);
+      const rootIdx = getRootIndex(rootNote);
+
+      if (mode === "note") {
+        const correct = notes[noteIdx];
+        const pool = notes.filter((n) => n !== correct).sort(() => Math.random() - 0.5);
+        const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+        return { stringIdx, fret, correct, choices };
+      } else {
+        const correct = getDegreeName(noteIdx, rootIdx);
+        const pool = DEGREE_NAMES.filter((d) => d !== correct).sort(() => Math.random() - 0.5);
+        const choices = [...pool.slice(0, 3), correct].sort(() => Math.random() - 0.5);
+        return { stringIdx, fret, correct, choices };
+      }
+    },
+    [accidental, fretRange, rootNote],
+  );
+
+  const startQuiz = useCallback(() => {
+    setQuizScore({ correct: 0, total: 0 });
+    setSelectedAnswer(null);
+    setQuizQuestion(generateQuizQuestion(quizMode));
+  }, [generateQuizQuestion, quizMode]);
+
+  const handleQuizModeChange = useCallback(
+    (mode: QuizMode) => {
+      setQuizMode(mode);
+      setSelectedAnswer(null);
+      setQuizScore({ correct: 0, total: 0 });
+      setQuizQuestion(generateQuizQuestion(mode));
+    },
+    [generateQuizQuestion],
+  );
+
+  const handleQuizAnswer = useCallback(
+    (answer: string) => {
+      if (selectedAnswer !== null || quizQuestion === null) return;
+      const isCorrect = answer === quizQuestion.correct;
+      setSelectedAnswer(answer);
+      setQuizScore((prev) => ({
+        correct: prev.correct + (isCorrect ? 1 : 0),
+        total: prev.total + 1,
+      }));
+    },
+    [selectedAnswer, quizQuestion],
+  );
+
   const handleDiatonicKeyTypeChange = (value: string) => {
     const validDegrees = DIATONIC_CHORDS[`${value}-${diatonicChordSize}`].map((item) => item.value);
     setDiatonicKeyType(value);
@@ -124,6 +188,29 @@ export default function App() {
 
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
+
+  // クイズ自動進行
+  useEffect(() => {
+    if (selectedAnswer === null || quizQuestion === null) return;
+    const timer = setTimeout(() => {
+      setSelectedAnswer(null);
+      setQuizQuestion(generateQuizQuestion(quizMode));
+    }, 1200);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAnswer]);
+
+  // クイズ開始時に初期問題を生成
+  useEffect(() => {
+    if (showQuiz && quizQuestion === null) {
+      startQuiz();
+    }
+    if (!showQuiz) {
+      setQuizQuestion(null);
+      setSelectedAnswer(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showQuiz]);
 
   const handleFretboardDisplaySizeChange = (size: FretboardDisplaySize) => {
     setFretboardDisplaySize(size);
@@ -234,6 +321,8 @@ export default function App() {
           setDiatonicChordSize={handleDiatonicChordSizeChange}
           diatonicDegree={diatonicDegree}
           setDiatonicDegree={setDiatonicDegree}
+          showQuiz={showQuiz}
+          setShowQuiz={setShowQuiz}
         />
 
         <FretboardHeader
@@ -242,6 +331,7 @@ export default function App() {
           accidental={accidental}
           baseLabelMode={baseLabelMode}
           fretRange={fretRange}
+          showQuiz={showQuiz}
           onBaseLabelModeChange={setBaseLabelMode}
           onRootNoteChange={handleNoteClick}
           onFretRangeChange={setFretRange}
@@ -253,11 +343,11 @@ export default function App() {
           baseLabelMode={baseLabelMode}
           displaySize={fretboardDisplaySize}
           fretRange={fretRange}
-          showChord={showChord}
+          showChord={showQuiz ? false : showChord}
           chordDisplayMode={chordDisplayMode}
-          showScale={showScale}
+          showScale={showQuiz ? false : showScale}
           scaleType={scaleType}
-          showCaged={showCaged}
+          showCaged={showQuiz ? false : showCaged}
           cagedForms={cagedForms}
           chordType={chordType}
           triadPosition={triadLayout}
@@ -265,7 +355,27 @@ export default function App() {
           diatonicDegree={diatonicDegree}
           onNoteClick={handleNoteClick}
           hiddenDegrees={hiddenDegrees}
+          quizCell={
+            showQuiz && quizQuestion
+              ? { stringIdx: quizQuestion.stringIdx, fret: quizQuestion.fret }
+              : undefined
+          }
         />
+
+        {showQuiz && quizQuestion && (
+          <div className="max-w-[840px] mx-auto w-full">
+            <QuizPanel
+              theme={theme}
+              mode={quizMode}
+              question={quizQuestion}
+              score={quizScore}
+              selectedAnswer={selectedAnswer}
+              rootNote={rootNote}
+              onModeChange={handleQuizModeChange}
+              onAnswer={handleQuizAnswer}
+            />
+          </div>
+        )}
 
         <div className="mt-4 min-h-[5.75rem]">
           {baseLabelMode === "degree" && (

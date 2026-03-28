@@ -135,6 +135,7 @@ interface FretboardProps {
   diatonicDegree: string;
   onNoteClick: (noteName: string) => void;
   hiddenDegrees?: Set<string>;
+  quizCell?: { stringIdx: number; fret: number };
 }
 
 export default function Fretboard({
@@ -156,8 +157,10 @@ export default function Fretboard({
   diatonicDegree,
   onNoteClick,
   hiddenDegrees = new Set(),
+  quizCell,
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
+  const quizActive = quizCell !== undefined;
   const size = FRETBOARD_SIZE_CONFIG[displaySize];
   const rootIndex = getRootIndex(rootNote);
   const diatonicChord =
@@ -344,6 +347,8 @@ export default function Fretboard({
               visibleFrets={visibleFrets}
               onNoteClick={onNoteClick}
               hiddenDegrees={hiddenDegrees}
+              quizActive={quizActive}
+              quizTargetFret={quizCell?.stringIdx === stringIdx ? quizCell.fret : null}
             />
           ))}
         </div>
@@ -424,6 +429,8 @@ interface StringRowProps {
   visibleFrets: number[];
   onNoteClick: (noteName: string) => void;
   hiddenDegrees: Set<string>;
+  quizActive: boolean;
+  quizTargetFret: number | null;
 }
 
 function StringRow({
@@ -441,6 +448,8 @@ function StringRow({
   visibleFrets,
   onNoteClick,
   hiddenDegrees,
+  quizActive,
+  quizTargetFret,
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -518,6 +527,8 @@ function StringRow({
             theme={theme}
             size={size}
             onClick={() => onNoteClick(noteName)}
+            isQuizTarget={fret === quizTargetFret}
+            quizActive={quizActive}
           />
         );
       })}
@@ -550,6 +561,8 @@ interface FretCellComponentProps {
   theme: Theme;
   size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
   onClick: () => void;
+  isQuizTarget: boolean;
+  quizActive: boolean;
 }
 
 function FretCellComponent({
@@ -566,9 +579,11 @@ function FretCellComponent({
   theme,
   size,
   onClick,
+  isQuizTarget,
+  quizActive,
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
-  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden;
+  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !quizActive;
 
   return (
     <div
@@ -576,7 +591,7 @@ function FretCellComponent({
         cursor-pointer
         ${isDark ? "border-l border-gray-600" : "border-l border-stone-300"}
         ${fret === 0 ? (isDark ? "border-r-4 border-r-gray-300" : "border-r-4 border-r-stone-500") : ""}
-        ${isDark ? "hover:bg-gray-700/30" : "hover:bg-stone-200/70"} transition-colors
+        ${isDark ? "[@media(hover:hover)]:hover:bg-gray-700/30" : "[@media(hover:hover)]:hover:bg-stone-200/70"} transition-colors
       `}
       style={{ width: size.cellWidth, height: size.rowHeight }}
       onClick={onClick}
@@ -587,7 +602,7 @@ function FretCellComponent({
       </div>
 
       {/* ルート共通ハイライト */}
-      {isRoot && (
+      {isRoot && !quizActive && (
         <div
           className="absolute rounded-full border-2 border-red-500 z-[18]"
           style={{ inset: size.rootRingInset }}
@@ -645,6 +660,21 @@ function FretCellComponent({
               {noteName}
             </span>
           </div>
+        </div>
+      )}
+
+      {/* クイズターゲット */}
+      {isQuizTarget && (
+        <div
+          className="absolute rounded-full flex items-center justify-center z-30 animate-pulse"
+          style={{ inset: size.overlayInset, backgroundColor: "#4f46e5" }}
+        >
+          <span
+            className="font-bold text-white leading-none"
+            style={{ fontSize: size.overlayFontSize }}
+          >
+            ?
+          </span>
         </div>
       )}
     </div>
