@@ -93,8 +93,8 @@ export default function QuizPanel({
           let btnClass: string;
           if (!answered) {
             btnClass = isDark
-              ? "bg-gray-700 text-white hover:bg-indigo-700"
-              : "bg-white text-stone-900 border border-stone-300 hover:bg-indigo-50";
+              ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
+              : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
           } else if (choice === question.correct) {
             btnClass = "bg-green-600 text-white";
           } else if (choice === selectedAnswer) {

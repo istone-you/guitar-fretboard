@@ -6,14 +6,31 @@ const controlsState: { latest: Record<string, unknown> | null } = { latest: null
 const fretboardState: { latest: Record<string, unknown> | null } = { latest: null };
 const headerState: { latest: Record<string, unknown> | null } = { latest: null };
 
+vi.mock("./components/SettingsMenu", () => ({
+  default: (props: any) => (
+    <div>
+      <button onClick={() => props.setShowQuiz?.(true)}>quiz-toggle</button>
+      <button onClick={() => props.onAccidentalChange?.("sharp")}>acc-sharp</button>
+      <button onClick={() => props.onAccidentalChange?.("flat")}>acc-flat</button>
+      <button onClick={() => props.onThemeChange?.()}>theme-toggle</button>
+    </div>
+  ),
+  DropdownSelect: ({ value, onChange, options }: any) => (
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
+      {(options ?? []).map((o: any) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  ),
+}));
+
 vi.mock("./components/Controls", () => ({
   default: (props: any) => {
     controlsState.latest = props;
     return (
       <div>
-        <button onClick={() => props.onAccidentalChange?.("sharp")}>acc-sharp</button>
-        <button onClick={() => props.onAccidentalChange?.("flat")}>acc-flat</button>
-        <button onClick={() => props.onThemeChange?.()}>theme-toggle</button>
         <button onClick={() => props.setShowScale?.(!(props.showScale as boolean))}>
           scale-toggle
         </button>

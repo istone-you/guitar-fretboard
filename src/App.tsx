@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import "./i18n";
 import Controls from "./components/Controls";
+import SettingsMenu from "./components/SettingsMenu";
 import Fretboard from "./components/Fretboard";
 import QuizPanel, { type QuizMode, type QuizQuestion } from "./components/QuizPanel";
 import FretboardHeader from "./components/FretboardHeader";
@@ -283,8 +284,10 @@ export default function App() {
           theme === "dark" ? "bg-gray-900" : "bg-white border border-stone-300 shadow-sm"
         }`}
       >
-        <Controls
+        <SettingsMenu
           theme={theme}
+          fretboardDisplaySize={fretboardDisplaySize}
+          onFretboardDisplaySizeChange={handleFretboardDisplaySizeChange}
           onThemeChange={() =>
             setTheme((currentTheme) => {
               const nextTheme = currentTheme === "dark" ? "light" : "dark";
@@ -292,11 +295,15 @@ export default function App() {
               return nextTheme;
             })
           }
-          rootNote={rootNote}
           accidental={accidental}
           onAccidentalChange={handleAccidentalChange}
-          fretboardDisplaySize={fretboardDisplaySize}
-          onFretboardDisplaySizeChange={handleFretboardDisplaySizeChange}
+          showQuiz={showQuiz}
+          setShowQuiz={setShowQuiz}
+        />
+        <Controls
+          theme={theme}
+          rootNote={rootNote}
+          accidental={accidental}
           showChord={showChord}
           setShowChord={setShowChord}
           chordDisplayMode={chordDisplayMode}
@@ -322,7 +329,6 @@ export default function App() {
           diatonicDegree={diatonicDegree}
           setDiatonicDegree={setDiatonicDegree}
           showQuiz={showQuiz}
-          setShowQuiz={setShowQuiz}
         />
 
         <FretboardHeader

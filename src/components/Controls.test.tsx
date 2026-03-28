@@ -1,24 +1,13 @@
 import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen, fireEvent } from "@testing-library/react";
 import Controls, { DropdownSelect } from "./Controls";
-import type {
-  Theme,
-  Accidental,
-  FretboardDisplaySize,
-  ChordDisplayMode,
-  ScaleType,
-  ChordType,
-} from "../types";
+import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../types";
 
 function makeProps(overrides: Record<string, unknown> = {}) {
   return {
     theme: "dark" as Theme,
     rootNote: "C",
-    setRootNote: vi.fn(),
     accidental: "flat" as Accidental,
-    onAccidentalChange: vi.fn(),
-    fretboardDisplaySize: "standard" as FretboardDisplaySize,
-    onFretboardDisplaySizeChange: vi.fn(),
     showChord: false,
     setShowChord: vi.fn(),
     chordDisplayMode: "form" as ChordDisplayMode,
@@ -44,38 +33,12 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     diatonicDegree: "I",
     setDiatonicDegree: vi.fn(),
     showQuiz: false,
-    setShowQuiz: vi.fn(),
-    onThemeChange: vi.fn(),
     ...overrides,
   };
 }
 
 describe("Controls", () => {
   // ===== レンダリング =====
-  it("設定ボタンをクリックすると♯/♭トグルが表示される", () => {
-    render(<Controls {...makeProps()} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    expect(screen.getByText("表示サイズ")).toBeTruthy();
-    expect(screen.getByText("♯")).toBeTruthy();
-    expect(screen.getByText("♭")).toBeTruthy();
-  });
-
-  it("表示サイズプルダウンを選ぶと onFretboardDisplaySizeChange が呼ばれる", () => {
-    const props = makeProps();
-    render(<Controls {...props} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    fireEvent.click(screen.getByRole("button", { name: "標準" }));
-    fireEvent.click(screen.getByText("コンパクト"));
-    expect(props.onFretboardDisplaySizeChange).toHaveBeenCalledWith("compact");
-  });
-
-  it("設定オーバーレイ外をクリックすると閉じる", () => {
-    render(<Controls {...makeProps()} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    fireEvent.click(document.querySelector(".fixed.inset-0.z-40")!);
-    expect(screen.queryByText("♯")).toBeNull();
-  });
-
   it("スケール・CAGED・コードのラベルが表示される", () => {
     render(<Controls {...makeProps()} />);
     expect(screen.getByText("スケール")).toBeTruthy();
@@ -110,23 +73,6 @@ describe("Controls", () => {
 
     expect(props.setScaleType).toHaveBeenCalledWith("melodic-minor");
     expect(screen.queryByRole("dialog", { name: "スケール一覧" })).toBeNull();
-  });
-
-  // ===== ♯/♭切り替え =====
-  it('♯ボタンをクリックすると onAccidentalChange("sharp") が呼ばれる', () => {
-    const props = makeProps();
-    render(<Controls {...props} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    fireEvent.click(screen.getByText("♯"));
-    expect(props.onAccidentalChange).toHaveBeenCalledWith("sharp");
-  });
-
-  it('♭ボタンをクリックすると onAccidentalChange("flat") が呼ばれる', () => {
-    const props = makeProps({ accidental: "sharp" as Accidental });
-    render(<Controls {...props} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    fireEvent.click(screen.getByText("♭"));
-    expect(props.onAccidentalChange).toHaveBeenCalledWith("flat");
   });
 
   // ===== レイヤートグル =====
@@ -175,14 +121,6 @@ describe("Controls", () => {
     const cagedBtn = allC.find((el) => el.tagName === "BUTTON" && el.className.includes("w-9"));
     fireEvent.click(cagedBtn!);
     expect(props.toggleCagedForm).toHaveBeenCalledWith("C");
-  });
-
-  it("ライトテーマへ切り替えると onThemeChange が呼ばれる", () => {
-    const props = makeProps();
-    render(<Controls {...props} />);
-    fireEvent.click(screen.getByTitle("設定"));
-    fireEvent.click(screen.getByText("テーマ").nextElementSibling!.querySelectorAll("button")[0]);
-    expect(props.onThemeChange).toHaveBeenCalled();
   });
 
   it("開いているパネル本体をクリックするとトグルが呼ばれる", () => {
