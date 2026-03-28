@@ -108,6 +108,7 @@ export default function Controls({
   setDiatonicDegree,
 }: ControlsProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [howToUseOpen, setHowToUseOpen] = useState(false);
   const { t, i18n } = useTranslation();
 
   const isDark = theme === "dark";
@@ -233,31 +234,6 @@ export default function Controls({
                   isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
                 }`}
               >
-                {/* 使い方 */}
-                <div className="space-y-2">
-                  <span
-                    className={`text-xs font-bold uppercase tracking-wide ${isDark ? "text-gray-300" : "text-stone-600"}`}
-                  >
-                    {t("howToUse")}
-                  </span>
-                  <ul
-                    className={`text-xs space-y-1.5 ${isDark ? "text-gray-200" : "text-stone-700"}`}
-                  >
-                    {[
-                      t("howToUseItems.changeRoot"),
-                      t("howToUseItems.switchLabels"),
-                      t("howToUseItems.togglePanel"),
-                      t("howToUseItems.switchMode"),
-                      t("howToUseItems.toggleDegree"),
-                      t("howToUseItems.filterOverlay"),
-                    ].map((item) => (
-                      <li key={item}>・{item}</li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className={`border-t ${isDark ? "border-gray-700" : "border-stone-200"}`} />
-
                 <div className="flex items-center justify-between gap-3">
                   <span
                     className={`text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
@@ -385,6 +361,44 @@ export default function Controls({
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* 使い方（折りたたみ） */}
+                <div className={`border-t ${isDark ? "border-gray-700" : "border-stone-200"}`} />
+                <div>
+                  <button
+                    onClick={() => setHowToUseOpen((prev) => !prev)}
+                    className={`w-full flex items-center justify-between text-sm font-semibold transition-colors ${isDark ? "text-gray-300 hover:text-white" : "text-stone-700 hover:text-stone-900"}`}
+                  >
+                    <span>{t("howToUse")}</span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={`w-4 h-4 transition-transform ${howToUseOpen ? "rotate-180" : ""}`}
+                    >
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </button>
+                  {howToUseOpen && (
+                    <ul
+                      className={`mt-2 text-xs space-y-1.5 ${isDark ? "text-gray-400" : "text-stone-600"}`}
+                    >
+                      {[
+                        t("howToUseItems.changeRoot"),
+                        t("howToUseItems.switchLabels"),
+                        t("howToUseItems.togglePanel"),
+                        t("howToUseItems.switchMode"),
+                        t("howToUseItems.toggleDegree"),
+                        t("howToUseItems.filterOverlay"),
+                      ].map((item) => (
+                        <li key={item}>・{item}</li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </div>
             </>
