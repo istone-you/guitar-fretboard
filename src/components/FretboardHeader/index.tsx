@@ -3,7 +3,72 @@ import "../../i18n";
 import type { Accidental, BaseLabelMode, Theme } from "../../types";
 import { SegmentedToggle } from "../ui/SegmentedToggle";
 import { NOTES_SHARP, NOTES_FLAT } from "../../logic/fretboard";
+
 const FRET_MAX = 14;
+
+interface StepperProps {
+  value: number | string;
+  onPrev: () => void;
+  onNext: () => void;
+  theme: Theme;
+  disabled?: boolean;
+  prevDisabled?: boolean;
+  nextDisabled?: boolean;
+  width?: string;
+}
+
+function Stepper({
+  value,
+  onPrev,
+  onNext,
+  theme,
+  disabled = false,
+  prevDisabled = false,
+  nextDisabled = false,
+  width = "w-6",
+}: StepperProps) {
+  const btnBase = `flex items-center justify-center min-w-[2.75rem] h-11 px-2 rounded transition-all text-lg ${
+    theme === "dark"
+      ? "text-gray-400 hover:text-white active:bg-gray-700"
+      : "text-stone-500 hover:text-stone-900 active:bg-stone-200"
+  }`;
+  const disabledClass = "opacity-40 pointer-events-none cursor-not-allowed";
+
+  const isPrevDisabled = disabled || prevDisabled;
+  const isNextDisabled = disabled || nextDisabled;
+
+  return (
+    <span className="inline-flex items-center">
+      <button
+        className={`${btnBase} ${isPrevDisabled ? disabledClass : ""}`}
+        onClick={isPrevDisabled ? undefined : onPrev}
+        disabled={isPrevDisabled}
+      >
+        ‹
+      </button>
+      <span
+        className={`text-base font-bold ${width} text-center ${
+          disabled
+            ? theme === "dark"
+              ? "text-gray-500"
+              : "text-stone-400"
+            : theme === "dark"
+              ? "text-white"
+              : "text-stone-900"
+        }`}
+      >
+        {value}
+      </span>
+      <button
+        className={`${btnBase} ${isNextDisabled ? disabledClass : ""}`}
+        onClick={isNextDisabled ? undefined : onNext}
+        disabled={isNextDisabled}
+      >
+        ›
+      </button>
+    </span>
+  );
+}
 
 interface FretboardHeaderProps {
   theme: Theme;
@@ -52,73 +117,14 @@ export default function FretboardHeader({
     }
   };
 
-  const btnBase = `flex items-center justify-center min-w-[2.75rem] h-11 px-2 rounded transition-all text-lg ${
-    theme === "dark"
-      ? "text-gray-400 hover:text-white active:bg-gray-700"
-      : "text-stone-500 hover:text-stone-900 active:bg-stone-200"
-  }`;
-
-  const Stepper = ({
-    value,
-    onPrev,
-    onNext,
-    disabled = false,
-    width = "w-6",
-  }: {
-    value: number | string;
-    onPrev: () => void;
-    onNext: () => void;
-    disabled?: boolean;
-    width?: string;
-  }) => (
-    <span className="inline-flex items-center">
-      <button
-        className={`${btnBase} ${
-          disabled
-            ? theme === "dark"
-              ? "cursor-not-allowed text-gray-700 hover:text-gray-700 active:bg-transparent"
-              : "cursor-not-allowed text-stone-300 hover:text-stone-300 active:bg-transparent"
-            : ""
-        }`}
-        onClick={onPrev}
-        disabled={disabled}
-      >
-        ‹
-      </button>
-      <span
-        className={`text-base font-bold ${width} text-center ${
-          disabled
-            ? theme === "dark"
-              ? "text-gray-700"
-              : "text-stone-300"
-            : theme === "dark"
-              ? "text-white"
-              : "text-stone-900"
-        }`}
-      >
-        {value}
-      </span>
-      <button
-        className={`${btnBase} ${
-          disabled
-            ? theme === "dark"
-              ? "cursor-not-allowed text-gray-700 hover:text-gray-700 active:bg-transparent"
-              : "cursor-not-allowed text-stone-300 hover:text-stone-300 active:bg-transparent"
-            : ""
-        }`}
-        onClick={onNext}
-        disabled={disabled}
-      >
-        ›
-      </button>
-    </span>
-  );
+  const canNarrow = fretRange[1] - fretRange[0] > 1;
 
   return (
     <div className="mb-2 flex flex-wrap items-center justify-center gap-6">
       <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
         {t("header.root")}:{" "}
         <Stepper
+          theme={theme}
           value={rootNote}
           width="w-8"
           disabled={rootChangeDisabled}
@@ -129,15 +135,21 @@ export default function FretboardHeader({
       <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
         {t("header.fret")}:{" "}
         <Stepper
+          theme={theme}
           value={fretRange[0]}
           onPrev={() => stepFret("min", -1)}
           onNext={() => stepFret("min", 1)}
+          prevDisabled={fretRange[0] <= 0}
+          nextDisabled={!canNarrow}
         />
         <span className={`mx-1 ${theme === "dark" ? "text-gray-500" : "text-stone-400"}`}>〜</span>
         <Stepper
+          theme={theme}
           value={fretRange[1]}
           onPrev={() => stepFret("max", -1)}
           onNext={() => stepFret("max", 1)}
+          prevDisabled={!canNarrow}
+          nextDisabled={fretRange[1] >= FRET_MAX}
         />
       </span>
       {!showQuiz && (

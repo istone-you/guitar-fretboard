@@ -83,4 +83,32 @@ describe("FretboardHeader", () => {
 
     expect(props.onRootNoteChange).not.toHaveBeenCalled();
   });
+
+  it("fretRange が [0, 14] のとき min の左・max の右が無効", () => {
+    render(<FretboardHeader {...makeProps({ fretRange: [0, 14] as [number, number] })} />);
+    // buttons: [root‹, root›, min‹, min›, max‹, max›, 音名, 度数]
+    const buttons = screen.getAllByRole("button");
+    expect((buttons[2] as HTMLButtonElement).disabled).toBe(true); // min ‹
+    expect((buttons[3] as HTMLButtonElement).disabled).toBe(false); // min ›
+    expect((buttons[4] as HTMLButtonElement).disabled).toBe(false); // max ‹
+    expect((buttons[5] as HTMLButtonElement).disabled).toBe(true); // max ›
+  });
+
+  it("fretRange が [5, 6] のとき狭める両ボタンが無効", () => {
+    render(<FretboardHeader {...makeProps({ fretRange: [5, 6] as [number, number] })} />);
+    const buttons = screen.getAllByRole("button");
+    expect((buttons[2] as HTMLButtonElement).disabled).toBe(false); // min ‹
+    expect((buttons[3] as HTMLButtonElement).disabled).toBe(true); // min › ← 狭められない
+    expect((buttons[4] as HTMLButtonElement).disabled).toBe(true); // max ‹ ← 狭められない
+    expect((buttons[5] as HTMLButtonElement).disabled).toBe(false); // max ›
+  });
+
+  it("fretRange が [0, 1] のとき min の左・狭める両ボタンが無効", () => {
+    render(<FretboardHeader {...makeProps({ fretRange: [0, 1] as [number, number] })} />);
+    const buttons = screen.getAllByRole("button");
+    expect((buttons[2] as HTMLButtonElement).disabled).toBe(true); // min ‹ (min=0)
+    expect((buttons[3] as HTMLButtonElement).disabled).toBe(true); // min › (狭められない)
+    expect((buttons[4] as HTMLButtonElement).disabled).toBe(true); // max ‹ (狭められない)
+    expect((buttons[5] as HTMLButtonElement).disabled).toBe(false); // max ›
+  });
 });
