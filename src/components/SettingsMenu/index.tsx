@@ -209,6 +209,8 @@ export default function SettingsMenu({
                       t("howToUseItems.switchLabels"),
                       t("howToUseItems.togglePanel"),
                       t("howToUseItems.switchMode"),
+                      t("howToUseItems.toggleNotes"),
+                      t("howToUseItems.filterNotes"),
                       t("howToUseItems.toggleDegree"),
                       t("howToUseItems.filterOverlay"),
                     ].map((item) => (

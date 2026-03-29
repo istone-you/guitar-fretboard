@@ -10,6 +10,8 @@
     "switchLabels": "「音名 / 度数」で表示内容を切り替え",
     "togglePanel": "各パネルをクリック（タップ）して表示 / 非表示を切り替え",
     "switchMode": "パネル内のコントロールでモードを切り替え",
+    "toggleNotes": "音名モード時、下の音名ボタンをクリック（タップ）して強調表示を切り替え",
+    "filterNotes": "音名モード時、「絞り込み」で表示中のオーバーレイ音名だけを強調",
     "toggleDegree": "度数モード時、下の度数ボタンをクリック（タップ）して表示 / 非表示を切り替え",
     "filterOverlay": "「絞り込む」で表示中のスケールやコードに含まれない度数を非表示"
   },
@@ -42,13 +44,17 @@
   },
   "degreeFilter": {
     "title": "度数",
-    "filter": "絞り込む",
+    "filter": "抽出",
     "filterTitle": "表示中のオーバーレイに合わせて絞り込む",
     "reset": "リセット",
     "hideAll": "全非表示"
   },
-  "overlayNotes": {
-    "title": "表示中の音名"
+  "noteFilter": {
+    "title": "音名",
+    "filter": "抽出",
+    "filterTitle": "表示中のオーバーレイに合わせて絞り込む",
+    "highlightAll": "全強調",
+    "reset": "リセット"
   },
   "scaleGroups": {
     "basics": "基本",

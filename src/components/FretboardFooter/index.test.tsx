@@ -7,10 +7,14 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     theme: "dark" as const,
     baseLabelMode: "note" as const,
     showQuiz: false,
+    allNotes: ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"] as string[],
     overlayNotes: [] as string[],
+    highlightedOverlayNotes: new Set<string>(),
     hiddenDegrees: new Set<string>(),
     onAutoFilter: vi.fn(),
     onResetOrHideAll: vi.fn(),
+    onSetOverlayNoteHighlights: vi.fn(),
+    onToggleOverlayNoteHighlight: vi.fn(),
     onToggleDegree: vi.fn(),
     ...overrides,
   };
@@ -20,10 +24,46 @@ describe("FretboardFooter", () => {
   it("音名モードでは構成音を表示する", () => {
     render(<FretboardFooter {...makeProps({ overlayNotes: ["C", "E", "G"] })} />);
 
-    expect(screen.getByText("表示中の音名")).toBeTruthy();
+    expect(screen.getByText("音名")).toBeTruthy();
     expect(screen.getByText("C")).toBeTruthy();
     expect(screen.getByText("E")).toBeTruthy();
     expect(screen.getByText("G")).toBeTruthy();
+  });
+
+  it("音名モードでは構成音がなくても見出しと全強調ボタンを表示する", () => {
+    render(<FretboardFooter {...makeProps()} />);
+
+    expect(screen.getByText("音名")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "全強調" })).toBeTruthy();
+  });
+
+  it("音名チップを押すと強調トグルが呼ばれる", () => {
+    const props = makeProps({ overlayNotes: ["C", "E", "G"] });
+    render(<FretboardFooter {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "E" }));
+
+    expect(props.onToggleOverlayNoteHighlight).toHaveBeenCalledWith("E");
+  });
+
+  it("何も強調されていない時は全強調ボタンが表示される", () => {
+    const props = makeProps({ overlayNotes: ["C", "E", "G"] });
+    render(<FretboardFooter {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "全強調" }));
+
+    expect(props.onSetOverlayNoteHighlights).toHaveBeenCalledWith(props.allNotes);
+  });
+
+  it("何か強調済みの時はリセットボタンが表示される", () => {
+    const props = makeProps({
+      highlightedOverlayNotes: new Set(["C"]),
+    });
+    render(<FretboardFooter {...props} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "リセット" }));
+
+    expect(props.onSetOverlayNoteHighlights).toHaveBeenCalledWith([]);
   });
 
   it("度数モードではフィルター UI を表示する", () => {

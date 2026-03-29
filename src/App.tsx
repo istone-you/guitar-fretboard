@@ -76,6 +76,7 @@ export default function App() {
   );
 
   const [theme, setTheme] = usePersistedSetting<Theme>(STORAGE_KEYS.theme, readStoredTheme);
+  const [highlightedOverlayNotes, setHighlightedOverlayNotes] = useState<Set<string>>(new Set());
 
   // レイヤー表示フラグ
   const [showChord, setShowChord] = useState(false);
@@ -125,6 +126,22 @@ export default function App() {
   // 指板の音をクリックしてルートを設定
   const handleNoteClick = (noteName: string) => {
     setRootNote(noteName);
+  };
+
+  const handleToggleOverlayNoteHighlight = (note: string) => {
+    setHighlightedOverlayNotes((current) => {
+      const next = new Set(current);
+      if (next.has(note)) {
+        next.delete(note);
+      } else {
+        next.add(note);
+      }
+      return next;
+    });
+  };
+
+  const handleSetOverlayNoteHighlights = (notes: string[]) => {
+    setHighlightedOverlayNotes(new Set(notes));
   };
 
   const { hiddenDegrees, handleAutoFilter, toggleDegree, resetHiddenDegrees, hideAllDegrees } =
@@ -208,6 +225,7 @@ export default function App() {
   const quizRootChangeEnabled =
     !showQuiz || quizMode === "degree" || quizMode === "scale" || quizMode === "diatonic";
   const quizNoteOptions = accidental === "sharp" ? [...NOTES_SHARP] : [...NOTES_FLAT];
+  const allNotes = accidental === "sharp" ? [...NOTES_SHARP] : [...NOTES_FLAT];
 
   return (
     <div
@@ -302,6 +320,7 @@ export default function App() {
             diatonicScaleType={diatonicScaleType}
             diatonicDegree={diatonicDegree}
             onNoteClick={quizRootChangeEnabled ? handleNoteClick : () => {}}
+            highlightedNotes={highlightedOverlayNotes}
             hiddenDegrees={hiddenDegrees}
             quizModeActive
             quizCell={
@@ -343,6 +362,7 @@ export default function App() {
             diatonicScaleType={diatonicScaleType}
             diatonicDegree={diatonicDegree}
             onNoteClick={handleNoteClick}
+            highlightedNotes={highlightedOverlayNotes}
             hiddenDegrees={hiddenDegrees}
           />
         )}
@@ -394,7 +414,9 @@ export default function App() {
           theme={theme}
           baseLabelMode={baseLabelMode}
           showQuiz={showQuiz}
+          allNotes={allNotes}
           overlayNotes={overlayNotes}
+          highlightedOverlayNotes={highlightedOverlayNotes}
           hiddenDegrees={hiddenDegrees}
           onAutoFilter={() =>
             handleAutoFilter({
@@ -412,6 +434,8 @@ export default function App() {
           onResetOrHideAll={() =>
             hiddenDegrees.size > 0 ? resetHiddenDegrees() : hideAllDegrees()
           }
+          onSetOverlayNoteHighlights={handleSetOverlayNoteHighlights}
+          onToggleOverlayNoteHighlight={handleToggleOverlayNoteHighlight}
           onToggleDegree={toggleDegree}
         />
       </main>

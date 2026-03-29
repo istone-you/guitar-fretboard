@@ -141,6 +141,7 @@ export interface FretboardProps {
   diatonicScaleType: string;
   diatonicDegree: string;
   onNoteClick: (noteName: string) => void;
+  highlightedNotes?: Set<string>;
   hiddenDegrees?: Set<string>;
   quizModeActive?: boolean;
   quizCell?: { stringIdx: number; fret: number };
@@ -174,6 +175,7 @@ export default function Fretboard({
   diatonicScaleType,
   diatonicDegree,
   onNoteClick,
+  highlightedNotes = new Set(),
   hiddenDegrees = new Set(),
   quizModeActive = false,
   quizCell,
@@ -379,6 +381,7 @@ export default function Fretboard({
               size={size}
               visibleFrets={visibleFrets}
               onNoteClick={onNoteClick}
+              highlightedNotes={highlightedNotes}
               hiddenDegrees={hiddenDegrees}
               quizActive={quizActive}
               quizTargetFret={quizCell?.stringIdx === stringIdx ? quizCell.fret : null}
@@ -470,6 +473,7 @@ interface StringRowProps {
   size: (typeof FRETBOARD_SIZE_CONFIG)[FretboardDisplaySize];
   visibleFrets: number[];
   onNoteClick: (noteName: string) => void;
+  highlightedNotes: Set<string>;
   hiddenDegrees: Set<string>;
   quizActive: boolean;
   quizTargetFret: number | null;
@@ -499,6 +503,7 @@ function StringRow({
   size,
   visibleFrets,
   onNoteClick,
+  highlightedNotes,
   hiddenDegrees,
   quizActive,
   quizTargetFret,
@@ -562,6 +567,7 @@ function StringRow({
               };
         const degreeRing =
           baseLabelMode === "degree" ? { color: baseLabel.color, label: degreeName } : null;
+        const isHighlighted = baseLabelMode === "note" && highlightedNotes.has(noteName);
 
         let overlayColor: { bg: string; text: string } | null = null;
         let overlayLabel = noteName;
@@ -613,6 +619,7 @@ function StringRow({
             baseLabel={baseLabel}
             noteName={noteName}
             degreeRing={degreeHidden || shouldSuppressRegularDisplay ? null : degreeRing}
+            isHighlighted={isHighlighted}
             overlayColor={overlayColor}
             overlayLabel={overlayLabel}
             inChord={inChord}
@@ -655,6 +662,7 @@ interface FretCellComponentProps {
   baseLabel: BaseLabelInfo;
   noteName: string;
   degreeRing: DegreeRingInfo | null;
+  isHighlighted: boolean;
   overlayColor: { bg: string; text: string } | null;
   overlayLabel: string;
   inChord: boolean;
@@ -681,6 +689,7 @@ function FretCellComponent({
   baseLabel,
   noteName,
   degreeRing,
+  isHighlighted,
   overlayColor,
   overlayLabel,
   inChord,
@@ -750,6 +759,15 @@ function FretCellComponent({
         <div
           className="absolute rounded-full border-2 z-[8]"
           style={{ inset: size.rootRingInset, borderColor: degreeRing.color }}
+        />
+      )}
+
+      {isHighlighted && (
+        <div
+          className={`absolute rounded-full border-2 z-[9] ${
+            isDark ? "border-sky-300" : "border-sky-500"
+          }`}
+          style={{ inset: Math.max(0, size.rootRingInset - 1) }}
         />
       )}
 

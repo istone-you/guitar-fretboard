@@ -10,6 +10,8 @@
     "switchLabels": "Use Notes / Degrees to switch what is shown",
     "togglePanel": "Click (tap) each panel to toggle it on or off",
     "switchMode": "Use panel controls to switch modes",
+    "toggleNotes": "In note mode, click (tap) note buttons below to toggle highlights",
+    "filterNotes": "In note mode, use \"Filter\" to highlight only the notes in the visible overlays",
     "toggleDegree": "In degree mode, click (tap) degrees to hide or show them on the fretboard",
     "filterOverlay": "Use \"Filter\" to show only notes included in the active overlays"
   },
@@ -47,8 +49,12 @@
     "reset": "Reset",
     "hideAll": "Hide all"
   },
-  "overlayNotes": {
-    "title": "Visible notes"
+  "noteFilter": {
+    "title": "Notes",
+    "filter": "Filter",
+    "filterTitle": "Filter by the currently visible overlays",
+    "highlightAll": "Highlight all",
+    "reset": "Reset"
   },
   "scaleGroups": {
     "basics": "Basics",

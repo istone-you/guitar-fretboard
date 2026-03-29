@@ -6,10 +6,14 @@ interface FretboardFooterProps {
   theme: Theme;
   baseLabelMode: BaseLabelMode;
   showQuiz: boolean;
+  allNotes: string[];
   overlayNotes: string[];
+  highlightedOverlayNotes: Set<string>;
   hiddenDegrees: Set<string>;
   onAutoFilter: () => void;
   onResetOrHideAll: () => void;
+  onSetOverlayNoteHighlights: (notes: string[]) => void;
+  onToggleOverlayNoteHighlight: (note: string) => void;
   onToggleDegree: (name: string) => void;
 }
 
@@ -32,13 +36,18 @@ export default function FretboardFooter({
   theme,
   baseLabelMode,
   showQuiz,
+  allNotes,
   overlayNotes,
+  highlightedOverlayNotes,
   hiddenDegrees,
   onAutoFilter,
   onResetOrHideAll,
+  onSetOverlayNoteHighlights,
+  onToggleOverlayNoteHighlight,
   onToggleDegree,
 }: FretboardFooterProps) {
   const { t } = useTranslation();
+  const hasHighlightedNotes = highlightedOverlayNotes.size > 0;
 
   if (showQuiz) {
     return <div className="mt-4 min-h-[5.75rem]" />;
@@ -46,25 +55,52 @@ export default function FretboardFooter({
 
   return (
     <div className="mt-4 min-h-[5.75rem]">
-      {baseLabelMode === "note" && overlayNotes.length > 0 && (
+      {baseLabelMode === "note" && (
         <>
           <div className="mb-3 flex items-center justify-center gap-2">
             <h3 className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
-              {t("overlayNotes.title")}
+              {t("noteFilter.title")}
             </h3>
+            <button
+              type="button"
+              onClick={() => onSetOverlayNoteHighlights(overlayNotes)}
+              title={t("noteFilter.filterTitle")}
+              className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
+                theme === "dark"
+                  ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
+                  : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
+              }`}
+            >
+              {t("noteFilter.filter")}
+            </button>
+            <button
+              type="button"
+              onClick={() => onSetOverlayNoteHighlights(hasHighlightedNotes ? [] : allNotes)}
+              className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
+                theme === "dark"
+                  ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
+                  : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
+              }`}
+            >
+              {hasHighlightedNotes ? t("noteFilter.reset") : t("noteFilter.highlightAll")}
+            </button>
           </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            {overlayNotes.map((note) => (
-              <span
+          <div className="flex min-h-8 flex-wrap justify-center gap-2">
+            {allNotes.map((note) => (
+              <button
                 key={note}
+                type="button"
+                onClick={() => onToggleOverlayNoteHighlight(note)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                  theme === "dark"
-                    ? "border-gray-700 bg-gray-800 text-gray-200"
-                    : "border-stone-300 bg-stone-50 text-stone-700"
+                  highlightedOverlayNotes.has(note)
+                    ? "border-indigo-500 bg-indigo-600 text-white"
+                    : theme === "dark"
+                      ? "border-gray-700 bg-gray-800 text-gray-200"
+                      : "border-stone-300 bg-stone-50 text-stone-700"
                 }`}
               >
                 {note}
-              </span>
+              </button>
             ))}
           </div>
         </>

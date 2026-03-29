@@ -30,6 +30,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     diatonicScaleType: "major-triad",
     diatonicDegree: "I",
     onNoteClick: vi.fn(),
+    highlightedNotes: new Set<string>(),
     ...overrides,
   };
 }
@@ -301,6 +302,31 @@ describe("ui/Fretboard", () => {
     );
 
     expect(screen.getAllByText("C").length).toBeGreaterThan(0);
+  });
+
+  it("highlightedNotes に含まれる音は追加リングを表示する", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          highlightedNotes: new Set(["C"]),
+        })}
+      />,
+    );
+
+    expect(container.querySelector(".border-sky-300")).toBeTruthy();
+  });
+
+  it("度数モードでは highlightedNotes があっても追加リングを表示しない", () => {
+    const { container } = render(
+      <Fretboard
+        {...makeProps({
+          baseLabelMode: "degree" as BaseLabelMode,
+          highlightedNotes: new Set(["C"]),
+        })}
+      />,
+    );
+
+    expect(container.querySelector(".border-sky-300")).toBeNull();
   });
 
   it("ライトテーマでもレンダリングできる", () => {
