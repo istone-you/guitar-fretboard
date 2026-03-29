@@ -55,7 +55,6 @@ vi.mock("./components/Controls/index", () => ({
         <button onClick={() => props.setDiatonicKeyType?.("natural-minor")}>key-minor</button>
         <button onClick={() => props.setDiatonicChordSize?.("triad")}>size-triad</button>
         <button onClick={() => props.setDiatonicChordSize?.("seventh")}>size-seventh</button>
-        <button onClick={() => props.setTriadStringSet?.("2-4")}>triad-strings</button>
         <button onClick={() => props.setTriadInversion?.("1st")}>triad-inversion</button>
       </div>
     );
@@ -143,7 +142,7 @@ describe("App", () => {
     expect(screen.getByText("header-mode:note")).toBeTruthy();
     expect(screen.getByText("fb-root:C")).toBeTruthy();
     expect(screen.getByText("fb-accidental:flat")).toBeTruthy();
-    expect(screen.getByText("fb-triad:1-3-root")).toBeTruthy();
+    expect(screen.getByText("fb-triad:root")).toBeTruthy();
     expect(screen.getByText("fb-diatonic:major-triad:I")).toBeTruthy();
     expect(screen.getByText("footer-mode:note")).toBeTruthy();
   });
@@ -211,10 +210,9 @@ describe("App", () => {
     expect(screen.getByText("fb-diatonic:major-triad:V")).toBeTruthy();
 
     fireEvent.click(screen.getByText("mode-triad"));
-    fireEvent.click(screen.getByText("triad-strings"));
     fireEvent.click(screen.getByText("triad-inversion"));
 
-    expect(screen.getByText("fb-triad:2-4-1st")).toBeTruthy();
+    expect(screen.getByText("fb-triad:1st")).toBeTruthy();
   });
 
   it("度数モードで絞り込みとリセットが動く", () => {

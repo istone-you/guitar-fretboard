@@ -86,7 +86,6 @@ export default function App() {
   // コードフォーム設定
   const [chordDisplayMode, setChordDisplayMode] = useState<ChordDisplayMode>("form");
   const [chordType, setChordType] = useState<ChordType>("Major");
-  const [triadStringSet, setTriadStringSet] = useState("1-3");
   const [triadInversion, setTriadInversion] = useState("root");
   const {
     diatonicKeyType,
@@ -188,7 +187,7 @@ export default function App() {
     scaleType,
     showQuiz,
   });
-  const triadLayout = `${triadStringSet}-${triadInversion}`;
+  const triadLayout = triadInversion;
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
   const overlaySemitones = useMemo(
     () =>
@@ -268,8 +267,6 @@ export default function App() {
           toggleCagedForm={toggleCagedForm}
           chordType={chordType}
           setChordType={(value) => setChordType(value as ChordType)}
-          triadStringSet={triadStringSet}
-          setTriadStringSet={setTriadStringSet}
           triadInversion={triadInversion}
           setTriadInversion={setTriadInversion}
           diatonicKeyType={diatonicKeyType}

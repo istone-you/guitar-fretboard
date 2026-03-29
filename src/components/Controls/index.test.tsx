@@ -23,8 +23,6 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     toggleCagedForm: vi.fn(),
     chordType: "Major" as ChordType,
     setChordType: vi.fn(),
-    triadStringSet: "1-3",
-    setTriadStringSet: vi.fn(),
     triadInversion: "root",
     setTriadInversion: vi.fn(),
     diatonicKeyType: "major",
@@ -162,13 +160,9 @@ describe("Controls", () => {
     expect(props.setShowChord).not.toHaveBeenCalled();
   });
 
-  it("トライアドモードでは弦と転回のドロップダウンが機能する", () => {
+  it("トライアドモードでは転回のドロップダウンが機能する", () => {
     const props = makeProps({ showChord: true, chordDisplayMode: "triad" as ChordDisplayMode });
     render(<Controls {...props} />);
-
-    fireEvent.click(screen.getByRole("button", { name: "1~3" }));
-    fireEvent.click(screen.getByRole("button", { name: "2~4" }));
-    expect(props.setTriadStringSet).toHaveBeenCalledWith("2-4");
 
     fireEvent.click(screen.getByRole("button", { name: "基本" }));
     fireEvent.click(screen.getByRole("button", { name: "第一転回" }));

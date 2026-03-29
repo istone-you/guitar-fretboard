@@ -26,7 +26,7 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     showCaged: false,
     cagedForms: new Set<string>(),
     chordType: "Major" as ChordType,
-    triadPosition: "1-3-root",
+    triadPosition: "root",
     diatonicScaleType: "major-triad",
     diatonicDegree: "I",
     onNoteClick: vi.fn(),
@@ -241,7 +241,7 @@ describe("ui/Fretboard", () => {
           showChord: true,
           chordDisplayMode: "triad" as ChordDisplayMode,
           chordType: "Major" as ChordType,
-          triadPosition: "1-3-root",
+          triadPosition: "root",
         })}
       />,
     );

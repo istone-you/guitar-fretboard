@@ -11,6 +11,7 @@ import {
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
   POWER_CHORD_FORMS,
+  TRIAD_STRING_SET_OPTIONS,
   buildTriadVoicing,
   getDiatonicChord,
   getOpenChordForm,
@@ -206,22 +207,24 @@ export default function Fretboard({
     if (!showChord) return [];
 
     if (chordDisplayMode === "triad") {
-      const cells = buildTriadVoicing(rootIndex, chordType, triadPosition);
-      if (cells.length === 0) return [];
-
-      const frets = cells.map((cell) => cell.fret);
-      const strings = cells.map((cell) => cell.string);
-      return [
-        {
-          id: `triad-${rootIndex}-${chordType}-${triadPosition}`,
+      const groups: ChordGroup[] = [];
+      for (const stringSetOpt of TRIAD_STRING_SET_OPTIONS) {
+        const layoutValue = `${stringSetOpt.value}-${triadPosition}`;
+        const cells = buildTriadVoicing(rootIndex, chordType, layoutValue);
+        if (cells.length === 0) continue;
+        const frets = cells.map((cell) => cell.fret);
+        const strings = cells.map((cell) => cell.string);
+        groups.push({
+          id: `triad-${stringSetOpt.value}-${rootIndex}-${chordType}-${triadPosition}`,
           kind: "triad",
           cells,
           minFret: Math.min(...frets),
           maxFret: Math.max(...frets),
           minString: Math.min(...strings),
           maxString: Math.max(...strings),
-        },
-      ];
+        });
+      }
+      return groups;
     }
 
     const movableGroups: ChordGroup[] = [0, 1].flatMap((rootStringIdx) => {

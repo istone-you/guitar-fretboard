@@ -6,7 +6,6 @@ import {
   CAGED_FORMS,
   CAGED_ORDER,
   DIATONIC_CHORDS,
-  TRIAD_STRING_SET_OPTIONS,
   TRIAD_INVERSION_OPTIONS,
   getDiatonicChord,
   getRootIndex,
@@ -54,8 +53,6 @@ interface ControlsProps {
   toggleCagedForm: (key: string) => void;
   chordType: ChordType;
   setChordType: (value: string) => void;
-  triadStringSet: string;
-  setTriadStringSet: (value: string) => void;
   triadInversion: string;
   setTriadInversion: (value: string) => void;
   diatonicKeyType: string;
@@ -85,8 +82,6 @@ export default function Controls({
   toggleCagedForm,
   chordType,
   setChordType,
-  triadStringSet,
-  setTriadStringSet,
   triadInversion,
   setTriadInversion,
   diatonicKeyType,
@@ -116,10 +111,6 @@ export default function Controls({
     { value: "seventh", label: t("options.diatonicChordSize.seventh") },
   ];
   const { options: scaleOptions, groups: scaleGroups } = buildScaleOptions(t);
-  const triadStringOptions = TRIAD_STRING_SET_OPTIONS.map(({ value }) => ({
-    value,
-    label: t(`options.triadStrings.${value}`),
-  }));
   const triadInversionOptions = TRIAD_INVERSION_OPTIONS.map(({ value }) => ({
     value,
     label: t(`options.triadInversions.${value}`),
@@ -273,7 +264,7 @@ export default function Controls({
                 <span
                   className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
                 >
-                  {chordDisplayMode === "triad" ? t("controls.strings") : t("controls.key")}
+                  {chordDisplayMode === "diatonic" ? t("controls.key") : t("controls.inversion")}
                 </span>
                 <DropdownSelect
                   theme={theme}
@@ -281,15 +272,17 @@ export default function Controls({
                     chordDisplayMode === "diatonic"
                       ? diatonicKeyType
                       : chordDisplayMode === "triad"
-                        ? triadStringSet
+                        ? triadInversion
                         : ""
                   }
-                  onChange={chordDisplayMode === "triad" ? setTriadStringSet : setDiatonicKeyType}
+                  onChange={
+                    chordDisplayMode === "diatonic" ? setDiatonicKeyType : setTriadInversion
+                  }
                   options={
                     chordDisplayMode === "diatonic"
                       ? diatonicKeyOptions
                       : chordDisplayMode === "triad"
-                        ? triadStringOptions
+                        ? triadInversionOptions
                         : [{ value: "", label: "--" }]
                   }
                   disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
@@ -300,28 +293,20 @@ export default function Controls({
 
               <div className="flex flex-col gap-1 items-center sm:items-start">
                 <span
-                  className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" || chordDisplayMode === "triad" ? "" : "invisible"}`}
+                  className={`pl-1 text-xs ${isDark ? "text-gray-200" : "text-stone-600"} ${chordDisplayMode === "diatonic" ? "" : "invisible"}`}
                 >
-                  {chordDisplayMode === "triad" ? t("controls.inversion") : t("controls.chordType")}
+                  {t("controls.chordType")}
                 </span>
                 <DropdownSelect
                   theme={theme}
-                  value={
-                    chordDisplayMode === "diatonic"
-                      ? diatonicChordSize
-                      : chordDisplayMode === "triad"
-                        ? triadInversion
-                        : ""
-                  }
-                  onChange={chordDisplayMode === "triad" ? setTriadInversion : setDiatonicChordSize}
+                  value={chordDisplayMode === "diatonic" ? diatonicChordSize : ""}
+                  onChange={setDiatonicChordSize}
                   options={
                     chordDisplayMode === "diatonic"
                       ? diatonicChordSizeOptions
-                      : chordDisplayMode === "triad"
-                        ? triadInversionOptions
-                        : [{ value: "", label: "--" }]
+                      : [{ value: "", label: "--" }]
                   }
-                  disabled={chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad"}
+                  disabled={chordDisplayMode !== "diatonic"}
                   accent="amber"
                   widthClass="w-36"
                 />
