@@ -224,7 +224,11 @@ export default function App() {
   const quizRootChangeEnabled =
     !showQuiz || quizMode === "degree" || quizMode === "scale" || quizMode === "diatonic";
   const quizNoteOptions = accidental === "sharp" ? [...NOTES_SHARP] : [...NOTES_FLAT];
-  const allNotes = accidental === "sharp" ? [...NOTES_SHARP] : [...NOTES_FLAT];
+  const allNotes = (() => {
+    const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
+    const rootIdx = getRootIndex(rootNote);
+    return [...notes.slice(rootIdx), ...notes.slice(0, rootIdx)];
+  })();
 
   return (
     <div
