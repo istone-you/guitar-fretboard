@@ -11,7 +11,6 @@ export default function QuizFretboard(props: FretboardProps) {
       highlightedDegrees={new Set()}
       suppressRegularDisplay
       hideChordNoteLabels={props.showChord && !props.quizAnswerMode}
-      chordOverlayTone={props.showChord && !props.quizAnswerMode ? "indigo" : "amber"}
     />
   );
 }

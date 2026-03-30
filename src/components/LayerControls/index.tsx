@@ -65,6 +65,12 @@ interface LayerControlsProps {
   setDiatonicChordSize: (value: string) => void;
   diatonicDegree: string;
   setDiatonicDegree: (value: string) => void;
+  scaleColor: string;
+  setScaleColor: (value: string) => void;
+  cagedColor: string;
+  setCagedColor: (value: string) => void;
+  chordColor: string;
+  setChordColor: (value: string) => void;
 }
 
 function TogglePill({
@@ -123,6 +129,12 @@ export default function LayerControls({
   setDiatonicChordSize,
   diatonicDegree,
   setDiatonicDegree,
+  scaleColor,
+  setScaleColor,
+  cagedColor,
+  setCagedColor,
+  chordColor,
+  setChordColor,
 }: LayerControlsProps) {
   const { t } = useTranslation();
   const isDark = theme === "dark";
@@ -219,8 +231,16 @@ export default function LayerControls({
         </div>
       </div>
       <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
-        <div className="mb-2 flex items-center justify-center">
+        <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.scale")}</span>
+          <input
+            type="color"
+            value={scaleColor}
+            onChange={(e) => setScaleColor(e.target.value)}
+            disabled={!showLayers}
+            className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
+            style={{ padding: 0 }}
+          />
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-1 text-center">
@@ -250,8 +270,16 @@ export default function LayerControls({
         </div>
       </div>
       <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
-        <div className="mb-2 flex items-center justify-center">
+        <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.caged")}</span>
+          <input
+            type="color"
+            value={cagedColor}
+            onChange={(e) => setCagedColor(e.target.value)}
+            disabled={!showLayers}
+            className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
+            style={{ padding: 0 }}
+          />
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="space-y-1 text-center">
@@ -296,8 +324,16 @@ export default function LayerControls({
         </div>
       </div>
       <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
-        <div className="mb-2 flex items-center justify-center">
+        <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.chord")}</span>
+          <input
+            type="color"
+            value={chordColor}
+            onChange={(e) => setChordColor(e.target.value)}
+            disabled={!showLayers}
+            className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
+            style={{ padding: 0 }}
+          />
         </div>
         <div className="grid flex-1 content-center grid-cols-2 gap-2">
           <div className="space-y-1 text-center">

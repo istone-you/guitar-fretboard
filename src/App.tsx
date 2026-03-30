@@ -33,6 +33,9 @@ const STORAGE_KEYS = {
   theme: "guiter:theme",
   accidental: "guiter:accidental",
   fretboardDisplaySize: "guiter:fretboard-display-size",
+  scaleColor: "guiter:scale-color",
+  cagedColor: "guiter:caged-color",
+  chordColor: "guiter:chord-color",
 } as const;
 
 function readStoredTheme(): Theme {
@@ -76,6 +79,18 @@ export default function App() {
   );
 
   const [theme, setTheme] = usePersistedSetting<Theme>(STORAGE_KEYS.theme, readStoredTheme);
+  const [scaleColor, setScaleColor] = usePersistedSetting<string>(
+    STORAGE_KEYS.scaleColor,
+    () => window.localStorage.getItem(STORAGE_KEYS.scaleColor) ?? "#34d399",
+  );
+  const [cagedColor, setCagedColor] = usePersistedSetting<string>(
+    STORAGE_KEYS.cagedColor,
+    () => window.localStorage.getItem(STORAGE_KEYS.cagedColor) ?? "#a78bfa",
+  );
+  const [chordColor, setChordColor] = usePersistedSetting<string>(
+    STORAGE_KEYS.chordColor,
+    () => window.localStorage.getItem(STORAGE_KEYS.chordColor) ?? "#fb923c",
+  );
   const [highlightedOverlayNotes, setHighlightedOverlayNotes] = useState<Set<string>>(new Set());
 
   // レイヤー表示フラグ
@@ -351,6 +366,9 @@ export default function App() {
             onNoteClick={handleNoteClick}
             highlightedNotes={highlightedOverlayNotes}
             highlightedDegrees={highlightedDegrees}
+            scaleColor={scaleColor}
+            cagedColor={cagedColor}
+            chordColor={chordColor}
           />
         )}
         {showQuiz && quizQuestion && (
@@ -452,6 +470,12 @@ export default function App() {
             setDiatonicChordSize={handleDiatonicChordSizeChange}
             diatonicDegree={diatonicDegree}
             setDiatonicDegree={setDiatonicDegree}
+            scaleColor={scaleColor}
+            setScaleColor={setScaleColor}
+            cagedColor={cagedColor}
+            setCagedColor={setCagedColor}
+            chordColor={chordColor}
+            setChordColor={setChordColor}
           />
         )}
       </main>

@@ -171,20 +171,25 @@ describe("ui/Fretboard", () => {
     expect(container.querySelector(".border-sky-500\\/70")).toBeTruthy();
   });
 
-  it("blue トーンのコードフォーム色を指定できる", () => {
+  it("カスタムカラーのコードフォーム色を指定できる", () => {
     const { container } = render(
       <Fretboard
         {...makeProps({
           showChord: true,
           chordDisplayMode: "form" as ChordDisplayMode,
           suppressRegularDisplay: true,
-          chordOverlayTone: "indigo",
+          chordColor: "#0ea5e9",
         })}
       />,
     );
 
-    expect(container.querySelector(".border-sky-500")).toBeTruthy();
-    expect(container.querySelector(".bg-sky-500")).toBeTruthy();
+    const allStyled = Array.from(container.querySelectorAll("[style]"));
+    const chordCell = allStyled.find(
+      (el) =>
+        (el as HTMLElement).style.backgroundColor.includes("14, 165, 233") ||
+        (el as HTMLElement).style.backgroundColor === "#0ea5e9",
+    );
+    expect(chordCell).toBeTruthy();
   });
 
   it("E メジャーではオープンコードとバレーコードの枠が重複しない", () => {

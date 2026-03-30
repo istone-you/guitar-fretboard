@@ -154,7 +154,9 @@ export interface FretboardProps {
   quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
   hideChordNoteLabels?: boolean;
-  chordOverlayTone?: "amber" | "indigo";
+  chordColor?: string;
+  scaleColor?: string;
+  cagedColor?: string;
 }
 
 export default function Fretboard({
@@ -188,7 +190,9 @@ export default function Fretboard({
   quizRevealNoteNames = null,
   suppressRegularDisplay = false,
   hideChordNoteLabels = false,
-  chordOverlayTone = "amber",
+  chordColor = "#fb923c",
+  scaleColor = "#34d399",
+  cagedColor = "#a78bfa",
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
   const quizActive = quizModeActive && quizCell !== undefined;
@@ -358,11 +362,20 @@ export default function Fretboard({
                 <div
                   key={group.id}
                   className={`pointer-events-none absolute rounded-2xl border-2 z-[6] ${
-                    hideChordNoteLabels
-                      ? "animate-pulse border-sky-500/70 bg-sky-500/10"
-                      : "border-amber-300/60 bg-amber-300/8"
+                    hideChordNoteLabels ? "animate-pulse border-sky-500/70 bg-sky-500/10" : ""
                   }`}
-                  style={{ top, left, width, height }}
+                  style={{
+                    top,
+                    left,
+                    width,
+                    height,
+                    ...(hideChordNoteLabels
+                      ? {}
+                      : {
+                          borderColor: `${chordColor}99`,
+                          backgroundColor: `${chordColor}14`,
+                        }),
+                  }}
                 />
               );
             })}
@@ -396,7 +409,9 @@ export default function Fretboard({
               quizRevealNoteNames={quizRevealNoteNames}
               suppressRegularDisplay={suppressRegularDisplay}
               hideChordNoteLabels={hideChordNoteLabels}
-              chordOverlayTone={chordOverlayTone}
+              chordColor={chordColor}
+              scaleColor={scaleColor}
+              cagedColor={cagedColor}
             />
           ))}
         </div>
@@ -488,7 +503,9 @@ interface StringRowProps {
   quizRevealNoteNames?: string[] | null;
   suppressRegularDisplay?: boolean;
   hideChordNoteLabels?: boolean;
-  chordOverlayTone?: "amber" | "indigo";
+  chordColor?: string;
+  scaleColor?: string;
+  cagedColor?: string;
 }
 
 function StringRow({
@@ -518,7 +535,9 @@ function StringRow({
   quizRevealNoteNames,
   suppressRegularDisplay = false,
   hideChordNoteLabels = false,
-  chordOverlayTone = "amber",
+  chordColor = "#fb923c",
+  scaleColor = "#34d399",
+  cagedColor = "#a78bfa",
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -576,10 +595,10 @@ function StringRow({
         let overlayLabel = baseLabelMode === "degree" ? degreeName : noteName;
 
         if (showScale && isInScale(semitone, scaleType)) {
-          overlayColor = { bg: "#2f9e73", text: "#fff" };
+          overlayColor = { bg: scaleColor, text: "#fff" };
         }
         if (cagedCell) {
-          overlayColor = { bg: cagedCell.color, text: "#fff" };
+          overlayColor = { bg: cagedColor, text: "#fff" };
         }
 
         const isAnswered = quizAnswerMode && quizAnsweredCell != null;
@@ -632,7 +651,7 @@ function StringRow({
             isQuizTarget={fret === quizTargetFret}
             suppressRegularDisplay={shouldSuppressRegularDisplay}
             hideChordNoteLabels={hideChordNoteLabels}
-            chordOverlayTone={chordOverlayTone}
+            chordColor={chordColor}
             quizAnswerMode={quizAnswerMode}
             isTargetStringCell={isTargetString}
             isAnswered={isAnswered}
@@ -675,7 +694,7 @@ interface FretCellComponentProps {
   isQuizTarget: boolean;
   suppressRegularDisplay: boolean;
   hideChordNoteLabels?: boolean;
-  chordOverlayTone?: "amber" | "indigo";
+  chordColor?: string;
   quizAnswerMode?: boolean;
   isTargetStringCell?: boolean;
   isAnswered?: boolean;
@@ -702,7 +721,7 @@ function FretCellComponent({
   isQuizTarget,
   suppressRegularDisplay,
   hideChordNoteLabels = false,
-  chordOverlayTone = "amber",
+  chordColor = "#fb923c",
   quizAnswerMode = false,
   isTargetStringCell = false,
   isAnswered = false,
@@ -712,8 +731,6 @@ function FretCellComponent({
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
   const shouldShowBaseLabel = !overlayColor && !inChord && !suppressRegularDisplay;
-  const chordOverlayClass =
-    chordOverlayTone === "indigo" ? "border-sky-500 bg-sky-500" : "border-amber-500 bg-amber-500";
   const overlayOpacity = hidden ? opacity * 0.3 : opacity;
 
   return (
@@ -788,17 +805,18 @@ function FretCellComponent({
 
       {inChord && (
         <div
-          className={`absolute rounded-full z-20 ${hideChordNoteLabels ? "" : chordOverlayClass.split(" ")[0]}`}
+          className="absolute rounded-full z-20"
           style={{
             inset: size.overlayInset,
             borderWidth: hideChordNoteLabels ? 0 : size.chordBorderWidth,
+            borderStyle: "solid",
+            borderColor: hideChordNoteLabels ? "transparent" : chordColor,
             opacity: overlayOpacity,
           }}
         >
           <div
-            className={`w-full h-full rounded-full flex items-center justify-center ${
-              chordOverlayClass.split(" ")[1]
-            } ${hideChordNoteLabels ? "animate-pulse" : ""}`}
+            className={`w-full h-full rounded-full flex items-center justify-center ${hideChordNoteLabels ? "animate-pulse" : ""}`}
+            style={{ backgroundColor: chordColor }}
           >
             {hideChordNoteLabels ? (
               <span
