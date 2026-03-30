@@ -47,7 +47,7 @@ function Stepper({
         ‹
       </button>
       <span
-        className={`text-base font-bold ${width} text-center ${
+        className={`text-sm sm:text-base font-bold ${width} text-center ${
           disabled
             ? theme === "dark"
               ? "text-gray-500"
@@ -120,8 +120,12 @@ export default function FretboardHeader({
   const canNarrow = fretRange[1] - fretRange[0] > 1;
 
   return (
-    <div className="mb-2 flex flex-wrap items-center justify-center gap-6">
-      <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
+    <div className="mb-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:mb-2 sm:gap-6">
+      <span
+        className={`inline-flex items-center gap-1 text-xs sm:text-sm ${
+          theme === "dark" ? "text-gray-400" : "text-stone-600"
+        }`}
+      >
         {t("header.root")}:{" "}
         <Stepper
           theme={theme}
@@ -132,7 +136,11 @@ export default function FretboardHeader({
           onNext={() => stepNote(1)}
         />
       </span>
-      <span className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-stone-600"}`}>
+      <span
+        className={`inline-flex items-center gap-1 text-xs sm:text-sm ${
+          theme === "dark" ? "text-gray-400" : "text-stone-600"
+        }`}
+      >
         {t("header.fret")}:{" "}
         <Stepper
           theme={theme}
@@ -142,7 +150,9 @@ export default function FretboardHeader({
           prevDisabled={fretRange[0] <= 0}
           nextDisabled={!canNarrow}
         />
-        <span className={`mx-1 ${theme === "dark" ? "text-gray-500" : "text-stone-400"}`}>〜</span>
+        <span className={`mx-0.5 sm:mx-1 ${theme === "dark" ? "text-gray-500" : "text-stone-400"}`}>
+          〜
+        </span>
         <Stepper
           theme={theme}
           value={fretRange[1]}

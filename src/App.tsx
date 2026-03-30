@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import "./i18n";
-import Controls from "./components/Controls/index";
+import LayerControls from "./components/LayerControls/index";
 import SettingsMenu from "./components/SettingsMenu/index";
 import NormalFretboard from "./components/NormalFretboard/index";
 import QuizFretboard from "./components/QuizFretboard/index";
@@ -82,6 +82,7 @@ export default function App() {
   const [showChord, setShowChord] = useState(false);
   const [showScale, setShowScale] = useState(false);
   const [showCaged, setShowCaged] = useState(false);
+  const [showLayers, setShowLayers] = useState(true);
 
   // コードフォーム設定
   const [chordDisplayMode, setChordDisplayMode] = useState<ChordDisplayMode>("form");
@@ -189,14 +190,17 @@ export default function App() {
   });
   const triadLayout = triadInversion;
   const diatonicScaleType = `${diatonicKeyType}-${diatonicChordSize}`;
+  const effectiveShowScale = showLayers && showScale;
+  const effectiveShowCaged = showLayers && showCaged;
+  const effectiveShowChord = showLayers && showChord;
   const overlaySemitones = useMemo(
     () =>
       getActiveOverlaySemitones({
         rootNote,
-        showScale,
+        showScale: effectiveShowScale,
         scaleType,
-        showCaged,
-        showChord,
+        showCaged: effectiveShowCaged,
+        showChord: effectiveShowChord,
         chordDisplayMode,
         diatonicScaleType,
         diatonicDegree,
@@ -204,10 +208,10 @@ export default function App() {
       }),
     [
       rootNote,
-      showScale,
+      effectiveShowScale,
       scaleType,
-      showCaged,
-      showChord,
+      effectiveShowCaged,
+      effectiveShowChord,
       chordDisplayMode,
       diatonicScaleType,
       diatonicDegree,
@@ -232,68 +236,41 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen p-4 flex flex-col gap-4 ${
+      className={`min-h-screen px-2 py-2 sm:p-4 flex flex-col gap-2 sm:gap-4 ${
         theme === "dark" ? "bg-gray-950" : "bg-stone-100"
       }`}
     >
       <main
-        className={`rounded-xl p-4 space-y-4 ${
+        className={`rounded-xl px-3 py-3 sm:p-4 space-y-3 sm:space-y-4 ${
           theme === "dark" ? "bg-gray-900" : "bg-white border border-stone-300 shadow-sm"
         }`}
       >
-        <SettingsMenu
-          theme={theme}
-          fretboardDisplaySize={fretboardDisplaySize}
-          onFretboardDisplaySizeChange={setFretboardDisplaySize}
-          onThemeChange={() =>
-            setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))
-          }
-          accidental={accidental}
-          onAccidentalChange={handleAccidentalChange}
-          showQuiz={showQuiz}
-          setShowQuiz={setShowQuiz}
-        />
-        <Controls
-          theme={theme}
-          rootNote={rootNote}
-          accidental={accidental}
-          showChord={showChord}
-          setShowChord={setShowChord}
-          chordDisplayMode={chordDisplayMode}
-          setChordDisplayMode={(value) => setChordDisplayMode(value as ChordDisplayMode)}
-          showScale={showScale}
-          setShowScale={setShowScale}
-          scaleType={scaleType}
-          setScaleType={(value) => setScaleType(value as ScaleType)}
-          showCaged={showCaged}
-          setShowCaged={setShowCaged}
-          cagedForms={cagedForms}
-          toggleCagedForm={toggleCagedForm}
-          chordType={chordType}
-          setChordType={(value) => setChordType(value as ChordType)}
-          triadInversion={triadInversion}
-          setTriadInversion={setTriadInversion}
-          diatonicKeyType={diatonicKeyType}
-          setDiatonicKeyType={handleDiatonicKeyTypeChange}
-          diatonicChordSize={diatonicChordSize}
-          setDiatonicChordSize={handleDiatonicChordSizeChange}
-          diatonicDegree={diatonicDegree}
-          setDiatonicDegree={setDiatonicDegree}
-          showQuiz={showQuiz}
-        />
-
-        <FretboardHeader
-          theme={theme}
-          rootNote={rootNote}
-          accidental={accidental}
-          baseLabelMode={baseLabelMode}
-          fretRange={fretRange}
-          showQuiz={showQuiz}
-          rootChangeDisabled={!quizRootChangeEnabled}
-          onBaseLabelModeChange={setBaseLabelMode}
-          onRootNoteChange={quizRootChangeEnabled ? handleNoteClick : () => {}}
-          onFretRangeChange={setFretRange}
-        />
+        <div className="space-y-3 sm:space-y-4">
+          <SettingsMenu
+            theme={theme}
+            fretboardDisplaySize={fretboardDisplaySize}
+            onFretboardDisplaySizeChange={setFretboardDisplaySize}
+            onThemeChange={() =>
+              setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))
+            }
+            accidental={accidental}
+            onAccidentalChange={handleAccidentalChange}
+            showQuiz={showQuiz}
+            setShowQuiz={setShowQuiz}
+          />
+          <FretboardHeader
+            theme={theme}
+            rootNote={rootNote}
+            accidental={accidental}
+            baseLabelMode={baseLabelMode}
+            fretRange={fretRange}
+            showQuiz={showQuiz}
+            rootChangeDisabled={!quizRootChangeEnabled}
+            onBaseLabelModeChange={setBaseLabelMode}
+            onRootNoteChange={quizRootChangeEnabled ? handleNoteClick : () => {}}
+            onFretRangeChange={setFretRange}
+          />
+        </div>
         {showQuiz ? (
           <QuizFretboard
             theme={theme}
@@ -308,9 +285,9 @@ export default function App() {
             fretRange={fretRange}
             showChord={quizMode === "chord" && quizType === "choice"}
             chordDisplayMode={"form"}
-            showScale={showScale}
+            showScale={effectiveShowScale}
             scaleType={scaleType}
-            showCaged={showCaged}
+            showCaged={effectiveShowCaged}
             cagedForms={cagedForms}
             chordType={
               quizMode === "chord" && quizType === "choice" && quizQuestion?.promptChordType
@@ -352,11 +329,11 @@ export default function App() {
             baseLabelMode={baseLabelMode}
             displaySize={fretboardDisplaySize}
             fretRange={fretRange}
-            showChord={showChord}
+            showChord={effectiveShowChord}
             chordDisplayMode={chordDisplayMode}
-            showScale={showScale}
+            showScale={effectiveShowScale}
             scaleType={scaleType}
-            showCaged={showCaged}
+            showCaged={effectiveShowCaged}
             cagedForms={cagedForms}
             chordType={chordType}
             triadPosition={triadLayout}
@@ -367,7 +344,6 @@ export default function App() {
             hiddenDegrees={hiddenDegrees}
           />
         )}
-
         {showQuiz && quizQuestion && (
           <div className="max-w-[840px] mx-auto w-full">
             <QuizPanel
@@ -410,7 +386,6 @@ export default function App() {
             />
           </div>
         )}
-
         <FretboardFooter
           theme={theme}
           baseLabelMode={baseLabelMode}
@@ -422,10 +397,10 @@ export default function App() {
           onAutoFilter={() =>
             handleAutoFilter({
               rootNote,
-              showScale,
+              showScale: effectiveShowScale,
               scaleType,
-              showCaged,
-              showChord,
+              showCaged: effectiveShowCaged,
+              showChord: effectiveShowChord,
               chordDisplayMode,
               diatonicScaleType,
               diatonicDegree,
@@ -439,6 +414,37 @@ export default function App() {
           onToggleOverlayNoteHighlight={handleToggleOverlayNoteHighlight}
           onToggleDegree={toggleDegree}
         />
+        {!showQuiz && (
+          <LayerControls
+            theme={theme}
+            rootNote={rootNote}
+            accidental={accidental}
+            showChord={showChord}
+            setShowChord={setShowChord}
+            chordDisplayMode={chordDisplayMode}
+            setChordDisplayMode={(value) => setChordDisplayMode(value as ChordDisplayMode)}
+            showScale={showScale}
+            setShowScale={setShowScale}
+            scaleType={scaleType}
+            setScaleType={(value) => setScaleType(value as ScaleType)}
+            showCaged={showCaged}
+            setShowCaged={setShowCaged}
+            showLayers={showLayers}
+            setShowLayers={setShowLayers}
+            cagedForms={cagedForms}
+            toggleCagedForm={toggleCagedForm}
+            chordType={chordType}
+            setChordType={(value) => setChordType(value as ChordType)}
+            triadInversion={triadInversion}
+            setTriadInversion={setTriadInversion}
+            diatonicKeyType={diatonicKeyType}
+            setDiatonicKeyType={handleDiatonicKeyTypeChange}
+            diatonicChordSize={diatonicChordSize}
+            setDiatonicChordSize={handleDiatonicChordSizeChange}
+            diatonicDegree={diatonicDegree}
+            setDiatonicDegree={setDiatonicDegree}
+          />
+        )}
       </main>
     </div>
   );

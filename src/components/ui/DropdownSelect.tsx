@@ -11,6 +11,7 @@ export interface DropdownSelectProps {
   disabled?: boolean;
   widthClass?: string;
   keepOpen?: boolean;
+  direction?: "down" | "up";
 }
 
 export function DropdownSelect({
@@ -22,6 +23,7 @@ export function DropdownSelect({
   disabled = false,
   widthClass = "w-32",
   keepOpen = false,
+  direction = "down",
 }: DropdownSelectProps) {
   const [open, setOpen] = useState(false);
   const isDark = theme === "dark";
@@ -56,9 +58,9 @@ export function DropdownSelect({
           />
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`absolute left-0 top-[calc(100%+0.5rem)] z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
-              isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
-            }`}
+            className={`absolute left-0 z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
+              direction === "up" ? "bottom-[calc(100%+0.5rem)]" : "top-[calc(100%+0.5rem)]"
+            } ${isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"}`}
           >
             <div role="listbox" className="space-y-1">
               {options.map((option) => {

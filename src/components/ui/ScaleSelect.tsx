@@ -10,6 +10,7 @@ interface ScaleSelectProps {
   options: { value: ScaleType; label: string }[];
   groups: { title: string; options: { value: ScaleType; label: string }[] }[];
   direction?: "down" | "up";
+  disabled?: boolean;
 }
 
 export function ScaleSelect({
@@ -19,6 +20,7 @@ export function ScaleSelect({
   options,
   groups,
   direction = "down",
+  disabled = false,
 }: ScaleSelectProps) {
   const { t } = useTranslation();
   const selected = options.find((option) => option.value === value) ?? options[0];
@@ -31,6 +33,7 @@ export function ScaleSelect({
       triggerClassName="w-44"
       panelClassName="w-64"
       direction={direction}
+      disabled={disabled}
     >
       {({ closePanel }) => (
         <div className="space-y-2">

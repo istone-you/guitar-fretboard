@@ -48,13 +48,14 @@ export default function FretboardFooter({
 }: FretboardFooterProps) {
   const { t } = useTranslation();
   const hasHighlightedNotes = highlightedOverlayNotes.size > 0;
+  const footerHeightClass = "mt-4 min-h-[6.25rem] sm:min-h-[5.75rem]";
 
   if (showQuiz) {
-    return <div className="mt-4 min-h-[5.75rem]" />;
+    return <div className={footerHeightClass} />;
   }
 
   return (
-    <div className="mt-4 min-h-[5.75rem]">
+    <div className={footerHeightClass}>
       {baseLabelMode === "note" && (
         <>
           <div className="mb-3 flex items-center justify-center gap-2">

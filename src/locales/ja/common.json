@@ -56,6 +56,15 @@
     "highlightAll": "全強調",
     "reset": "リセット"
   },
+  "mobileControls": {
+    "layers": "レイヤー",
+    "hide": "非表示",
+    "show": "表示",
+    "scaleKind": "種類",
+    "cagedForms": "フォーム",
+    "more": "詳細",
+    "less": "閉じる"
+  },
   "scaleGroups": {
     "basics": "基本",
     "minorDerived": "マイナー派生",

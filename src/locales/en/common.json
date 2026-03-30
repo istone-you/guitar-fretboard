@@ -56,6 +56,15 @@
     "highlightAll": "Highlight all",
     "reset": "Reset"
   },
+  "mobileControls": {
+    "layers": "Layers",
+    "hide": "Hide",
+    "show": "Show",
+    "scaleKind": "Type",
+    "cagedForms": "Forms",
+    "more": "Details",
+    "less": "Close"
+  },
   "scaleGroups": {
     "basics": "Basics",
     "minorDerived": "Minor Derived",

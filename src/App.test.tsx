@@ -28,7 +28,7 @@ vi.mock("./components/SettingsMenu/index", () => ({
   ),
 }));
 
-vi.mock("./components/Controls/index", () => ({
+vi.mock("./components/LayerControls/index", () => ({
   default: (props: any) => {
     controlsState.latest = props;
     return (

@@ -4,9 +4,9 @@ import "../../i18n";
 import type { DegreeName, Theme, ChordType, ScaleType } from "../../types";
 import QuizKindSelect from "./QuizKindSelect";
 import ChordQuizTypeSelect from "./ChordQuizTypeSelect";
-import { ScaleSelect } from "../Controls/ScaleSelect";
-import { buildScaleOptions } from "../Controls/scaleOptions";
 import { DropdownSelect } from "../ui/DropdownSelect";
+import { ScaleSelect } from "../ui/ScaleSelect";
+import { buildScaleOptions } from "../ui/scaleOptions";
 
 export type QuizMode = "note" | "degree" | "chord" | "scale" | "diatonic";
 export type QuizType = "choice" | "fretboard" | "all";
