@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Theme } from "../../types";
 import { DropdownButton } from "./DropdownButton";
 
@@ -26,8 +26,31 @@ export function DropdownSelect({
   direction = "down",
 }: DropdownSelectProps) {
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const isDark = theme === "dark";
   const selected = options.find((option) => option.value === value) ?? options[0];
+
+  const getPanelStyle = (): React.CSSProperties => {
+    if (!buttonRef.current) return {};
+    const rect = buttonRef.current.getBoundingClientRect();
+    const panelWidth = Math.max(rect.width, 120);
+    if (direction === "up") {
+      return {
+        position: "fixed",
+        left: rect.left,
+        bottom: window.innerHeight - rect.top + 8,
+        width: panelWidth,
+        zIndex: 9999,
+      };
+    }
+    return {
+      position: "fixed",
+      left: rect.left,
+      top: rect.bottom + 8,
+      width: panelWidth,
+      zIndex: 9999,
+    };
+  };
 
   const activeOptionClass =
     accent === "amber"
@@ -41,7 +64,7 @@ export function DropdownSelect({
           : "bg-stone-100 text-stone-900";
 
   return (
-    <div className={`relative ${widthClass}`}>
+    <div ref={buttonRef} className={`relative ${widthClass}`}>
       <DropdownButton
         theme={theme}
         label={selected?.label ?? ""}
@@ -62,9 +85,8 @@ export function DropdownSelect({
           />
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`absolute left-0 z-30 w-full overflow-hidden rounded-[20px] border p-1.5 shadow-2xl backdrop-blur ${
-              direction === "up" ? "bottom-[calc(100%+0.5rem)]" : "top-[calc(100%+0.5rem)]"
-            } ${
+            style={getPanelStyle()}
+            className={`overflow-hidden rounded-[20px] border p-1.5 shadow-2xl backdrop-blur ${
               isDark
                 ? "border-white/8 bg-gray-900/95"
                 : "border-stone-200 bg-stone-50/95 shadow-[0_20px_60px_-32px_rgba(15,23,42,0.24)]"

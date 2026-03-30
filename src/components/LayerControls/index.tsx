@@ -13,7 +13,6 @@ import {
 import type { Theme, Accidental, ChordDisplayMode, ScaleType, ChordType } from "../../types";
 import { DropdownSelect } from "../ui/DropdownSelect";
 import { ScaleSelect } from "../ui/ScaleSelect";
-import { SegmentedToggle } from "../ui/SegmentedToggle";
 import { buildScaleOptions } from "../ui/scaleOptions";
 
 const CHORD_TYPES: ChordType[] = [
@@ -73,7 +72,7 @@ interface LayerControlsProps {
   setChordColor: (value: string) => void;
 }
 
-function TogglePill({
+function ToggleSwitch({
   active,
   onClick,
   theme,
@@ -82,21 +81,22 @@ function TogglePill({
   onClick: () => void;
   theme: Theme;
 }) {
+  const isDark = theme === "dark";
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={active}
       onClick={onClick}
-      className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-        active
-          ? theme === "dark"
-            ? "bg-sky-600 text-white shadow-[0_8px_24px_-16px_rgba(2,132,199,0.55)]"
-            : "bg-sky-500 text-white"
-          : theme === "dark"
-            ? "bg-gray-700 text-gray-200"
-            : "bg-stone-200 text-stone-700"
+      className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ${
+        active ? "bg-sky-500" : isDark ? "bg-gray-600" : "bg-stone-300"
       }`}
     >
-      {active ? "ON" : "OFF"}
+      <span
+        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+          active ? "translate-x-5" : "translate-x-0.5"
+        }`}
+      />
     </button>
   );
 }
@@ -237,29 +237,39 @@ export default function LayerControls({
   const inactiveCardToneClass = isDark
     ? "border-white/5 bg-white/[0.02]"
     : "border-stone-200 bg-stone-100/70";
+  const layerOffCardToneClass = isDark
+    ? "border-white/5 bg-white/[0.015]"
+    : "border-stone-200/60 bg-stone-100/40";
   const sectionLabelClass = `text-center text-[11px] font-semibold uppercase tracking-wide ${
     isDark ? "text-gray-400" : "text-stone-500"
   }`;
   const headingClass = `text-sm ${isDark ? "text-gray-400" : "text-stone-600"}`;
   const layerCardStateClass = showLayers ? "opacity-100" : "opacity-45";
 
+  const getCardToneClass = (layerOn: boolean) => {
+    if (!showLayers) return inactiveCardToneClass;
+    return layerOn ? activeCardToneClass : layerOffCardToneClass;
+  };
+  const getCardContentClass = (layerOn: boolean) =>
+    showLayers && layerOn ? "opacity-100" : "opacity-45";
+
   const scaleCard = (
     <div
-      className={`${cardClass} ${showLayers ? activeCardToneClass : inactiveCardToneClass} flex min-h-full flex-col`}
+      className={`${cardClass} ${getCardToneClass(showScale)} flex min-h-full flex-col transition-colors`}
     >
-      <div className="absolute right-3 top-3">
+      <div className="absolute right-3 top-3 z-10">
         <div className={layerCardStateClass}>
-          <TogglePill active={showScale} onClick={() => setShowScale(!showScale)} theme={theme} />
+          <ToggleSwitch active={showScale} onClick={() => setShowScale(!showScale)} theme={theme} />
         </div>
       </div>
-      <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
+      <div className={`${getCardContentClass(showScale)} flex flex-1 flex-col transition-opacity`}>
         <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.scale")}</span>
           <input
             type="color"
             value={scaleColor}
             onChange={(e) => setScaleColor(e.target.value)}
-            disabled={!showLayers}
+            disabled={!showLayers || !showScale}
             className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
             style={{ padding: 0 }}
           />
@@ -274,7 +284,7 @@ export default function LayerControls({
               options={scaleOptions}
               groups={scaleGroups}
               direction="up"
-              disabled={!showLayers}
+              disabled={!showLayers || !showScale}
             />
           </div>
         </div>
@@ -284,21 +294,21 @@ export default function LayerControls({
 
   const cagedCard = (
     <div
-      className={`${cardClass} ${showLayers ? activeCardToneClass : inactiveCardToneClass} flex min-h-full flex-col`}
+      className={`${cardClass} ${getCardToneClass(showCaged)} flex min-h-full flex-col transition-colors`}
     >
-      <div className="absolute right-3 top-3">
+      <div className="absolute right-3 top-3 z-10">
         <div className={layerCardStateClass}>
-          <TogglePill active={showCaged} onClick={() => setShowCaged(!showCaged)} theme={theme} />
+          <ToggleSwitch active={showCaged} onClick={() => setShowCaged(!showCaged)} theme={theme} />
         </div>
       </div>
-      <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
+      <div className={`${getCardContentClass(showCaged)} flex flex-1 flex-col transition-opacity`}>
         <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.caged")}</span>
           <input
             type="color"
             value={cagedColor}
             onChange={(e) => setCagedColor(e.target.value)}
-            disabled={!showLayers}
+            disabled={!showLayers || !showCaged}
             className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
             style={{ padding: 0 }}
           />
@@ -309,11 +319,12 @@ export default function LayerControls({
             <div className="flex flex-wrap content-center justify-center gap-2">
               {CAGED_ORDER.map((key) => {
                 const active = cagedForms.has(key);
+                const cagedDisabled = !showLayers || !showCaged;
                 return (
                   <button
                     key={key}
                     type="button"
-                    disabled={!showLayers}
+                    disabled={cagedDisabled}
                     onClick={() => toggleCagedForm(key)}
                     className={`h-9 w-9 rounded-full border-2 text-sm font-bold transition-all ${
                       active
@@ -323,7 +334,7 @@ export default function LayerControls({
                         : isDark
                           ? "border-gray-500 bg-gray-700 text-gray-100"
                           : "border-stone-300 bg-white text-stone-700"
-                    } ${!showLayers ? "cursor-not-allowed" : ""}`}
+                    } ${cagedDisabled ? "cursor-not-allowed" : ""}`}
                   >
                     {key}
                   </button>
@@ -337,22 +348,20 @@ export default function LayerControls({
   );
 
   const chordCard = (
-    <div
-      className={`${cardClass} ${showLayers ? activeCardToneClass : inactiveCardToneClass} flex flex-col`}
-    >
-      <div className="absolute right-3 top-3">
+    <div className={`${cardClass} ${getCardToneClass(showChord)} flex flex-col transition-colors`}>
+      <div className="absolute right-3 top-3 z-10">
         <div className={layerCardStateClass}>
-          <TogglePill active={showChord} onClick={() => setShowChord(!showChord)} theme={theme} />
+          <ToggleSwitch active={showChord} onClick={() => setShowChord(!showChord)} theme={theme} />
         </div>
       </div>
-      <div className={`${layerCardStateClass} flex flex-1 flex-col`}>
+      <div className={`${getCardContentClass(showChord)} flex flex-1 flex-col transition-opacity`}>
         <div className="mb-2 flex items-center justify-center gap-2">
           <span className={sectionLabelClass}>{t("layers.chord")}</span>
           <input
             type="color"
             value={chordColor}
             onChange={(e) => setChordColor(e.target.value)}
-            disabled={!showLayers}
+            disabled={!showLayers || !showChord}
             className="h-5 w-5 cursor-pointer overflow-hidden rounded-full border-0 p-0 disabled:cursor-not-allowed [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-0 [&::-webkit-color-swatch-wrapper]:p-0"
             style={{ padding: 0 }}
           />
@@ -368,7 +377,7 @@ export default function LayerControls({
               accent="sky"
               widthClass="w-full"
               direction="up"
-              disabled={!showLayers}
+              disabled={!showLayers || !showChord}
             />
           </div>
           <div className="space-y-1 text-center">
@@ -383,7 +392,7 @@ export default function LayerControls({
               accent="sky"
               widthClass="w-full"
               direction="up"
-              disabled={!showLayers || chordDisplayMode === "power"}
+              disabled={!showLayers || !showChord || chordDisplayMode === "power"}
             />
           </div>
           <div className="space-y-1 text-center">
@@ -399,7 +408,9 @@ export default function LayerControls({
               widthClass="w-full"
               direction="up"
               disabled={
-                !showLayers || (chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad")
+                !showLayers ||
+                !showChord ||
+                (chordDisplayMode !== "diatonic" && chordDisplayMode !== "triad")
               }
             />
           </div>
@@ -413,7 +424,7 @@ export default function LayerControls({
               accent="sky"
               widthClass="w-full"
               direction="up"
-              disabled={!showLayers || chordDisplayMode !== "diatonic"}
+              disabled={!showLayers || !showChord || chordDisplayMode !== "diatonic"}
             />
           </div>
         </div>
@@ -440,23 +451,63 @@ export default function LayerControls({
         </div>
       </div>
       <div className="flex justify-center lg:hidden">
-        <SegmentedToggle
-          theme={theme}
-          value={activeTab}
-          onChange={(next) => {
-            const currentIndex = TABS.indexOf(activeTab);
-            const nextIndex = TABS.indexOf(next as MobileTab);
-            setSlideDirection(nextIndex > currentIndex ? "left" : "right");
-            setActiveTab(next as MobileTab);
-          }}
-          size="compact"
-          buttonWidthClass="w-[5.5rem] text-center"
-          options={[
-            { value: "scale", label: t("layers.scale") },
-            { value: "caged", label: t("layers.caged") },
-            { value: "chord", label: t("layers.chord") },
-          ]}
-        />
+        <div className="flex items-center gap-5">
+          {(
+            [
+              {
+                tab: "scale" as MobileTab,
+                label: t("layers.scale"),
+                on: showScale,
+                color: scaleColor,
+              },
+              {
+                tab: "caged" as MobileTab,
+                label: t("layers.caged"),
+                on: showCaged,
+                color: cagedColor,
+              },
+              {
+                tab: "chord" as MobileTab,
+                label: t("layers.chord"),
+                on: showChord,
+                color: chordColor,
+              },
+            ] as const
+          ).map(({ tab, label, on, color }) => {
+            const isCurrent = activeTab === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => {
+                  const currentIndex = TABS.indexOf(activeTab);
+                  const nextIndex = TABS.indexOf(tab);
+                  setSlideDirection(nextIndex > currentIndex ? "left" : "right");
+                  setActiveTab(tab);
+                }}
+                className="flex flex-col items-center gap-1"
+              >
+                <span
+                  className={`text-xs transition-colors ${
+                    isCurrent
+                      ? isDark
+                        ? "font-semibold text-gray-100"
+                        : "font-semibold text-stone-800"
+                      : isDark
+                        ? "text-gray-500"
+                        : "text-stone-400"
+                  }`}
+                >
+                  {label}
+                </span>
+                <span
+                  className="h-2 w-2 rounded-full transition-colors"
+                  style={{ backgroundColor: on ? color : isDark ? "#4b5563" : "#d6d3d1" }}
+                />
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div

@@ -278,9 +278,9 @@ describe("QuizPanel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "メジャースケール" }));
 
-    expect(screen.getByRole("dialog", { name: "スケール一覧" }).className).toContain(
-      "bottom-[calc(100%+0.5rem)]",
-    );
+    const panel = screen.getByRole("dialog", { name: "スケール一覧" });
+    expect(panel.style.position).toBe("fixed");
+    expect(panel.style.bottom).not.toBe("");
   });
 
   it("ダイアトニック全答では7枠が表示される", () => {
