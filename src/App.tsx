@@ -32,6 +32,7 @@ const DEFAULT_CHORD_QUIZ_TYPES: ChordType[] = ["Major", "Minor", "7th", "maj7", 
 const STORAGE_KEYS = {
   theme: "guiter:theme",
   accidental: "guiter:accidental",
+  fretRange: "guiter:fret-range",
   fretboardDisplaySize: "guiter:fretboard-display-size",
   scaleColor: "guiter:scale-color",
   cagedColor: "guiter:caged-color",
@@ -53,16 +54,39 @@ function readStoredAccidental(): Accidental {
 function readStoredFretboardDisplaySize(): FretboardDisplaySize {
   if (typeof window === "undefined") return "standard";
   const stored = window.localStorage.getItem(STORAGE_KEYS.fretboardDisplaySize);
-  if (stored === "standard" || stored === "compact" || stored === "tiny") return stored;
-  if (window.innerWidth < 640) return "tiny";
+  if (stored === "large" || stored === "standard" || stored === "small") return stored;
+  if (window.innerWidth < 640) return "small";
   return "standard";
+}
+
+function readStoredFretRange(): [number, number] {
+  if (typeof window === "undefined") return [0, 14];
+  const stored = window.localStorage.getItem(STORAGE_KEYS.fretRange);
+  if (stored === null) return [0, 14];
+
+  const [rawMin, rawMax] = stored.split("-").map(Number);
+  if (
+    Number.isInteger(rawMin) &&
+    Number.isInteger(rawMax) &&
+    rawMin >= 0 &&
+    rawMax <= 14 &&
+    rawMin < rawMax
+  ) {
+    return [rawMin, rawMax];
+  }
+
+  return [0, 14];
 }
 
 export default function App() {
   // ルート音
   const [rootNote, setRootNote] = useState("C");
   // フレット範囲
-  const [fretRange, setFretRange] = useState<[number, number]>([0, 14]);
+  const [fretRange, setFretRange] = usePersistedSetting<[number, number]>(
+    STORAGE_KEYS.fretRange,
+    readStoredFretRange,
+    (value) => `${value[0]}-${value[1]}`,
+  );
   // クイズ機能
   const [showQuiz, setShowQuiz] = useState(false);
   const [chordQuizTypes, setChordQuizTypes] = useState<ChordType[]>(DEFAULT_CHORD_QUIZ_TYPES);
@@ -81,15 +105,15 @@ export default function App() {
   const [theme, setTheme] = usePersistedSetting<Theme>(STORAGE_KEYS.theme, readStoredTheme);
   const [scaleColor, setScaleColor] = usePersistedSetting<string>(
     STORAGE_KEYS.scaleColor,
-    () => window.localStorage.getItem(STORAGE_KEYS.scaleColor) ?? "#34d399",
+    () => window.localStorage.getItem(STORAGE_KEYS.scaleColor) ?? "#ff69b6",
   );
   const [cagedColor, setCagedColor] = usePersistedSetting<string>(
     STORAGE_KEYS.cagedColor,
-    () => window.localStorage.getItem(STORAGE_KEYS.cagedColor) ?? "#a78bfa",
+    () => window.localStorage.getItem(STORAGE_KEYS.cagedColor) ?? "#40e0d0",
   );
   const [chordColor, setChordColor] = usePersistedSetting<string>(
     STORAGE_KEYS.chordColor,
-    () => window.localStorage.getItem(STORAGE_KEYS.chordColor) ?? "#fb923c",
+    () => window.localStorage.getItem(STORAGE_KEYS.chordColor) ?? "#ffd700",
   );
   const [highlightedOverlayNotes, setHighlightedOverlayNotes] = useState<Set<string>>(new Set());
 
@@ -271,7 +295,9 @@ export default function App() {
           <AppHeader
             theme={theme}
             fretboardDisplaySize={fretboardDisplaySize}
+            fretRange={fretRange}
             onFretboardDisplaySizeChange={setFretboardDisplaySize}
+            onFretRangeChange={setFretRange}
             onThemeChange={() =>
               setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"))
             }
@@ -285,12 +311,10 @@ export default function App() {
             rootNote={rootNote}
             accidental={accidental}
             baseLabelMode={baseLabelMode}
-            fretRange={fretRange}
             showQuiz={showQuiz}
             rootChangeDisabled={!quizRootChangeEnabled}
             onBaseLabelModeChange={setBaseLabelMode}
             onRootNoteChange={quizRootChangeEnabled ? handleNoteClick : () => {}}
-            onFretRangeChange={setFretRange}
           />
         </div>
         {showQuiz ? (

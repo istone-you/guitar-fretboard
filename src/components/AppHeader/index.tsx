@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import { changeLocale } from "../../i18n";
@@ -6,10 +7,14 @@ import type { Theme, Accidental, FretboardDisplaySize } from "../../types";
 import { DropdownSelect } from "../ui/DropdownSelect";
 import { SegmentedToggle } from "../ui/SegmentedToggle";
 
+const FRET_MAX = 14;
+
 interface AppHeaderProps {
   theme: Theme;
   fretboardDisplaySize: FretboardDisplaySize;
+  fretRange: [number, number];
   onFretboardDisplaySizeChange: (size: FretboardDisplaySize) => void;
+  onFretRangeChange: (range: [number, number]) => void;
   onThemeChange: () => void;
   accidental: Accidental;
   onAccidentalChange: (mode: Accidental) => void;
@@ -20,7 +25,9 @@ interface AppHeaderProps {
 export default function AppHeader({
   theme,
   fretboardDisplaySize,
+  fretRange,
   onFretboardDisplaySizeChange,
+  onFretRangeChange,
   onThemeChange,
   accidental,
   onAccidentalChange,
@@ -33,15 +40,26 @@ export default function AppHeader({
   const isDark = theme === "dark";
 
   const fretboardDisplaySizeOptions: { value: FretboardDisplaySize; label: string }[] = [
+    { value: "large", label: t("options.displaySize.large") },
     { value: "standard", label: t("options.displaySize.standard") },
-    { value: "compact", label: t("options.displaySize.compact") },
-    { value: "tiny", label: t("options.displaySize.tiny") },
+    { value: "small", label: t("options.displaySize.small") },
   ];
 
   const tabs = [
     { value: false, label: t("mode.normal") },
     { value: true, label: t("mode.quiz") },
   ];
+  const [fretMin, fretMax] = fretRange;
+  const sliderLeftPercent = (fretMin / FRET_MAX) * 100;
+  const sliderRightPercent = (fretMax / FRET_MAX) * 100;
+
+  const handleFretMinChange = (nextMin: number) => {
+    onFretRangeChange([Math.min(nextMin, fretMax - 1), fretMax]);
+  };
+
+  const handleFretMaxChange = (nextMax: number) => {
+    onFretRangeChange([fretMin, Math.max(nextMax, fretMin + 1)]);
+  };
 
   return (
     <div className="relative mx-auto w-full max-w-[840px]">
@@ -126,7 +144,76 @@ export default function AppHeader({
                 onChange={(value) => onFretboardDisplaySizeChange(value as FretboardDisplaySize)}
                 options={fretboardDisplaySizeOptions}
                 widthClass="w-28"
+                align="end"
               />
+            </div>
+
+            <div className="space-y-2">
+              <span
+                className={`block text-sm font-semibold ${isDark ? "text-gray-300" : "text-stone-700"}`}
+              >
+                {t("settingsPanel.fretRange")}
+              </span>
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-5 text-center text-xs font-semibold ${
+                    isDark ? "text-gray-400" : "text-stone-600"
+                  }`}
+                >
+                  {fretMin}
+                </span>
+                <div className="relative h-8 flex-1">
+                  <div
+                    className={`absolute left-0 right-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full ${
+                      isDark ? "bg-white/10" : "bg-stone-200"
+                    }`}
+                  />
+                  <div
+                    className={`absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full ${
+                      isDark ? "bg-sky-500" : "bg-sky-500"
+                    }`}
+                    style={{
+                      left: `${sliderLeftPercent}%`,
+                      right: `${100 - sliderRightPercent}%`,
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min={0}
+                    max={FRET_MAX - 1}
+                    value={fretMin}
+                    aria-label={t("settingsPanel.fretStart")}
+                    onChange={(event) => handleFretMinChange(Number(event.target.value))}
+                    className="fret-range-slider pointer-events-none absolute inset-0 h-8 w-full appearance-none bg-transparent"
+                    style={
+                      {
+                        "--slider-thumb-fill": isDark ? "#111827" : "#fafaf9",
+                      } as CSSProperties
+                    }
+                  />
+                  <input
+                    type="range"
+                    min={1}
+                    max={FRET_MAX}
+                    value={fretMax}
+                    aria-label={t("settingsPanel.fretEnd")}
+                    onChange={(event) => handleFretMaxChange(Number(event.target.value))}
+                    className="fret-range-slider pointer-events-none absolute inset-0 h-8 w-full appearance-none bg-transparent"
+                    style={
+                      {
+                        "--slider-thumb-fill": isDark ? "#111827" : "#fafaf9",
+                      } as CSSProperties
+                    }
+                  />
+                </div>
+                <span
+                  className={`w-6 text-center text-xs font-semibold ${
+                    isDark ? "text-gray-400" : "text-stone-600"
+                  }`}
+                >
+                  {fretMax}
+                </span>
+              </div>
             </div>
 
             <div className="flex items-center justify-between gap-3">

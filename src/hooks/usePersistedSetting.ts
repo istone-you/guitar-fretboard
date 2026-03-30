@@ -1,8 +1,9 @@
 import { useState } from "react";
 
-export function usePersistedSetting<T extends string>(
+export function usePersistedSetting<T>(
   storageKey: string,
   readInitialValue: () => T,
+  serialize: (value: T) => string = (value) => String(value),
 ): [T, (value: T | ((current: T) => T)) => void] {
   const [value, setValue] = useState<T>(readInitialValue);
 
@@ -11,7 +12,7 @@ export function usePersistedSetting<T extends string>(
       const resolved =
         typeof nextValue === "function" ? (nextValue as (current: T) => T)(current) : nextValue;
       if (typeof window !== "undefined") {
-        window.localStorage.setItem(storageKey, resolved);
+        window.localStorage.setItem(storageKey, serialize(resolved));
       }
       return resolved;
     });

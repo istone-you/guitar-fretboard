@@ -15,6 +15,7 @@ vi.mock("./components/AppHeader/index", () => ({
       <button onClick={() => props.onAccidentalChange?.("sharp")}>acc-sharp</button>
       <button onClick={() => props.onAccidentalChange?.("flat")}>acc-flat</button>
       <button onClick={() => props.onThemeChange?.()}>theme-toggle</button>
+      <button onClick={() => props.onFretRangeChange?.([3, 9])}>fret-range-3-9</button>
     </div>
   ),
   DropdownSelect: ({ value, onChange, options }: any) => (
@@ -150,11 +151,22 @@ describe("App", () => {
   it("theme と accidental を localStorage から復元する", () => {
     window.localStorage.setItem("guiter:theme", "light");
     window.localStorage.setItem("guiter:accidental", "sharp");
+    window.localStorage.setItem("guiter:fret-range", "2-10");
 
     render(<App />);
 
     expect(screen.getByText("fb-theme:light")).toBeTruthy();
     expect(screen.getByText("fb-accidental:sharp")).toBeTruthy();
+    expect(normalFretboardState.latest?.fretRange).toEqual([2, 10]);
+  });
+
+  it("フレット範囲設定を保存して指板へ渡す", () => {
+    render(<App />);
+
+    fireEvent.click(screen.getByText("fret-range-3-9"));
+
+    expect(normalFretboardState.latest?.fretRange).toEqual([3, 9]);
+    expect(window.localStorage.getItem("guiter:fret-range")).toBe("3-9");
   });
 
   it("指板クリックと臨時記号変更でルート表記を更新する", () => {

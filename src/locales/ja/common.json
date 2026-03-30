@@ -18,6 +18,11 @@
   "displaySize": "表示サイズ",
   "language": "言語",
   "accidental": "♯/♭",
+  "settingsPanel": {
+    "fretRange": "フレット範囲",
+    "fretStart": "開始",
+    "fretEnd": "終了"
+  },
   "layers": {
     "scale": "スケール",
     "caged": "CAGED",
@@ -86,9 +91,9 @@
       "seventh": "4和音"
     },
     "displaySize": {
+      "large": "大きめ",
       "standard": "標準",
-      "compact": "コンパクト",
-      "tiny": "極小"
+      "small": "小さめ"
     },
     "triadStrings": {
       "1-3": "1~3",

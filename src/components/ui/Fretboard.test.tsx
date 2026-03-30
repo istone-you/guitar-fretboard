@@ -339,13 +339,13 @@ describe("ui/Fretboard", () => {
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("コンパクト表示でもレンダリングできる", () => {
-    render(<Fretboard {...makeProps({ displaySize: "compact" as FretboardDisplaySize })} />);
+  it("大きめ表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ displaySize: "large" as FretboardDisplaySize })} />);
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("極小表示でもレンダリングできる", () => {
-    render(<Fretboard {...makeProps({ displaySize: "tiny" as FretboardDisplaySize })} />);
+  it("小さめ表示でもレンダリングできる", () => {
+    render(<Fretboard {...makeProps({ displaySize: "small" as FretboardDisplaySize })} />);
     expect(screen.getAllByText("E").length).toBeGreaterThanOrEqual(2);
   });
 

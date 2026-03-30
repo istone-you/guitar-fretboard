@@ -52,7 +52,7 @@ const FRETBOARD_SIZE_CONFIG: Record<
     chordBorderWidth: number;
   }
 > = {
-  standard: {
+  large: {
     cellWidth: 56,
     stringLabelWidth: 32,
     rowHeight: 40,
@@ -69,7 +69,7 @@ const FRETBOARD_SIZE_CONFIG: Record<
     overlayInset: 4,
     chordBorderWidth: 4,
   },
-  compact: {
+  standard: {
     cellWidth: 41,
     stringLabelWidth: 23,
     rowHeight: 31,
@@ -86,7 +86,7 @@ const FRETBOARD_SIZE_CONFIG: Record<
     overlayInset: 3,
     chordBorderWidth: 3,
   },
-  tiny: {
+  small: {
     cellWidth: 34,
     stringLabelWidth: 18,
     rowHeight: 26,
@@ -190,9 +190,9 @@ export default function Fretboard({
   quizRevealNoteNames = null,
   suppressRegularDisplay = false,
   hideChordNoteLabels = false,
-  chordColor = "#fb923c",
-  scaleColor = "#34d399",
-  cagedColor = "#a78bfa",
+  chordColor = "#ffd700",
+  scaleColor = "#ff69b6",
+  cagedColor = "#40e0d0",
 }: FretboardProps) {
   const [fretMin, fretMax] = fretRange;
   const quizActive = quizModeActive && quizCell !== undefined;
@@ -535,9 +535,9 @@ function StringRow({
   quizRevealNoteNames,
   suppressRegularDisplay = false,
   hideChordNoteLabels = false,
-  chordColor = "#fb923c",
-  scaleColor = "#34d399",
-  cagedColor = "#a78bfa",
+  chordColor = "#ffd700",
+  scaleColor = "#ff69b6",
+  cagedColor = "#40e0d0",
 }: StringRowProps) {
   const isDark = theme === "dark";
   const NOTES = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -721,7 +721,7 @@ function FretCellComponent({
   isQuizTarget,
   suppressRegularDisplay,
   hideChordNoteLabels = false,
-  chordColor = "#fb923c",
+  chordColor = "#ffd700",
   quizAnswerMode = false,
   isTargetStringCell = false,
   isAnswered = false,

@@ -4,8 +4,6 @@ import type { Accidental, BaseLabelMode, Theme } from "../../types";
 import { SegmentedToggle } from "../ui/SegmentedToggle";
 import { NOTES_SHARP, NOTES_FLAT } from "../../logic/fretboard";
 
-const FRET_MAX = 14;
-
 interface StepperProps {
   value: number | string;
   onPrev: () => void;
@@ -75,12 +73,10 @@ interface FretboardHeaderProps {
   rootNote: string;
   accidental: Accidental;
   baseLabelMode: BaseLabelMode;
-  fretRange: [number, number];
   showQuiz: boolean;
   rootChangeDisabled?: boolean;
   onBaseLabelModeChange: (mode: BaseLabelMode) => void;
   onRootNoteChange: (note: string) => void;
-  onFretRangeChange: (range: [number, number]) => void;
 }
 
 export default function FretboardHeader({
@@ -88,12 +84,10 @@ export default function FretboardHeader({
   rootNote,
   accidental,
   baseLabelMode,
-  fretRange,
   showQuiz,
   rootChangeDisabled = false,
   onBaseLabelModeChange,
   onRootNoteChange,
-  onFretRangeChange,
 }: FretboardHeaderProps) {
   const { t, i18n } = useTranslation();
   const isEnglish = i18n.language === "en";
@@ -105,19 +99,6 @@ export default function FretboardHeader({
     const next = (currentIndex + dir + 12) % 12;
     onRootNoteChange(notes[next]);
   };
-
-  const stepFret = (side: "min" | "max", dir: 1 | -1) => {
-    const [min, max] = fretRange;
-    if (side === "min") {
-      const next = min + dir;
-      if (next >= 0 && next < max) onFretRangeChange([next, max]);
-    } else {
-      const next = max + dir;
-      if (next > min && next <= FRET_MAX) onFretRangeChange([min, next]);
-    }
-  };
-
-  const canNarrow = fretRange[1] - fretRange[0] > 1;
 
   return (
     <div className="mx-auto mb-1 flex w-full max-w-[840px] flex-wrap items-center justify-center gap-x-3 gap-y-2 px-3 py-2.5 sm:mb-2 sm:gap-6 sm:px-4">
@@ -134,32 +115,6 @@ export default function FretboardHeader({
           disabled={rootChangeDisabled}
           onPrev={() => stepNote(-1)}
           onNext={() => stepNote(1)}
-        />
-      </span>
-      <span
-        className={`inline-flex items-center gap-1 text-xs sm:text-sm ${
-          theme === "dark" ? "text-gray-400" : "text-stone-600"
-        }`}
-      >
-        {t("header.fret")}:{" "}
-        <Stepper
-          theme={theme}
-          value={fretRange[0]}
-          onPrev={() => stepFret("min", -1)}
-          onNext={() => stepFret("min", 1)}
-          prevDisabled={fretRange[0] <= 0}
-          nextDisabled={!canNarrow}
-        />
-        <span className={`mx-0.5 sm:mx-1 ${theme === "dark" ? "text-gray-500" : "text-stone-400"}`}>
-          〜
-        </span>
-        <Stepper
-          theme={theme}
-          value={fretRange[1]}
-          onPrev={() => stepFret("max", -1)}
-          onNext={() => stepFret("max", 1)}
-          prevDisabled={!canNarrow}
-          nextDisabled={fretRange[1] >= FRET_MAX}
         />
       </span>
       {!showQuiz && (

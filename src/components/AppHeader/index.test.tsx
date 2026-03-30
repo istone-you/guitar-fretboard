@@ -7,7 +7,9 @@ function makeProps(overrides: Record<string, unknown> = {}) {
   return {
     theme: "dark" as Theme,
     fretboardDisplaySize: "standard" as FretboardDisplaySize,
+    fretRange: [0, 14] as [number, number],
     onFretboardDisplaySizeChange: vi.fn(),
+    onFretRangeChange: vi.fn(),
     onThemeChange: vi.fn(),
     accidental: "flat" as Accidental,
     onAccidentalChange: vi.fn(),
@@ -42,6 +44,7 @@ describe("AppHeader", () => {
     render(<AppHeader {...makeProps()} />);
     fireEvent.click(screen.getByTitle("設定"));
     expect(screen.getByText("表示サイズ")).toBeTruthy();
+    expect(screen.getByText("フレット範囲")).toBeTruthy();
     expect(screen.getByText("テーマ")).toBeTruthy();
     expect(screen.getByText("♯")).toBeTruthy();
     expect(screen.getByText("♭")).toBeTruthy();
@@ -65,5 +68,26 @@ describe("AppHeader", () => {
 
     fireEvent.click(screen.getByText("♭"));
     expect(props.onAccidentalChange).toHaveBeenCalledWith("flat");
+  });
+
+  it("設定内でフレット範囲スライダーが表示される", () => {
+    render(<AppHeader {...makeProps({ fretRange: [2, 12] as [number, number] })} />);
+
+    fireEvent.click(screen.getByTitle("設定"));
+
+    expect(screen.getByLabelText("開始")).toBeTruthy();
+    expect(screen.getByLabelText("終了")).toBeTruthy();
+    expect(screen.getByText("2")).toBeTruthy();
+    expect(screen.getByText("12")).toBeTruthy();
+  });
+
+  it("開始側スライダー変更で onFretRangeChange が呼ばれる", () => {
+    const props = makeProps({ fretRange: [2, 12] as [number, number] });
+    render(<AppHeader {...props} />);
+
+    fireEvent.click(screen.getByTitle("設定"));
+    fireEvent.change(screen.getByLabelText("開始"), { target: { value: "4" } });
+
+    expect(props.onFretRangeChange).toHaveBeenCalledWith([4, 12]);
   });
 });
