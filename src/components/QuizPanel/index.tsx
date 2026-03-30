@@ -174,8 +174,8 @@ export default function QuizPanel({
 
   return (
     <div
-      className={`rounded-xl p-4 space-y-3 ${
-        isDark ? "bg-gray-800" : "bg-stone-50 border border-stone-200"
+      className={`space-y-3 rounded-[24px] border p-4 ${
+        isDark ? "border-white/10 bg-white/[0.045]" : "border-stone-200 bg-stone-50/90"
       }`}
     >
       {/* 種別 + スコア */}
@@ -339,10 +339,12 @@ export default function QuizPanel({
 
               if (!answered) {
                 btnClass = isSelectedChoice
-                  ? "bg-indigo-600 text-white"
+                  ? isDark
+                    ? "bg-sky-600 text-white"
+                    : "bg-sky-500 text-white"
                   : isDark
-                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50";
               } else if (isCorrectChoice) {
                 btnClass = "bg-green-600 text-white";
               } else if (isSelectedChoice) {
@@ -373,10 +375,12 @@ export default function QuizPanel({
 
               if (!answered) {
                 btnClass = isSelectedChoice
-                  ? "bg-indigo-600 text-white"
+                  ? isDark
+                    ? "bg-sky-600 text-white"
+                    : "bg-sky-500 text-white"
                   : isDark
-                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+                    ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                    : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50";
               } else if (isCorrectChoice) {
                 btnClass = "bg-green-600 text-white";
               } else if (isSelectedChoice) {
@@ -436,10 +440,12 @@ export default function QuizPanel({
                       : answered && !isCorrectEntry && answeredEntry != null
                         ? "border-red-400 bg-red-900/20 text-white"
                         : isCurrent
-                          ? "border-indigo-500 bg-indigo-600/20 text-white"
+                          ? isDark
+                            ? "border-sky-600 bg-sky-600/20 text-white"
+                            : "border-sky-500 bg-sky-500/20 text-white"
                           : isDark
-                            ? "border-gray-600 bg-gray-700 text-gray-200 [@media(hover:hover)]:hover:border-indigo-400 cursor-pointer"
-                            : "border-stone-300 bg-white text-stone-700 [@media(hover:hover)]:hover:border-indigo-400 cursor-pointer"
+                            ? "border-gray-600 bg-gray-700 text-gray-200 [@media(hover:hover)]:hover:border-sky-400 cursor-pointer"
+                            : "border-stone-300 bg-white text-stone-700 [@media(hover:hover)]:hover:border-sky-400 cursor-pointer"
                   }`}
                 >
                   <div className="font-semibold">{entry.degree}</div>
@@ -460,10 +466,12 @@ export default function QuizPanel({
                       onClick={() => onDiatonicAnswerRootSelect(choice)}
                       className={`min-w-10 rounded-xl px-3 py-2 text-sm font-bold transition-all ${
                         active
-                          ? "bg-indigo-600 text-white"
+                          ? isDark
+                            ? "bg-sky-600 text-white"
+                            : "bg-sky-500 text-white"
                           : isDark
-                            ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                            : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50"
+                            ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                            : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50"
                       }`}
                     >
                       {choice}
@@ -482,10 +490,12 @@ export default function QuizPanel({
                       diatonicSelectedRoot == null ? "cursor-not-allowed opacity-50" : ""
                     } ${
                       diatonicSelectedChordType === choice
-                        ? "bg-indigo-600 text-white"
+                        ? isDark
+                          ? "bg-sky-600 text-white"
+                          : "bg-sky-500 text-white"
                         : isDark
-                          ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                          : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50"
+                          ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                          : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50"
                     }`}
                   >
                     {choice}
@@ -508,8 +518,8 @@ export default function QuizPanel({
                   btnClass = isSelectedCorrect
                     ? "bg-green-600 text-white"
                     : isDark
-                      ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                      : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+                      ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                      : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50";
                 } else if (isCorrectChoice) {
                   btnClass = "bg-green-600 text-white";
                 } else if (choice === selectedAnswer) {
@@ -521,8 +531,8 @@ export default function QuizPanel({
                 }
               } else if (!answered) {
                 btnClass = isDark
-                  ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-indigo-700"
-                  : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-indigo-50";
+                  ? "bg-gray-700 text-white [@media(hover:hover)]:hover:bg-sky-700"
+                  : "bg-white text-stone-900 border border-stone-300 [@media(hover:hover)]:hover:bg-sky-50";
               } else if (choice === question.correct) {
                 btnClass = "bg-green-600 text-white";
               } else if (choice === selectedAnswer) {
@@ -578,7 +588,9 @@ export default function QuizPanel({
               disabled={!diatonicAllFilled}
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
                 diatonicAllFilled
-                  ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                  ? isDark
+                    ? "bg-sky-600 text-white hover:bg-sky-500"
+                    : "bg-sky-500 text-white hover:bg-sky-400"
                   : isDark
                     ? "bg-gray-700 text-gray-500"
                     : "bg-stone-200 text-stone-400"
@@ -593,7 +605,9 @@ export default function QuizPanel({
               disabled={!answered}
               className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
                 answered
-                  ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                  ? isDark
+                    ? "bg-sky-600 text-white hover:bg-sky-500"
+                    : "bg-sky-500 text-white hover:bg-sky-400"
                   : isDark
                     ? "bg-gray-700 text-gray-500"
                     : "bg-stone-200 text-stone-400"

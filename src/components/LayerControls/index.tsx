@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import {
-  CAGED_FORMS,
   CAGED_ORDER,
   DIATONIC_CHORDS,
   NOTES_FLAT,
@@ -83,7 +82,9 @@ function TogglePill({
       onClick={onClick}
       className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
         active
-          ? "bg-indigo-600 text-white"
+          ? theme === "dark"
+            ? "bg-sky-600 text-white shadow-[0_8px_24px_-16px_rgba(2,132,199,0.55)]"
+            : "bg-sky-500 text-white"
           : theme === "dark"
             ? "bg-gray-700 text-gray-200"
             : "bg-stone-200 text-stone-700"
@@ -194,13 +195,13 @@ export default function LayerControls({
   const fourthValue = chordDisplayMode === "diatonic" ? diatonicChordSize : "";
 
   const cardClass = isDark
-    ? "relative h-[14.5rem] sm:h-[12.5rem] lg:h-[13rem] rounded-2xl border p-3 text-white"
-    : "relative h-[14.5rem] sm:h-[12.5rem] lg:h-[13rem] rounded-2xl border p-3 text-stone-900";
+    ? "relative h-[14.5rem] sm:h-[12.5rem] lg:h-[13rem] rounded-[24px] border p-4 text-white"
+    : "relative h-[14.5rem] sm:h-[12.5rem] lg:h-[13rem] rounded-[24px] border p-4 text-stone-900";
   const activeCardToneClass = isDark
-    ? "border-gray-700 bg-gray-800/80"
-    : "border-stone-300 bg-stone-50";
+    ? "border-white/10 bg-white/[0.045]"
+    : "border-stone-200 bg-stone-50/90";
   const inactiveCardToneClass = isDark
-    ? "border-gray-800 bg-gray-900/70"
+    ? "border-white/5 bg-white/[0.02]"
     : "border-stone-200 bg-stone-100/70";
   const sectionLabelClass = `text-center text-[11px] font-semibold uppercase tracking-wide ${
     isDark ? "text-gray-400" : "text-stone-500"
@@ -266,12 +267,13 @@ export default function LayerControls({
                     onClick={() => toggleCagedForm(key)}
                     className={`h-9 w-9 rounded-full border-2 text-sm font-bold transition-all ${
                       active
-                        ? "scale-105 border-transparent text-white shadow-lg"
+                        ? isDark
+                          ? "scale-105 border-transparent bg-sky-600 text-white shadow-[0_10px_28px_-18px_rgba(2,132,199,0.6)]"
+                          : "scale-105 border-transparent bg-sky-500 text-white shadow-lg"
                         : isDark
                           ? "border-gray-500 bg-gray-700 text-gray-100"
                           : "border-stone-300 bg-white text-stone-700"
                     } ${!showLayers ? "cursor-not-allowed" : ""}`}
-                    style={active ? { backgroundColor: CAGED_FORMS[key].color } : undefined}
                   >
                     {key}
                   </button>
@@ -305,7 +307,7 @@ export default function LayerControls({
               value={chordDisplayMode}
               onChange={setChordDisplayMode}
               options={chordDisplayOptions}
-              accent="amber"
+              accent="sky"
               widthClass="w-full"
               direction="up"
               disabled={!showLayers}
@@ -320,7 +322,7 @@ export default function LayerControls({
               value={chordValue}
               onChange={chordDisplayMode === "diatonic" ? setDiatonicDegree : setChordType}
               options={chordValueOptions}
-              accent="amber"
+              accent="sky"
               widthClass="w-full"
               direction="up"
               disabled={!showLayers || chordDisplayMode === "power"}
@@ -335,7 +337,7 @@ export default function LayerControls({
               value={thirdValue}
               onChange={chordDisplayMode === "diatonic" ? setDiatonicKeyType : setTriadInversion}
               options={thirdOptions}
-              accent="amber"
+              accent="sky"
               widthClass="w-full"
               direction="up"
               disabled={
@@ -350,7 +352,7 @@ export default function LayerControls({
               value={fourthValue}
               onChange={setDiatonicChordSize}
               options={fourthOptions}
-              accent="amber"
+              accent="sky"
               widthClass="w-full"
               direction="up"
               disabled={!showLayers || chordDisplayMode !== "diatonic"}
@@ -362,17 +364,17 @@ export default function LayerControls({
   );
 
   return (
-    <div className="mt-4 mx-auto w-full max-w-[840px] space-y-2 pt-2 sm:pt-0">
+    <div className="mx-auto mt-4 w-full max-w-[840px] space-y-3 pt-2 sm:pt-0">
       <div className="flex justify-center">
         <div className="flex items-center gap-2">
           <h3 className={headingClass}>{t("mobileControls.layers")}</h3>
           <button
             type="button"
             onClick={() => setShowLayers(!showLayers)}
-            className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
+            className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
               isDark
-                ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
-                : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
+                ? "border-white/10 text-gray-300 hover:border-white/20 hover:text-white"
+                : "border-stone-200 bg-stone-50 text-stone-500 hover:border-stone-300 hover:bg-stone-100 hover:text-stone-700"
             }`}
           >
             {showLayers ? t("mobileControls.hide") : t("mobileControls.show")}

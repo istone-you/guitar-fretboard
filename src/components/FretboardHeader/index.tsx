@@ -27,10 +27,10 @@ function Stepper({
   nextDisabled = false,
   width = "w-6",
 }: StepperProps) {
-  const btnBase = `flex items-center justify-center min-w-[2.75rem] h-11 px-2 rounded transition-all text-lg ${
+  const btnBase = `flex h-11 min-w-[2.75rem] items-center justify-center rounded-full px-2 transition-all text-lg ${
     theme === "dark"
-      ? "text-gray-400 hover:text-white active:bg-gray-700"
-      : "text-stone-500 hover:text-stone-900 active:bg-stone-200"
+      ? "text-gray-400 hover:bg-white/8 hover:text-white active:bg-white/10"
+      : "text-stone-500 hover:bg-white hover:text-stone-900 active:bg-stone-100"
   }`;
   const disabledClass = "opacity-40 pointer-events-none cursor-not-allowed";
 
@@ -120,7 +120,7 @@ export default function FretboardHeader({
   const canNarrow = fretRange[1] - fretRange[0] > 1;
 
   return (
-    <div className="mb-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-2 sm:mb-2 sm:gap-6">
+    <div className="mx-auto mb-1 flex w-full max-w-[840px] flex-wrap items-center justify-center gap-x-3 gap-y-2 px-3 py-2.5 sm:mb-2 sm:gap-6 sm:px-4">
       <span
         className={`inline-flex items-center gap-1 text-xs sm:text-sm ${
           theme === "dark" ? "text-gray-400" : "text-stone-600"
@@ -173,11 +173,6 @@ export default function FretboardHeader({
           ]}
           size="compact"
           buttonWidthClass={`${isEnglish ? "min-w-[4rem]" : "w-[4rem]"} whitespace-nowrap`}
-          inactiveClassName={
-            theme === "dark"
-              ? "bg-gray-700 text-gray-400 hover:bg-gray-600"
-              : "bg-white text-stone-600 hover:bg-stone-200"
-          }
         />
       )}
     </div>

@@ -59,7 +59,9 @@ export function ScaleSelect({
                       }}
                       className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                         active
-                          ? "border-transparent bg-emerald-600 text-white"
+                          ? theme === "dark"
+                            ? "border-transparent bg-sky-600 text-white"
+                            : "border-transparent bg-sky-500 text-white"
                           : theme === "dark"
                             ? "border-gray-600 bg-gray-800 text-gray-200 hover:border-gray-400"
                             : "border-stone-300 bg-stone-50 text-stone-700 hover:border-stone-500"

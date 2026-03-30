@@ -39,7 +39,7 @@ export default function SettingsMenu({
   ];
 
   return (
-    <div className="flex items-center justify-center relative max-w-[840px] mx-auto w-full">
+    <div className="relative mx-auto flex w-full max-w-[840px] items-center justify-center">
       <SegmentedToggle
         theme={theme}
         value={showQuiz}
@@ -48,7 +48,7 @@ export default function SettingsMenu({
           { value: false, label: t("mode.normal") },
           { value: true, label: t("mode.quiz") },
         ]}
-        activeClassName="bg-indigo-600 text-white"
+        activeClassName={isDark ? "bg-sky-600 text-white" : "bg-sky-500 text-white"}
         inactiveClassName={
           isDark ? "text-gray-400 hover:text-white" : "text-stone-500 hover:text-stone-900"
         }
@@ -56,8 +56,10 @@ export default function SettingsMenu({
       <div className="absolute right-0">
         <button
           onClick={() => setSettingsOpen((prev) => !prev)}
-          className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-            isDark ? "text-gray-200 hover:text-white" : "text-stone-600 hover:text-stone-900"
+          className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${
+            isDark
+              ? "border-white/10 bg-white/5 text-gray-200 hover:bg-white/10 hover:text-white"
+              : "border-stone-200 bg-stone-50/90 text-stone-600 shadow-[0_10px_30px_-24px_rgba(15,23,42,0.2)] hover:border-stone-300 hover:bg-stone-100 hover:text-stone-900"
           }`}
           title={t("settings")}
         >
@@ -79,8 +81,10 @@ export default function SettingsMenu({
           <>
             <div className="fixed inset-0 z-40" onClick={() => setSettingsOpen(false)} />
             <div
-              className={`absolute right-0 top-[calc(100%+0.5rem)] z-50 rounded-2xl border p-4 shadow-2xl backdrop-blur w-64 space-y-4 ${
-                isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"
+              className={`absolute right-0 top-[calc(100%+0.75rem)] z-50 w-72 space-y-4 rounded-[24px] border p-5 shadow-2xl backdrop-blur ${
+                isDark
+                  ? "border-white/10 bg-gray-900/95"
+                  : "border-stone-200 bg-stone-50/95 shadow-[0_24px_80px_-36px_rgba(15,23,42,0.2)]"
               }`}
             >
               <div className="flex items-center justify-between gap-3">
@@ -181,7 +185,7 @@ export default function SettingsMenu({
               </div>
 
               {/* 使い方（折りたたみ） */}
-              <div className={`border-t ${isDark ? "border-gray-700" : "border-stone-200"}`} />
+              <div className={`border-t ${isDark ? "border-white/10" : "border-stone-200"}`} />
               <div>
                 <button
                   onClick={() => setHowToUseOpen((prev) => !prev)}

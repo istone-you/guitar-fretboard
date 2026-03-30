@@ -7,7 +7,7 @@ export interface DropdownSelectProps {
   value: string;
   onChange: (value: string) => void;
   options: { value: string; label: string }[];
-  accent?: "neutral" | "amber";
+  accent?: "neutral" | "amber" | "sky";
   disabled?: boolean;
   widthClass?: string;
   keepOpen?: boolean;
@@ -32,9 +32,13 @@ export function DropdownSelect({
   const activeOptionClass =
     accent === "amber"
       ? "bg-amber-500 text-white"
-      : isDark
-        ? "bg-gray-800 text-white"
-        : "bg-stone-100 text-stone-900";
+      : accent === "sky"
+        ? isDark
+          ? "bg-sky-600 text-white"
+          : "bg-sky-500 text-white"
+        : isDark
+          ? "bg-slate-800 text-white"
+          : "bg-stone-100 text-stone-900";
 
   return (
     <div className={`relative ${widthClass}`}>
@@ -58,9 +62,13 @@ export function DropdownSelect({
           />
           <div
             onClick={(e) => e.stopPropagation()}
-            className={`absolute left-0 z-30 w-full overflow-hidden rounded-2xl border p-1.5 shadow-2xl backdrop-blur ${
+            className={`absolute left-0 z-30 w-full overflow-hidden rounded-[20px] border p-1.5 shadow-2xl backdrop-blur ${
               direction === "up" ? "bottom-[calc(100%+0.5rem)]" : "top-[calc(100%+0.5rem)]"
-            } ${isDark ? "border-gray-700 bg-gray-900/95" : "border-stone-200 bg-white/95"}`}
+            } ${
+              isDark
+                ? "border-white/8 bg-gray-900/95"
+                : "border-stone-200 bg-stone-50/95 shadow-[0_20px_60px_-32px_rgba(15,23,42,0.24)]"
+            }`}
           >
             <div role="listbox" className="space-y-1">
               {options.map((option) => {
@@ -77,7 +85,7 @@ export function DropdownSelect({
                       active
                         ? activeOptionClass
                         : isDark
-                          ? "text-gray-300 hover:bg-gray-800/80"
+                          ? "text-gray-300 hover:bg-white/[0.06]"
                           : "text-stone-700 hover:bg-stone-50"
                     }`}
                   >

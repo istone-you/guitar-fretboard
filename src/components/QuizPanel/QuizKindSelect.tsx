@@ -66,7 +66,9 @@ export default function QuizKindSelect({
                         }}
                         className={`min-w-0 rounded-xl border px-2.5 py-3 text-left text-sm leading-tight whitespace-nowrap transition-colors ${
                           active
-                            ? "border-transparent bg-indigo-600 text-white"
+                            ? isDark
+                              ? "border-transparent bg-sky-600 text-white"
+                              : "border-transparent bg-sky-500 text-white"
                             : isDark
                               ? "border-gray-600 bg-gray-800 text-gray-200 hover:border-gray-400"
                               : "border-stone-300 bg-stone-50 text-stone-700 hover:border-stone-500"

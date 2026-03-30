@@ -168,10 +168,10 @@ describe("ui/Fretboard", () => {
 
     expect(screen.getAllByText("?").length).toBeGreaterThan(0);
     expect(container.querySelectorAll(".animate-pulse").length).toBeGreaterThan(1);
-    expect(container.querySelector(".border-indigo-500\\/70")).toBeTruthy();
+    expect(container.querySelector(".border-sky-500\\/70")).toBeTruthy();
   });
 
-  it("indigo のコードフォーム色を指定できる", () => {
+  it("blue トーンのコードフォーム色を指定できる", () => {
     const { container } = render(
       <Fretboard
         {...makeProps({
@@ -183,8 +183,8 @@ describe("ui/Fretboard", () => {
       />,
     );
 
-    expect(container.querySelector(".border-indigo-500")).toBeTruthy();
-    expect(container.querySelector(".bg-indigo-500")).toBeTruthy();
+    expect(container.querySelector(".border-sky-500")).toBeTruthy();
+    expect(container.querySelector(".bg-sky-500")).toBeTruthy();
   });
 
   it("E メジャーではオープンコードとバレーコードの枠が重複しない", () => {

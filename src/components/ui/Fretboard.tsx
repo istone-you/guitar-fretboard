@@ -360,7 +360,7 @@ export default function Fretboard({
                   key={group.id}
                   className={`pointer-events-none absolute rounded-2xl border-2 z-[6] ${
                     hideChordNoteLabels
-                      ? "animate-pulse border-indigo-500/70 bg-indigo-500/10"
+                      ? "animate-pulse border-sky-500/70 bg-sky-500/10"
                       : "border-amber-300/60 bg-amber-300/8"
                   }`}
                   style={{ top, left, width, height }}
@@ -716,9 +716,7 @@ function FretCellComponent({
   const isDark = theme === "dark";
   const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !suppressRegularDisplay;
   const chordOverlayClass =
-    chordOverlayTone === "indigo"
-      ? "border-indigo-500 bg-indigo-500"
-      : "border-amber-500 bg-amber-500";
+    chordOverlayTone === "indigo" ? "border-sky-500 bg-sky-500" : "border-amber-500 bg-amber-500";
 
   return (
     <div
@@ -826,7 +824,7 @@ function FretCellComponent({
       {isQuizTarget && (
         <div
           className="absolute rounded-full flex items-center justify-center z-30 animate-pulse"
-          style={{ inset: size.overlayInset, backgroundColor: "#4f46e5" }}
+          style={{ inset: size.overlayInset, backgroundColor: "#0ea5e9" }}
         >
           <span
             className="font-bold text-white leading-none"
@@ -867,7 +865,7 @@ function FretCellComponent({
 
       {quizAnswerMode && isTargetStringCell && !isAnswered && (
         <div
-          className="absolute rounded-full border-2 border-indigo-400/50 z-[15]"
+          className="absolute rounded-full border-2 border-sky-400/50 z-[15]"
           style={{ inset: size.overlayInset }}
         />
       )}

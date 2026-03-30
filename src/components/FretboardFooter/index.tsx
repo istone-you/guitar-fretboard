@@ -48,7 +48,8 @@ export default function FretboardFooter({
 }: FretboardFooterProps) {
   const { t } = useTranslation();
   const hasHighlightedNotes = highlightedOverlayNotes.size > 0;
-  const footerHeightClass = "mt-4 min-h-[6.25rem] sm:min-h-[5.75rem]";
+  const footerHeightClass =
+    "mx-auto mt-4 w-full max-w-[840px] min-h-[6.25rem] px-3 py-3 sm:min-h-[5.75rem] sm:px-4";
 
   if (showQuiz) {
     return <div className={footerHeightClass} />;
@@ -79,8 +80,8 @@ export default function FretboardFooter({
               onClick={() => onSetOverlayNoteHighlights(hasHighlightedNotes ? [] : allNotes)}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
-                  : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
+                  ? "border-sky-600 text-sky-400 hover:bg-sky-600/20"
+                  : "border-sky-400 text-sky-600 hover:bg-sky-50"
               }`}
             >
               {hasHighlightedNotes ? t("noteFilter.reset") : t("noteFilter.highlightAll")}
@@ -94,7 +95,9 @@ export default function FretboardFooter({
                 onClick={() => onToggleOverlayNoteHighlight(note)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium ${
                   highlightedOverlayNotes.has(note)
-                    ? "border-indigo-500 bg-indigo-600 text-white"
+                    ? theme === "dark"
+                      ? "border-sky-600 bg-sky-600 text-white"
+                      : "border-sky-500 bg-sky-500 text-white"
                     : theme === "dark"
                       ? "border-gray-700 bg-gray-800 text-gray-200"
                       : "border-stone-300 bg-stone-50 text-stone-700"
@@ -128,8 +131,8 @@ export default function FretboardFooter({
               onClick={onResetOrHideAll}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-indigo-500 text-indigo-400 hover:bg-indigo-500/20"
-                  : "border-indigo-400 text-indigo-500 hover:bg-indigo-50"
+                  ? "border-sky-600 text-sky-400 hover:bg-sky-600/20"
+                  : "border-sky-400 text-sky-600 hover:bg-sky-50"
               }`}
             >
               {hiddenDegrees.size > 0 ? t("degreeFilter.reset") : t("degreeFilter.hideAll")}
