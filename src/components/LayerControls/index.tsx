@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 import {
@@ -139,6 +139,28 @@ export default function LayerControls({
   const { t } = useTranslation();
   const isDark = theme === "dark";
   const [activeTab, setActiveTab] = useState<MobileTab>("scale");
+  const [slideDirection, setSlideDirection] = useState<"left" | "right">("left");
+  const touchStartXRef = useRef(0);
+  const TABS: MobileTab[] = ["scale", "caged", "chord"];
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const delta = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (Math.abs(delta) < 50) return;
+    const currentIndex = TABS.indexOf(activeTab);
+    if (delta < 0) {
+      const nextIndex = (currentIndex + 1) % TABS.length;
+      setSlideDirection("left");
+      setActiveTab(TABS[nextIndex]);
+    } else {
+      const prevIndex = (currentIndex - 1 + TABS.length) % TABS.length;
+      setSlideDirection("right");
+      setActiveTab(TABS[prevIndex]);
+    }
+  };
 
   const { options: scaleOptions, groups: scaleGroups } = buildScaleOptions(t);
   const notes = accidental === "sharp" ? NOTES_SHARP : NOTES_FLAT;
@@ -421,7 +443,12 @@ export default function LayerControls({
         <SegmentedToggle
           theme={theme}
           value={activeTab}
-          onChange={setActiveTab}
+          onChange={(next) => {
+            const currentIndex = TABS.indexOf(activeTab);
+            const nextIndex = TABS.indexOf(next as MobileTab);
+            setSlideDirection(nextIndex > currentIndex ? "left" : "right");
+            setActiveTab(next as MobileTab);
+          }}
           size="compact"
           buttonWidthClass="w-[5.5rem] text-center"
           options={[
@@ -432,10 +459,19 @@ export default function LayerControls({
         />
       </div>
 
-      <div className="lg:hidden">
-        {activeTab === "scale" && scaleCard}
-        {activeTab === "caged" && cagedCard}
-        {activeTab === "chord" && chordCard}
+      <div
+        className="lg:hidden overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        <div
+          key={activeTab}
+          className={slideDirection === "left" ? "slide-in-from-right" : "slide-in-from-left"}
+        >
+          {activeTab === "scale" && scaleCard}
+          {activeTab === "caged" && cagedCard}
+          {activeTab === "chord" && chordCard}
+        </div>
       </div>
 
       <div className="hidden lg:grid lg:grid-cols-3 lg:gap-3">
