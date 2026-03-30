@@ -8,7 +8,7 @@ const quizFretboardState: { latest: Record<string, unknown> | null } = { latest:
 const headerState: { latest: Record<string, unknown> | null } = { latest: null };
 const footerState: { latest: Record<string, unknown> | null } = { latest: null };
 
-vi.mock("./components/SettingsMenu/index", () => ({
+vi.mock("./components/AppHeader/index", () => ({
   default: (props: any) => (
     <div>
       <button onClick={() => props.setShowQuiz?.(true)}>quiz-toggle</button>

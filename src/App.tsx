@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import "./i18n";
 import LayerControls from "./components/LayerControls/index";
-import SettingsMenu from "./components/SettingsMenu/index";
+import AppHeader from "./components/AppHeader/index";
 import NormalFretboard from "./components/NormalFretboard/index";
 import QuizFretboard from "./components/QuizFretboard/index";
 import QuizPanel from "./components/QuizPanel/index";
@@ -256,21 +256,19 @@ export default function App() {
 
   return (
     <div
-      className={`min-h-screen px-2 py-3 sm:p-5 ${
+      className={`min-h-screen ${
         theme === "dark"
           ? "bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.14),_transparent_30%),linear-gradient(180deg,_#111827_0%,_#030712_100%)]"
           : "bg-[linear-gradient(180deg,_#f3f4f6_0%,_#ece7e1_100%)]"
       }`}
     >
       <main
-        className={`w-full rounded-[28px] px-3 py-4 sm:px-5 sm:py-5 space-y-4 sm:space-y-5 ${
-          theme === "dark"
-            ? "border border-white/10 bg-gray-900/88 shadow-[0_24px_80px_-32px_rgba(0,0,0,0.65)] backdrop-blur"
-            : "border border-stone-200/80 bg-stone-100/90 shadow-[0_24px_80px_-36px_rgba(15,23,42,0.18)] backdrop-blur"
+        className={`w-full px-3 py-4 sm:px-5 sm:py-5 space-y-4 sm:space-y-5 ${
+          theme === "dark" ? "bg-gray-900" : "bg-stone-100"
         }`}
       >
         <div className="space-y-3 sm:space-y-4">
-          <SettingsMenu
+          <AppHeader
             theme={theme}
             fretboardDisplaySize={fretboardDisplaySize}
             onFretboardDisplaySizeChange={setFretboardDisplaySize}

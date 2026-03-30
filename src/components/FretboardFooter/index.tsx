@@ -101,8 +101,8 @@ export default function FretboardFooter({
               title={t("noteFilter.filterTitle")}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
-                  : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
+                  ? "border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-400 hover:text-gray-100"
+                  : "border-stone-300 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800"
               }`}
             >
               {t("noteFilter.filter")}
@@ -112,8 +112,8 @@ export default function FretboardFooter({
               onClick={() => onSetOverlayNoteHighlights(hasHighlightedNotes ? [] : allNotes)}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-sky-600 text-sky-400 hover:bg-sky-600/20"
-                  : "border-sky-400 text-sky-600 hover:bg-sky-50"
+                  ? "border-sky-600 bg-gray-800 text-sky-400 hover:bg-sky-600/20"
+                  : "border-sky-400 bg-white text-sky-600 hover:bg-sky-50"
               }`}
             >
               {hasHighlightedNotes ? t("noteFilter.reset") : t("noteFilter.highlightAll")}
@@ -139,8 +139,8 @@ export default function FretboardFooter({
               title={t("degreeFilter.filterTitle")}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-gray-600 text-gray-400 hover:border-gray-400 hover:text-gray-200"
-                  : "border-stone-300 text-stone-500 hover:border-stone-500 hover:text-stone-700"
+                  ? "border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-400 hover:text-gray-100"
+                  : "border-stone-300 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800"
               }`}
             >
               {t("degreeFilter.filter")}
@@ -149,8 +149,8 @@ export default function FretboardFooter({
               onClick={onResetOrHighlightAll}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
-                  ? "border-sky-600 text-sky-400 hover:bg-sky-600/20"
-                  : "border-sky-400 text-sky-600 hover:bg-sky-50"
+                  ? "border-sky-600 bg-gray-800 text-sky-400 hover:bg-sky-600/20"
+                  : "border-sky-400 bg-white text-sky-600 hover:bg-sky-50"
               }`}
             >
               {highlightedDegrees.size > 0

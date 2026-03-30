@@ -409,8 +409,8 @@ export default function LayerControls({
             onClick={() => setShowLayers(!showLayers)}
             className={`rounded-full border px-2.5 py-1 text-xs transition-all ${
               isDark
-                ? "border-white/10 text-gray-300 hover:border-white/20 hover:text-white"
-                : "border-stone-200 bg-stone-50 text-stone-500 hover:border-stone-300 hover:bg-stone-100 hover:text-stone-700"
+                ? "border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-400 hover:text-gray-100"
+                : "border-stone-300 bg-white text-stone-600 hover:border-stone-400 hover:text-stone-800"
             }`}
           >
             {showLayers ? t("mobileControls.hide") : t("mobileControls.show")}
