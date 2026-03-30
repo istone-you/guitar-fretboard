@@ -41,7 +41,7 @@ const STORAGE_KEYS = {
 function readStoredTheme(): Theme {
   if (typeof window === "undefined") return "dark";
   const stored = window.localStorage.getItem(STORAGE_KEYS.theme);
-  return stored === "light" || stored === "dark" ? stored : "dark";
+  return stored === "light" || stored === "dark" ? stored : "light";
 }
 
 function readStoredAccidental(): Accidental {

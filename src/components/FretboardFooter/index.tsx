@@ -161,7 +161,7 @@ export default function FretboardFooter({
           <FilterChipGroup
             theme={theme}
             items={[...DEGREE_CHIPS]}
-            activeItems={highlightedDegrees.size === 0 ? new Set(DEGREE_CHIPS) : highlightedDegrees}
+            activeItems={highlightedDegrees}
             onToggle={onToggleDegree}
           />
         </>

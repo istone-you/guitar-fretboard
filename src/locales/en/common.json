@@ -6,14 +6,13 @@
   "settings": "Settings",
   "howToUse": "How to Use",
   "howToUseItems": {
-    "changeRoot": "Click (tap) a fretboard note to change the root",
-    "switchLabels": "Use Notes / Degrees to switch what is shown",
-    "togglePanel": "Click (tap) each panel to toggle it on or off",
-    "switchMode": "Use panel controls to switch modes",
-    "toggleNotes": "In note mode, click (tap) note buttons below to toggle highlights",
-    "filterNotes": "In note mode, use \"Filter\" to highlight only the notes in the visible overlays",
-    "toggleDegree": "In degree mode, click (tap) degrees to hide or show them on the fretboard",
-    "filterOverlay": "Use \"Filter\" to show only notes included in the active overlays"
+    "changeRoot": "Click (tap) a fretboard note or the root field above to change the root",
+    "switchLabels": "Use Notes / Degrees to switch the label display",
+    "togglePanel": "Toggle each layer on/off with the ON/OFF button",
+    "colorPicker": "Use the color picker next to Scale / CAGED / Chord to change each layer's color",
+    "switchMode": "Use the controls in each card to switch scale types, chord forms, etc.",
+    "toggleNotes": "Click (tap) the note / degree chips below the fretboard to toggle individual highlights",
+    "filterNotes": "Use \"Filter\" to highlight only the notes / degrees in the active overlays"
   },
   "theme": "Theme",
   "displaySize": "Display Size",

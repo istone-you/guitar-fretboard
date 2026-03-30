@@ -211,12 +211,11 @@ export default function SettingsMenu({
                     {[
                       t("howToUseItems.changeRoot"),
                       t("howToUseItems.switchLabels"),
-                      t("howToUseItems.togglePanel"),
-                      t("howToUseItems.switchMode"),
                       t("howToUseItems.toggleNotes"),
                       t("howToUseItems.filterNotes"),
-                      t("howToUseItems.toggleDegree"),
-                      t("howToUseItems.filterOverlay"),
+                      t("howToUseItems.togglePanel"),
+                      t("howToUseItems.colorPicker"),
+                      t("howToUseItems.switchMode"),
                     ].map((item) => (
                       <li key={item}>・{item}</li>
                     ))}

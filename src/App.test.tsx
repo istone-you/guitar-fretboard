@@ -181,8 +181,8 @@ describe("App", () => {
     fireEvent.click(screen.getByText("mode-power"));
     fireEvent.click(screen.getByText("chord-minor"));
 
-    expect(screen.getByText("fb-theme:light")).toBeTruthy();
-    expect(window.localStorage.getItem("guiter:theme")).toBe("light");
+    expect(screen.getByText("fb-theme:dark")).toBeTruthy();
+    expect(window.localStorage.getItem("guiter:theme")).toBe("dark");
     expect(screen.getByText("fb-scale:blues")).toBeTruthy();
     expect(screen.getByText("fb-mode:power")).toBeTruthy();
     expect(normalFretboardState.latest).toBeTruthy();
