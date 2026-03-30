@@ -10,9 +10,9 @@ function makeProps(overrides: Record<string, unknown> = {}) {
     allNotes: ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"] as string[],
     overlayNotes: [] as string[],
     highlightedOverlayNotes: new Set<string>(),
-    hiddenDegrees: new Set<string>(),
+    highlightedDegrees: new Set<string>(),
     onAutoFilter: vi.fn(),
-    onResetOrHideAll: vi.fn(),
+    onResetOrHighlightAll: vi.fn(),
     onSetOverlayNoteHighlights: vi.fn(),
     onToggleOverlayNoteHighlight: vi.fn(),
     onToggleDegree: vi.fn(),
@@ -72,12 +72,12 @@ describe("FretboardFooter", () => {
 
     fireEvent.click(screen.getByTitle("表示中のオーバーレイに合わせて絞り込む"));
     fireEvent.click(screen.getByText("P1"));
-    fireEvent.click(screen.getByText("全非表示"));
+    fireEvent.click(screen.getByText("全強調"));
 
     expect(screen.getByText("度数")).toBeTruthy();
     expect(props.onAutoFilter).toHaveBeenCalledTimes(1);
     expect(props.onToggleDegree).toHaveBeenCalledWith("P1");
-    expect(props.onResetOrHideAll).toHaveBeenCalledTimes(1);
+    expect(props.onResetOrHighlightAll).toHaveBeenCalledTimes(1);
   });
 
   it("クイズ表示中は中身を描画しない", () => {

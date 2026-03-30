@@ -7,7 +7,6 @@ import {
   getNoteIndex,
   getDegreeName,
   calcDegree,
-  DEGREE_COLORS,
   CHORD_FORMS_6TH,
   CHORD_FORMS_5TH,
   POWER_CHORD_FORMS,
@@ -143,7 +142,7 @@ export interface FretboardProps {
   diatonicDegree: string;
   onNoteClick: (noteName: string) => void;
   highlightedNotes?: Set<string>;
-  hiddenDegrees?: Set<string>;
+  highlightedDegrees?: Set<string>;
   quizModeActive?: boolean;
   quizCell?: { stringIdx: number; fret: number };
   quizAnswerMode?: boolean;
@@ -177,7 +176,7 @@ export default function Fretboard({
   diatonicDegree,
   onNoteClick,
   highlightedNotes = new Set(),
-  hiddenDegrees = new Set(),
+  highlightedDegrees = new Set(),
   quizModeActive = false,
   quizCell,
   quizAnswerMode = false,
@@ -385,7 +384,7 @@ export default function Fretboard({
               visibleFrets={visibleFrets}
               onNoteClick={onNoteClick}
               highlightedNotes={highlightedNotes}
-              hiddenDegrees={hiddenDegrees}
+              highlightedDegrees={highlightedDegrees}
               quizActive={quizActive}
               quizTargetFret={quizCell?.stringIdx === stringIdx ? quizCell.fret : null}
               quizAnswerMode={quizAnswerMode}
@@ -477,7 +476,7 @@ interface StringRowProps {
   visibleFrets: number[];
   onNoteClick: (noteName: string) => void;
   highlightedNotes: Set<string>;
-  hiddenDegrees: Set<string>;
+  highlightedDegrees: Set<string>;
   quizActive: boolean;
   quizTargetFret: number | null;
   quizAnswerMode?: boolean;
@@ -507,7 +506,7 @@ function StringRow({
   visibleFrets,
   onNoteClick,
   highlightedNotes,
-  hiddenDegrees,
+  highlightedDegrees,
   quizActive,
   quizTargetFret,
   quizAnswerMode = false,
@@ -560,7 +559,7 @@ function StringRow({
           baseLabelMode === "degree"
             ? {
                 text: degreeName,
-                color: (DEGREE_COLORS[degreeName] || { bg: "#6b7280" }).bg,
+                color: "#6b7280",
                 isDegree: true,
               }
             : {
@@ -568,23 +567,21 @@ function StringRow({
                 color: "#6b7280",
                 isDegree: false,
               };
-        const degreeRing =
-          baseLabelMode === "degree" ? { color: baseLabel.color, label: degreeName } : null;
-        const isHighlighted = baseLabelMode === "note" && highlightedNotes.has(noteName);
+        const degreeRing = null;
+        const isHighlighted =
+          (baseLabelMode === "note" && highlightedNotes.has(noteName)) ||
+          (baseLabelMode === "degree" && highlightedDegrees.has(degreeName));
 
         let overlayColor: { bg: string; text: string } | null = null;
-        let overlayLabel = noteName;
+        let overlayLabel = baseLabelMode === "degree" ? degreeName : noteName;
 
         if (showScale && isInScale(semitone, scaleType)) {
-          overlayColor = { bg: "#22c55e", text: "#fff" };
-          overlayLabel = noteName;
+          overlayColor = { bg: "#2f9e73", text: "#fff" };
         }
         if (cagedCell) {
           overlayColor = { bg: cagedCell.color, text: "#fff" };
-          overlayLabel = noteName;
         }
 
-        const degreeHidden = baseLabelMode === "degree" && hiddenDegrees.has(degreeName);
         const isAnswered = quizAnswerMode && quizAnsweredCell != null;
         const isTappedCell =
           isAnswered &&
@@ -621,13 +618,13 @@ function StringRow({
             fret={fret}
             baseLabel={baseLabel}
             noteName={noteName}
-            degreeRing={degreeHidden || shouldSuppressRegularDisplay ? null : degreeRing}
+            degreeRing={shouldSuppressRegularDisplay ? null : degreeRing}
             isHighlighted={isHighlighted}
             overlayColor={overlayColor}
             overlayLabel={overlayLabel}
             inChord={inChord}
             isRoot={isRoot}
-            hidden={degreeHidden}
+            hidden={false}
             opacity={opacity}
             theme={theme}
             size={size}
@@ -714,9 +711,10 @@ function FretCellComponent({
   showChoiceAnswerReveal = false,
 }: FretCellComponentProps) {
   const isDark = theme === "dark";
-  const shouldShowBaseLabel = !overlayColor && !inChord && !hidden && !suppressRegularDisplay;
+  const shouldShowBaseLabel = !overlayColor && !inChord && !suppressRegularDisplay;
   const chordOverlayClass =
     chordOverlayTone === "indigo" ? "border-sky-500 bg-sky-500" : "border-amber-500 bg-amber-500";
+  const overlayOpacity = hidden ? opacity * 0.3 : opacity;
 
   return (
     <div
@@ -749,8 +747,8 @@ function FretCellComponent({
 
       {shouldShowBaseLabel && (
         <span
-          className={`absolute font-mono z-0 select-none ${baseLabel.isDegree ? "font-bold" : ""}`}
-          style={{ fontSize: size.baseFontSize }}
+          className={`absolute font-mono z-0 select-none ${isHighlighted ? "font-bold" : ""}`}
+          style={{ fontSize: size.baseFontSize, opacity: hidden ? 0.3 : 1 }}
         >
           <span style={{ color: baseLabel.color }}>{baseLabel.text}</span>
         </span>
@@ -779,7 +777,7 @@ function FretCellComponent({
             inset: size.overlayInset,
             backgroundColor: overlayColor.bg,
             color: overlayColor.text,
-            opacity,
+            opacity: overlayOpacity,
           }}
         >
           <span className="font-bold leading-none" style={{ fontSize: size.overlayFontSize }}>
@@ -794,7 +792,7 @@ function FretCellComponent({
           style={{
             inset: size.overlayInset,
             borderWidth: hideChordNoteLabels ? 0 : size.chordBorderWidth,
-            opacity,
+            opacity: overlayOpacity,
           }}
         >
           <div
@@ -814,7 +812,7 @@ function FretCellComponent({
                 className="font-bold text-white leading-none"
                 style={{ fontSize: size.overlayFontSize }}
               >
-                {noteName}
+                {overlayLabel}
               </span>
             )}
           </div>

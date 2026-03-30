@@ -47,7 +47,7 @@
     "filter": "Filter",
     "filterTitle": "Filter by the currently visible overlays",
     "reset": "Reset",
-    "hideAll": "Hide all"
+    "highlightAll": "Highlight all"
   },
   "noteFilter": {
     "title": "Notes",

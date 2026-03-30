@@ -84,7 +84,7 @@ vi.mock("./components/FretboardFooter/index", () => ({
         <span>footer-mode:{String(props.baseLabelMode)}</span>
         <span>footer-notes:{String((props.overlayNotes as string[]).join(","))}</span>
         <button onClick={() => props.onAutoFilter?.()}>footer-auto</button>
-        <button onClick={() => props.onResetOrHideAll?.()}>footer-reset</button>
+        <button onClick={() => props.onResetOrHighlightAll?.()}>footer-reset</button>
         <button onClick={() => props.onToggleDegree?.("P1")}>footer-toggle-p1</button>
       </div>
     );
@@ -105,7 +105,7 @@ vi.mock("./components/NormalFretboard/index", () => ({
           fb-diatonic:{String(props.diatonicScaleType)}:{String(props.diatonicDegree)}
         </span>
         <span>fb-triad:{String(props.triadPosition)}</span>
-        <span>fb-hidden:{String((props.hiddenDegrees as Set<string>).size)}</span>
+        <span>fb-highlighted:{String((props.highlightedDegrees as Set<string>).size)}</span>
         <button onClick={() => props.onNoteClick?.("D♭")}>note-db</button>
       </div>
     );
@@ -222,13 +222,13 @@ describe("App", () => {
     expect(screen.getByText("footer-mode:degree")).toBeTruthy();
 
     fireEvent.click(screen.getByText("footer-auto"));
-    expect(screen.getByText("fb-hidden:0")).toBeTruthy();
+    expect(screen.getByText("fb-highlighted:0")).toBeTruthy();
 
     fireEvent.click(screen.getByText("footer-reset"));
-    expect(screen.getByText("fb-hidden:12")).toBeTruthy();
+    expect(screen.getByText("fb-highlighted:12")).toBeTruthy();
 
     fireEvent.click(screen.getByText("footer-reset"));
-    expect(screen.getByText("fb-hidden:0")).toBeTruthy();
+    expect(screen.getByText("fb-highlighted:0")).toBeTruthy();
 
     fireEvent.click(screen.getByText("scale-toggle"));
     fireEvent.click(screen.getByText("chord-toggle"));
@@ -237,7 +237,9 @@ describe("App", () => {
     fireEvent.click(screen.getByText("footer-auto"));
 
     expect(normalFretboardState.latest).toBeTruthy();
-    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect((normalFretboardState.latest!.highlightedDegrees as Set<string>).size).toBeGreaterThan(
+      0,
+    );
   });
 
   it("度数チップをトグルできる", () => {
@@ -245,10 +247,10 @@ describe("App", () => {
 
     fireEvent.click(screen.getByText("header-degree"));
     fireEvent.click(screen.getByText("footer-toggle-p1"));
-    expect(screen.getByText("fb-hidden:1")).toBeTruthy();
+    expect(screen.getByText("fb-highlighted:1")).toBeTruthy();
 
     fireEvent.click(screen.getByText("footer-toggle-p1"));
-    expect(screen.getByText("fb-hidden:0")).toBeTruthy();
+    expect(screen.getByText("fb-highlighted:0")).toBeTruthy();
 
     fireEvent.click(screen.getByText("header-note"));
     expect(screen.getByText("footer-mode:note")).toBeTruthy();
@@ -283,12 +285,16 @@ describe("App", () => {
     fireEvent.click(screen.getByText("chord-toggle"));
     fireEvent.click(screen.getByText("footer-auto"));
     expect(normalFretboardState.latest).toBeTruthy();
-    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect((normalFretboardState.latest!.highlightedDegrees as Set<string>).size).toBeGreaterThan(
+      0,
+    );
 
     fireEvent.click(screen.getByText("footer-reset"));
     fireEvent.click(screen.getByText("mode-power"));
     fireEvent.click(screen.getByText("footer-auto"));
-    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect((normalFretboardState.latest!.highlightedDegrees as Set<string>).size).toBeGreaterThan(
+      0,
+    );
   });
 
   it("CAGED表示のみでも自動絞り込みできる", () => {
@@ -299,7 +305,9 @@ describe("App", () => {
     fireEvent.click(screen.getByText("footer-auto"));
 
     expect(normalFretboardState.latest).toBeTruthy();
-    expect((normalFretboardState.latest!.hiddenDegrees as Set<string>).size).toBeGreaterThan(0);
+    expect((normalFretboardState.latest!.highlightedDegrees as Set<string>).size).toBeGreaterThan(
+      0,
+    );
   });
 
   it("クイズ中にルートを変えると問題も更新される", () => {

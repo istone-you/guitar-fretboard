@@ -144,8 +144,13 @@ export default function App() {
     setHighlightedOverlayNotes(new Set(notes));
   };
 
-  const { hiddenDegrees, handleAutoFilter, toggleDegree, resetHiddenDegrees, hideAllDegrees } =
-    useDegreeFilter();
+  const {
+    highlightedDegrees,
+    handleAutoFilter,
+    toggleDegree,
+    resetHighlightedDegrees,
+    highlightAllDegrees,
+  } = useDegreeFilter();
   const {
     quizMode,
     quizType,
@@ -303,7 +308,7 @@ export default function App() {
             diatonicDegree={diatonicDegree}
             onNoteClick={quizRootChangeEnabled ? handleNoteClick : () => {}}
             highlightedNotes={highlightedOverlayNotes}
-            hiddenDegrees={hiddenDegrees}
+            highlightedDegrees={highlightedDegrees}
             quizModeActive
             quizCell={
               quizQuestion && quizType === "choice" && quizMode !== "chord" && quizMode !== "scale"
@@ -345,7 +350,7 @@ export default function App() {
             diatonicDegree={diatonicDegree}
             onNoteClick={handleNoteClick}
             highlightedNotes={highlightedOverlayNotes}
-            hiddenDegrees={hiddenDegrees}
+            highlightedDegrees={highlightedDegrees}
           />
         )}
         {showQuiz && quizQuestion && (
@@ -397,7 +402,7 @@ export default function App() {
           allNotes={allNotes}
           overlayNotes={overlayNotes}
           highlightedOverlayNotes={highlightedOverlayNotes}
-          hiddenDegrees={hiddenDegrees}
+          highlightedDegrees={highlightedDegrees}
           onAutoFilter={() =>
             handleAutoFilter({
               rootNote,
@@ -411,8 +416,8 @@ export default function App() {
               chordType,
             })
           }
-          onResetOrHideAll={() =>
-            hiddenDegrees.size > 0 ? resetHiddenDegrees() : hideAllDegrees()
+          onResetOrHighlightAll={() =>
+            highlightedDegrees.size > 0 ? resetHighlightedDegrees() : highlightAllDegrees()
           }
           onSetOverlayNoteHighlights={handleSetOverlayNoteHighlights}
           onToggleOverlayNoteHighlight={handleToggleOverlayNoteHighlight}

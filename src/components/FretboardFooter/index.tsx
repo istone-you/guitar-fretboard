@@ -9,28 +9,60 @@ interface FretboardFooterProps {
   allNotes: string[];
   overlayNotes: string[];
   highlightedOverlayNotes: Set<string>;
-  hiddenDegrees: Set<string>;
+  highlightedDegrees: Set<string>;
   onAutoFilter: () => void;
-  onResetOrHideAll: () => void;
+  onResetOrHighlightAll: () => void;
   onSetOverlayNoteHighlights: (notes: string[]) => void;
   onToggleOverlayNoteHighlight: (note: string) => void;
   onToggleDegree: (name: string) => void;
 }
 
 const DEGREE_CHIPS = [
-  ["P1", "#ef4444"],
-  ["m2", "#ec4899"],
-  ["M2", "#84cc16"],
-  ["m3", "#a855f7"],
-  ["M3", "#22c55e"],
-  ["P4", "#06b6d4"],
-  ["b5", "#6b7280"],
-  ["P5", "#3b82f6"],
-  ["m6", "#8b5cf6"],
-  ["M6", "#10b981"],
-  ["m7", "#f97316"],
-  ["M7", "#f59e0b"],
+  "P1",
+  "m2",
+  "M2",
+  "m3",
+  "M3",
+  "P4",
+  "b5",
+  "P5",
+  "m6",
+  "M6",
+  "m7",
+  "M7",
 ] as const;
+
+interface FilterChipGroupProps {
+  theme: Theme;
+  items: string[];
+  activeItems: Set<string>;
+  onToggle: (value: string) => void;
+}
+
+function FilterChipGroup({ theme, items, activeItems, onToggle }: FilterChipGroupProps) {
+  return (
+    <div className="flex min-h-8 flex-wrap justify-center gap-2">
+      {items.map((item) => (
+        <button
+          key={item}
+          type="button"
+          onClick={() => onToggle(item)}
+          className={`rounded-full border px-3 py-1 text-xs font-medium ${
+            activeItems.has(item)
+              ? theme === "dark"
+                ? "border-sky-600 bg-sky-600 text-white"
+                : "border-sky-500 bg-sky-500 text-white"
+              : theme === "dark"
+                ? "border-gray-700 bg-gray-800 text-gray-200"
+                : "border-stone-300 bg-stone-50 text-stone-700"
+          }`}
+        >
+          {item}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function FretboardFooter({
   theme,
@@ -39,9 +71,9 @@ export default function FretboardFooter({
   allNotes,
   overlayNotes,
   highlightedOverlayNotes,
-  hiddenDegrees,
+  highlightedDegrees,
   onAutoFilter,
-  onResetOrHideAll,
+  onResetOrHighlightAll,
   onSetOverlayNoteHighlights,
   onToggleOverlayNoteHighlight,
   onToggleDegree,
@@ -87,26 +119,12 @@ export default function FretboardFooter({
               {hasHighlightedNotes ? t("noteFilter.reset") : t("noteFilter.highlightAll")}
             </button>
           </div>
-          <div className="flex min-h-8 flex-wrap justify-center gap-2">
-            {allNotes.map((note) => (
-              <button
-                key={note}
-                type="button"
-                onClick={() => onToggleOverlayNoteHighlight(note)}
-                className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                  highlightedOverlayNotes.has(note)
-                    ? theme === "dark"
-                      ? "border-sky-600 bg-sky-600 text-white"
-                      : "border-sky-500 bg-sky-500 text-white"
-                    : theme === "dark"
-                      ? "border-gray-700 bg-gray-800 text-gray-200"
-                      : "border-stone-300 bg-stone-50 text-stone-700"
-                }`}
-              >
-                {note}
-              </button>
-            ))}
-          </div>
+          <FilterChipGroup
+            theme={theme}
+            items={allNotes}
+            activeItems={highlightedOverlayNotes}
+            onToggle={onToggleOverlayNoteHighlight}
+          />
         </>
       )}
 
@@ -128,36 +146,24 @@ export default function FretboardFooter({
               {t("degreeFilter.filter")}
             </button>
             <button
-              onClick={onResetOrHideAll}
+              onClick={onResetOrHighlightAll}
               className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
                 theme === "dark"
                   ? "border-sky-600 text-sky-400 hover:bg-sky-600/20"
                   : "border-sky-400 text-sky-600 hover:bg-sky-50"
               }`}
             >
-              {hiddenDegrees.size > 0 ? t("degreeFilter.reset") : t("degreeFilter.hideAll")}
+              {highlightedDegrees.size > 0
+                ? t("degreeFilter.reset")
+                : t("degreeFilter.highlightAll")}
             </button>
           </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            {DEGREE_CHIPS.map(([name, color]) => {
-              const hidden = hiddenDegrees.has(name);
-              return (
-                <div
-                  key={name}
-                  className="flex cursor-pointer select-none items-center gap-1"
-                  style={{ opacity: hidden ? 0.3 : 1 }}
-                  onClick={() => onToggleDegree(name)}
-                >
-                  <div className="h-6 w-6 rounded-full" style={{ backgroundColor: color }} />
-                  <span
-                    className={`text-xs ${theme === "dark" ? "text-gray-300" : "text-stone-700"}`}
-                  >
-                    {name}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          <FilterChipGroup
+            theme={theme}
+            items={[...DEGREE_CHIPS]}
+            activeItems={highlightedDegrees.size === 0 ? new Set(DEGREE_CHIPS) : highlightedDegrees}
+            onToggle={onToggleDegree}
+          />
         </>
       )}
     </div>

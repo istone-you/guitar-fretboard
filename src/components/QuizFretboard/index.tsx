@@ -8,7 +8,7 @@ export default function QuizFretboard(props: FretboardProps) {
       {...props}
       showScale={false}
       showCaged={false}
-      hiddenDegrees={new Set()}
+      highlightedDegrees={new Set()}
       suppressRegularDisplay
       hideChordNoteLabels={props.showChord && !props.quizAnswerMode}
       chordOverlayTone={props.showChord && !props.quizAnswerMode ? "indigo" : "amber"}

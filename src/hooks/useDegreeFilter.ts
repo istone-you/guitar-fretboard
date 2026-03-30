@@ -30,7 +30,7 @@ interface AutoFilterParams {
 }
 
 export function useDegreeFilter() {
-  const [hiddenDegrees, setHiddenDegrees] = useState(new Set<string>());
+  const [highlightedDegrees, setHighlightedDegrees] = useState(new Set<string>());
 
   const handleAutoFilter = ({
     rootNote,
@@ -56,15 +56,15 @@ export function useDegreeFilter() {
     });
 
     if (active.size === 0) {
-      setHiddenDegrees(new Set());
+      setHighlightedDegrees(new Set());
       return;
     }
 
-    setHiddenDegrees(new Set(DEGREE_BY_SEMITONE.filter((_, i) => !active.has(i))));
+    setHighlightedDegrees(new Set(DEGREE_BY_SEMITONE.filter((_, i) => active.has(i))));
   };
 
   const toggleDegree = (name: string) => {
-    setHiddenDegrees((prev) => {
+    setHighlightedDegrees((prev) => {
       const next = new Set(prev);
       if (next.has(name)) {
         next.delete(name);
@@ -75,16 +75,16 @@ export function useDegreeFilter() {
     });
   };
 
-  const resetHiddenDegrees = () => setHiddenDegrees(new Set());
-  const hideAllDegrees = () => setHiddenDegrees(new Set(DEGREE_BY_SEMITONE));
+  const resetHighlightedDegrees = () => setHighlightedDegrees(new Set());
+  const highlightAllDegrees = () => setHighlightedDegrees(new Set(DEGREE_BY_SEMITONE));
 
   return {
-    hiddenDegrees,
+    highlightedDegrees,
     degreeNames: DEGREE_BY_SEMITONE,
-    setHiddenDegrees,
+    setHighlightedDegrees,
     handleAutoFilter,
     toggleDegree,
-    resetHiddenDegrees,
-    hideAllDegrees,
+    resetHighlightedDegrees,
+    highlightAllDegrees,
   };
 }

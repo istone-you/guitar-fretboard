@@ -278,25 +278,25 @@ describe("ui/Fretboard", () => {
     });
   });
 
-  it("hiddenDegrees に含まれる度数は非表示になる", () => {
+  it("highlightedDegrees に含まれない度数は薄く表示される", () => {
     render(
       <Fretboard
         {...makeProps({
           baseLabelMode: "degree" as BaseLabelMode,
-          hiddenDegrees: new Set(["P1"]),
+          highlightedDegrees: new Set(["P5"]),
         })}
       />,
     );
-    expect(screen.queryAllByText("P1")).toHaveLength(0);
+    expect(screen.getAllByText("P1").length).toBeGreaterThan(0);
     expect(screen.getAllByText("P5").length).toBeGreaterThan(0);
   });
 
-  it("音名モードでは hiddenDegrees があっても音名表示は消えない", () => {
+  it("音名モードでは highlightedDegrees があっても音名表示は消えない", () => {
     render(
       <Fretboard
         {...makeProps({
           baseLabelMode: "note" as BaseLabelMode,
-          hiddenDegrees: new Set(["P1"]),
+          highlightedDegrees: new Set(["P5"]),
         })}
       />,
     );

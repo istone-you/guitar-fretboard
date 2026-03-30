@@ -47,7 +47,7 @@
     "filter": "抽出",
     "filterTitle": "表示中のオーバーレイに合わせて絞り込む",
     "reset": "リセット",
-    "hideAll": "全非表示"
+    "highlightAll": "全強調"
   },
   "noteFilter": {
     "title": "音名",
